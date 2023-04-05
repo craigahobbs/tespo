@@ -72,6 +72,23 @@ async function main()
     chartHeight = 210
     fontSize = getDocumentFontSize()
 
+    # Controls
+    chargeRatio = objectGet(system, 'chargeRatio')
+    dischargeRatio = objectGet(system, 'dischargeRatio')
+    ratioDelta = 0.001
+    markdownPrint( \
+        '', \
+        '**Charge Ratio:** ' + numberToFixed(chargeRatio, 3) + '&nbsp;&nbsp;', \
+        '[Up](#var.vCharge=' + numberToFixed(chargeRatio + ratioDelta, 3) + '&var.vDischarge=' + numberToFixed(dischargeRatio, 3) + ') |', \
+        '[Down](#var.vCharge=' + numberToFixed(chargeRatio - ratioDelta, 3) + '&var.vDischarge=' + numberToFixed(dischargeRatio, 3) + ')', \
+        '', \
+        '**Discharge Ratio:** ' + numberToFixed(dischargeRatio, 3) + '&nbsp;&nbsp;', \
+        '[Up](#var.vCharge=' + numberToFixed(chargeRatio, 3) + '&var.vDischarge=' + numberToFixed(dischargeRatio + ratioDelta, 3) + ') |', \
+        '[Down](#var.vCharge=' + numberToFixed(chargeRatio, 3) + '&var.vDischarge=' + numberToFixed(dischargeRatio - ratioDelta, 3) + ')', \
+        '', \
+        '---' \
+    )
+
     # Difference
     markdownPrint( \
         '', \
@@ -83,7 +100,9 @@ async function main()
         '**Euclidian Distance:** \\', \
         '&nbsp;&nbsp;&nbsp;&nbsp;**Powerwall:** ' + numberToFixed(powerwallEuclidianDistance) + ' \\', \
         '&nbsp;&nbsp;&nbsp;&nbsp;**Grid:** ' + numberToFixed(gridEuclidianDistance) + ' \\', \
-        '&nbsp;&nbsp;&nbsp;&nbsp;**Battery:** ' + numberToFixed(batteryEuclidianDistance) \
+        '&nbsp;&nbsp;&nbsp;&nbsp;**Battery:** ' + numberToFixed(batteryEuclidianDistance), \
+        '', \
+        '---' \
     )
     dataLineChart(differences, objectNew( \
         'title', 'Simulated Powerwall/Grid Difference', \
