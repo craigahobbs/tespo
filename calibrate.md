@@ -8,6 +8,14 @@ async function main()
     # Load the system specifications
     system = teslaValidateSystem(fetch('data/system.json'))
 
+    # System variable-overrides
+    if vCharge then
+        objectSet(system, 'chargeRatio', vCharge)
+    endif
+    if vDischarge then
+        objectSet(system, 'dischargeRatio', vDischarge)
+    endif
+
     # Load the data
     data = dataParseCSV(fetch('data-raw/2023-03-25.csv', null, true))
 
