@@ -5,21 +5,24 @@ include 'tesla.mds'
 
 
 async function main()
-    # Load the system specifications
-    system = teslaValidateSystem(fetch('data/system.json'))
-
     # System variable-overrides
-    if vCharge then
-        objectSet(system, 'chargeRatio', vCharge)
-    endif
-    if vDischarge then
-        objectSet(system, 'dischargeRatio', vDischarge)
-    endif
+    batteryCapacity = if(vBatteryCapacity, mathMax(1, vBatteryCapacity), 40.5)
+    backupPercent = if(vBackupPercent, mathMax(0, vBackupPercent), 20)
+    chargeRatio = if(vChargeRatio, mathMax(0.1, vChargeRatio), 0.9)
+    dischargeRatio = if(vDischargeRatio, mathMax(0.1, vDischargeRatio), 0.9)
+    precision = if(vPrecision, mathMax(1, mathRound(vPrecision)), 3)
+    ratioDelta = 0.1 ** precision
 
     # Load the data
     data = dataParseCSV(fetch('data-raw/2023-03-25.csv', null, true))
 
     # Simulate the data
+    system = objectNew( \
+        'usableEnergy', batteryCapacity, \
+        'backupPercent', backupPercent, \
+        'chargeRatio', chargeRatio, \
+        'dischargeRatio', dischargeRatio \
+    )
     simulated = teslaSimulate(system, data)
 
     # Compute the differences
@@ -73,18 +76,23 @@ async function main()
     fontSize = getDocumentFontSize()
 
     # Controls
-    chargeRatio = objectGet(system, 'chargeRatio')
-    dischargeRatio = objectGet(system, 'dischargeRatio')
-    ratioDelta = 0.001
     markdownPrint( \
         '', \
-        '**Charge Ratio:** ' + numberToFixed(chargeRatio, 3) + '&nbsp;&nbsp;', \
-        '[Up](#var.vCharge=' + numberToFixed(chargeRatio + ratioDelta, 3) + '&var.vDischarge=' + numberToFixed(dischargeRatio, 3) + ') |', \
-        '[Down](#var.vCharge=' + numberToFixed(chargeRatio - ratioDelta, 3) + '&var.vDischarge=' + numberToFixed(dischargeRatio, 3) + ')', \
-        '', \
-        '**Discharge Ratio:** ' + numberToFixed(dischargeRatio, 3) + '&nbsp;&nbsp;', \
-        '[Up](#var.vCharge=' + numberToFixed(chargeRatio, 3) + '&var.vDischarge=' + numberToFixed(dischargeRatio + ratioDelta, 3) + ') |', \
-        '[Down](#var.vCharge=' + numberToFixed(chargeRatio, 3) + '&var.vDischarge=' + numberToFixed(dischargeRatio - ratioDelta, 3) + ')', \
+        '**Battery Capacity:** ' + numberToFixed(batteryCapacity, precision) + '&nbsp;&nbsp;', \
+        link('Up', batteryCapacity + ratioDelta, backupPercent, chargeRatio, dischargeRatio, precision) + ' |', \
+        link('Down', mathMax(batteryCapacity - ratioDelta, 1), backupPercent, mathMax(chargeRatio, ratioDelta), dischargeRatio, precision) + ' \\', \
+        '**Backup Percent:** ' + numberToFixed(backupPercent, precision) + '&nbsp;&nbsp;', \
+        link('Up', batteryCapacity, mathMin(backupPercent + 1, 100), chargeRatio, dischargeRatio, precision) + ' |', \
+        link('Down', batteryCapacity, mathMax(backupPercent - 1, 0), mathMax(chargeRatio, ratioDelta), dischargeRatio, precision) + ' \\', \
+        '**Charge Ratio:** ' + numberToFixed(chargeRatio, precision) + '&nbsp;&nbsp;', \
+        link('Up', batteryCapacity, backupPercent, chargeRatio + ratioDelta, dischargeRatio, precision) + ' |', \
+        link('Down', batteryCapacity, backupPercent, mathMax(chargeRatio - ratioDelta, ratioDelta), dischargeRatio, precision) + ' \\', \
+        '**Discharge Ratio:** ' + numberToFixed(dischargeRatio, precision) + '&nbsp;&nbsp;', \
+        link('Up', batteryCapacity, backupPercent, chargeRatio, dischargeRatio + ratioDelta, precision) + ' |', \
+        link('Down', batteryCapacity, backupPercent, chargeRatio, mathMax(dischargeRatio - ratioDelta, ratioDelta), precision) + ' \\', \
+        '**Precision:** ' + precision + '&nbsp;&nbsp;', \
+        link('Up', batteryCapacity, backupPercent, chargeRatio, dischargeRatio, precision + 1) + ' |', \
+        link('Down', batteryCapacity, backupPercent, chargeRatio, dischargeRatio, mathMax(1, precision - 1)), \
         '', \
         '---' \
     )
@@ -93,14 +101,14 @@ async function main()
     markdownPrint( \
         '', \
         '**Manhattan Distance:** \\', \
-        '&nbsp;&nbsp;&nbsp;&nbsp;**Powerwall:** ' + numberToFixed(powerwallManhattanDistance) + ' \\', \
-        '&nbsp;&nbsp;&nbsp;&nbsp;**Grid:** ' + numberToFixed(gridManhattanDistance) + ' \\', \
-        '&nbsp;&nbsp;&nbsp;&nbsp;**Battery:** ' + numberToFixed(batteryManhattanDistance), \
+        '&nbsp;&nbsp;&nbsp;&nbsp;**Powerwall:** ' + numberToFixed(powerwallManhattanDistance, precision) + ' \\', \
+        '&nbsp;&nbsp;&nbsp;&nbsp;**Grid:** ' + numberToFixed(gridManhattanDistance, precision) + ' \\', \
+        '&nbsp;&nbsp;&nbsp;&nbsp;**Battery:** ' + numberToFixed(batteryManhattanDistance, precision), \
         '', \
         '**Euclidian Distance:** \\', \
-        '&nbsp;&nbsp;&nbsp;&nbsp;**Powerwall:** ' + numberToFixed(powerwallEuclidianDistance) + ' \\', \
-        '&nbsp;&nbsp;&nbsp;&nbsp;**Grid:** ' + numberToFixed(gridEuclidianDistance) + ' \\', \
-        '&nbsp;&nbsp;&nbsp;&nbsp;**Battery:** ' + numberToFixed(batteryEuclidianDistance), \
+        '&nbsp;&nbsp;&nbsp;&nbsp;**Powerwall:** ' + numberToFixed(powerwallEuclidianDistance, precision) + ' \\', \
+        '&nbsp;&nbsp;&nbsp;&nbsp;**Grid:** ' + numberToFixed(gridEuclidianDistance, precision) + ' \\', \
+        '&nbsp;&nbsp;&nbsp;&nbsp;**Battery:** ' + numberToFixed(batteryEuclidianDistance, precision), \
         '', \
         '---' \
     )
@@ -153,7 +161,6 @@ async function main()
     markdownPrint('', '---')
 
     # Battery
-    backupPercent = objectGet(system, 'backupPercent')
     dataLineChart(data, objectNew( \
         'title', 'Battery', \
         'width', chartWidth - mathFloor(10 * fontSize), \
@@ -188,6 +195,16 @@ async function main()
             teslaFieldBatteryPercent + '2' \
         ) \
     ))
+endfunction
+
+
+function link(text, batteryCapacity, backupPercent, chargeRatio, dischargeRatio, precision)
+    return '[' + text + '](#' + \
+        'var.vBatteryCapacity=' + numberToFixed(batteryCapacity, precision) + \
+        '&var.vBackupPercent=' + numberToFixed(backupPercent, precision) + \
+        '&var.vChargeRatio=' + numberToFixed(chargeRatio, precision) + \
+        '&var.vDischargeRatio=' + numberToFixed(dischargeRatio, precision) + \
+        '&var.vPrecision=' + precision + ')'
 endfunction
 
 
