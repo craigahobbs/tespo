@@ -1,6 +1,6 @@
 {
     "usableEnergy": 40.5,
     "backupPercent": 20,
-    "chargeRatio": 0.9,
-    "dischargeRatio": 0.9
+    "chargeRatio": 1.489,
+    "dischargeRatio": 0.575
 }
