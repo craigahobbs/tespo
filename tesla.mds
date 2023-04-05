@@ -1,0 +1,150 @@
+# Licensed under the MIT License
+# https://github.com/craigahobbs/craigahobbs.github.io/blob/main/LICENSE
+
+
+# Simulate a Tesla Powerwall system
+function teslaSimulate(system, data)
+    # Powerwall specifications
+    usableEnergyKwh = objectGet(system, 'usableEnergy')
+    backupPercent = objectGet(system, 'backupPercent')
+    chargeRatio = objectGet(system, 'chargeRatio')
+    dischargeRatio = objectGet(system, 'dischargeRatio')
+
+    # Compute the initial battery percentage
+    teslaFillBatteryPercent(data)
+    row0 = arrayGet(data, 0)
+    row1 = arrayGet(data, 1)
+    batteryPercent = 2 * objectGet(row0, teslaFieldBatteryPercent) - objectGet(row1, teslaFieldBatteryPercent)
+
+    # Compute the row duration
+    durationHours = (objectGet(row1, teslaFieldDate) - objectGet(row0, teslaFieldDate)) / (60 * 60 * 1000)
+
+    # Simulate the system
+    simulated = arrayNew()
+    foreach row in data do
+        # Get the home and solar energy
+        homeKw = objectGet(row, teslaFieldHome)
+        solarKw = objectGet(row, teslaFieldSolar)
+
+        # Compute battery power and backup power
+        batteryKwh = batteryPercent * usableEnergyKwh / 100
+        backupKwh = backupPercent * usableEnergyKwh / 100
+
+        # Are we generating more solar energy than we're currently using?
+        powerwallKw = homeKw - solarKw
+        if solarKw > homeKw then
+            # Charge the battery - did we exceed the battery's capacity?
+            batteryNewKwh = batteryKwh + (solarKw - homeKw) * chargeRatio * durationHours
+            if batteryNewKwh > usableEnergyKwh then
+                # Battery is full - output excess energy to the grid
+                batteryNewKwh = usableEnergyKwh
+                powerwallKw = ((batteryKwh - usableEnergyKwh) / chargeRatio) / durationHours
+                gridKw = -solarKw - powerwallKw
+            else then
+                # Battery is charging
+                gridKw = 0
+            endif
+
+        # No, we are using more energy than we are generating
+        else then
+            # Discharge the battery - did we run out of battery power?
+            batteryNewKwh = batteryKwh - ((homeKw - solarKw) / dischargeRatio) * durationHours
+            if batteryNewKwh < backupKwh then
+                # Battery is empty - pull from the grid
+                batteryNewKwh = backupKwh
+                powerwallKw = ((batteryKwh - backupKwh) * dischargeRatio) / durationHours
+                gridKw = homeKw - powerwallKw
+            else then
+                # Battery is discharging
+                gridKw = 0
+            endif
+        endif
+
+        # Update the battery percentage
+        batteryPercent = 100 * batteryNewKwh / usableEnergyKwh
+
+        # Push the simulated row
+        arrayPush(simulated, objectNew( \
+            teslaFieldDate, objectGet(row, teslaFieldDate), \
+            teslaFieldHome, homeKw, \
+            teslaFieldSolar, solarKw, \
+            teslaFieldPowerwall, powerwallKw, \
+            teslaFieldGrid, gridKw, \
+            teslaFieldBatteryPercent, batteryPercent \
+        ))
+    endforeach
+
+    return simulated
+endfunction
+
+
+# Helper to fill battery percentage holes
+function teslaFillBatteryPercent(data)
+    ixPrev = null
+    foreach row, ixRow in data do
+        # Does this row have a battery percent value?
+        batteryPercent = objectGet(row, teslaFieldBatteryPercent)
+        if batteryPercent != null then
+            # Set interpolated battery percent values between non-null values
+            if ixPrev != null then
+                prevPercent = objectGet(arrayGet(data, ixPrev), teslaFieldBatteryPercent)
+                ixHole = ixPrev + 1
+                while ixHole < ixRow do
+                    holePercent = prevPercent + ((ixHole - ixPrev) / (ixRow - ixPrev)) * (batteryPercent - prevPercent)
+                    objectSet(arrayGet(data, ixHole), teslaFieldBatteryPercent, holePercent)
+                    ixHole = ixHole + 1
+                endwhile
+            endif
+
+            # Set the previous non-null battery percent row
+            ixPrev = ixRow
+        endif
+    endforeach
+
+    # Any trailing nulls? If so, set to the previous value
+    if ixPrev != null then
+        prevPercent = objectGet(arrayGet(data, ixPrev), teslaFieldBatteryPercent)
+        dataLength = arrayLength(data)
+        ixHole = ixPrev + 1
+        while ixHole < dataLength do
+            objectSet(arrayGet(data, ixHole), teslaFieldBatteryPercent, prevPercent)
+            ixHole = ixHole + 1
+        endwhile
+    endif
+endfunction
+
+
+# Validate a Tesla Powerwall system specification
+function teslaValidateSystem(system)
+    return schemaValidate(teslaTypes, 'PowerwallSystem', system)
+endfunction
+
+
+# Tesla Powerwall system specification
+teslaTypes = schemaParse( \
+    '# Tesla Energy system specification', \
+    'struct PowerwallSystem', \
+    '', \
+    '    # The total Powerwall usable energy (kWh)', \
+    '    float(> 0) usableEnergy', \
+    '', \
+    '    # The self-powerered minimum battery percentage', \
+    '    int(> 0, <= 100) backupPercent', \
+    '', \
+    '    # The Powerwall charge ratio, the ratio of the power provided to charge the battery to', \
+    '    # the amount of power added the battery.', \
+    '    float(> 0) chargeRatio', \
+    '', \
+    '    # The Powerwall discharge ratio, the ratio of the power pulled from the battery to the', \
+    '    # amount of power removed from the battery.', \
+    '    float(> 0) dischargeRatio' \
+)
+
+
+# Tesla Energy data field names
+teslaFieldBatteryPercent = 'Energy Remaining (%)'
+teslaFieldDate = 'Date time'
+teslaFieldGrid = 'Grid (kW)'
+teslaFieldHome = 'Home (kW)'
+teslaFieldPowerwall = 'Powerwall (kW)'
+teslaFieldSolar = 'Solar (kW)'
