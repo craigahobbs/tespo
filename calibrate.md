@@ -100,30 +100,28 @@ async function calibrateMain()
         '[Down](' + calibrateURL(objectNew('precision', mathMax(precision - 1, 1)), scenario) + ') \\', \
         '[Reset](' + calibrateURL(objectNew('scenarioURL', vScenarioURL), null) + ')', \
         '', \
+        '## Error', \
+        '', \
+        '**Powerwall:**&nbsp;&nbsp;' + numberToFixed(powerwallManhattanDistance, precision), \
+        '&nbsp;/&nbsp;' + numberToFixed(powerwallEuclidianDistance, precision) + ' \\', \
+        '**Grid:**&nbsp;&nbsp;' + numberToFixed(gridManhattanDistance, precision), \
+        '&nbsp;/&nbsp;' + numberToFixed(gridEuclidianDistance, precision) + ' \\', \
+        '**Battery:**&nbsp;&nbsp;' + numberToFixed(batteryManhattanDistance, precision), \
+        '&nbsp;/&nbsp;' + numberToFixed(batteryEuclidianDistance, precision), \
+        '', \
+        'Note: Error values reported as Manhattan distance / Euclidian distance.', \
+        '', \
         '---' \
     )
 
-    # Difference
-    markdownPrint( \
-        '', \
-        '**Manhattan Distance:** \\', \
-        '&nbsp;&nbsp;&nbsp;&nbsp;**Powerwall:** ' + numberToFixed(powerwallManhattanDistance, precision) + ' \\', \
-        '&nbsp;&nbsp;&nbsp;&nbsp;**Grid:** ' + numberToFixed(gridManhattanDistance, precision) + ' \\', \
-        '&nbsp;&nbsp;&nbsp;&nbsp;**Battery:** ' + numberToFixed(batteryManhattanDistance, precision), \
-        '', \
-        '**Euclidian Distance:** \\', \
-        '&nbsp;&nbsp;&nbsp;&nbsp;**Powerwall:** ' + numberToFixed(powerwallEuclidianDistance, precision) + ' \\', \
-        '&nbsp;&nbsp;&nbsp;&nbsp;**Grid:** ' + numberToFixed(gridEuclidianDistance, precision) + ' \\', \
-        '&nbsp;&nbsp;&nbsp;&nbsp;**Battery:** ' + numberToFixed(batteryEuclidianDistance, precision), \
-        '', \
-        '---' \
-    )
+    # Difference data
     dataLineChart(differences, objectNew( \
         'title', 'Simulated Powerwall/Grid Difference', \
         'width', chartWidth - mathFloor(2.5 * fontSize), \
         'height', chartHeight, \
         'x', teslaFieldDate, \
         'y', arrayNew(teslaFieldPowerwall, teslaFieldGrid), \
+        'yTicks', objectNew('count', 2), \
         'yLines', arrayNew(objectNew('value', 0)) \
     ))
     dataLineChart(differences, objectNew( \
@@ -132,6 +130,7 @@ async function calibrateMain()
         'height', chartHeight, \
         'x', teslaFieldDate, \
         'y', arrayNew(teslaFieldBatteryPercent), \
+        'yTicks', objectNew('count', 2), \
         'yLines', arrayNew(objectNew('value', 0)) \
     ))
     markdownPrint('', '---')
@@ -143,7 +142,7 @@ async function calibrateMain()
         'height', chartHeight, \
         'x', teslaFieldDate, \
         'y', arrayNew(teslaFieldHome, teslaFieldSolar), \
-        'yTicks', objectNew('start', 0, 'end', 12) \
+        'yTicks', objectNew('start', 0) \
     ))
     markdownPrint('', '---')
 
@@ -154,7 +153,8 @@ async function calibrateMain()
         'height', chartHeight, \
         'x', teslaFieldDate, \
         'y', arrayNew(teslaFieldPowerwall, teslaFieldGrid), \
-        'yTicks', objectNew('start', -10, 'end', 10) \
+        'yTicks', objectNew('count', 2), \
+        'yLines', arrayNew(objectNew('value', 0)) \
     ))
     dataLineChart(simulated, objectNew( \
         'title', 'Simulated Powerwall/Grid', \
@@ -162,7 +162,8 @@ async function calibrateMain()
         'height', chartHeight, \
         'x', teslaFieldDate, \
         'y', arrayNew(teslaFieldPowerwall, teslaFieldGrid), \
-        'yTicks', objectNew('start', -10, 'end', 10) \
+        'yTicks', objectNew('count', 2), \
+        'yLines', arrayNew(objectNew('value', 0)) \
     ))
     markdownPrint('', '---')
 
