@@ -1,5 +1,3 @@
-# TESPO Simulation Calibration
-
 ~~~ markdown-script
 # Licensed under the MIT License
 # https://github.com/craigahobbs/tespo/blob/main/LICENSE
@@ -8,6 +6,10 @@ include 'tesla.mds'
 
 
 async function calibrateMain()
+    # Set the default title
+    title = 'TESPO Simulation Scenario Calibration'
+    setDocumentTitle(title)
+
     # Load the scenario
     scenario = if(vScenarioURL != null, teslaLoadPowerwallScenario(vScenarioURL))
     if scenario == null then
@@ -15,6 +17,7 @@ async function calibrateMain()
         return
     endif
     data = objectGet(scenario, 'data')
+    scenarioName = objectGet(scenario, 'name')
 
     # Variable scenario overrides
     batteryCapacity = if(vBatteryCapacity, mathMax(1, vBatteryCapacity), objectGet(scenario, 'batteryCapacity'))
@@ -82,9 +85,11 @@ async function calibrateMain()
     fontSize = getDocumentFontSize()
 
     # Controls
+    setDocumentTitle(scenarioName)
     markdownPrint( \
+        '# ' + title, \
         '', \
-        '**Scenario:** ' + markdownEscape(objectGet(scenario, 'name')), \
+        '**Scenario:** ' + markdownEscape(scenarioName), \
         '', \
         '**Battery Capacity:** ' + numberToFixed(batteryCapacity, 1) + '&nbsp;&nbsp;', \
         '[Up](' + calibrateURL(objectNew('batteryCapacity', mathMin(batteryCapacity + 0.5, 100)), scenario) + ')', \
