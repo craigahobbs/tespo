@@ -117,7 +117,7 @@ async function calibrateMain()
     # Difference data
     dataLineChart(differences, objectNew( \
         'title', 'Simulated Powerwall/Grid Difference', \
-        'width', chartWidth - mathFloor(2.5 * fontSize), \
+        'width', chartWidth, \
         'height', chartHeight, \
         'x', teslaFieldDate, \
         'y', arrayNew(teslaFieldPowerwall, teslaFieldGrid), \
@@ -126,7 +126,7 @@ async function calibrateMain()
     ))
     dataLineChart(differences, objectNew( \
         'title', 'Simulated Battery Difference', \
-        'width', chartWidth - mathFloor(2.5 * fontSize), \
+        'width', chartWidth - mathFloor(10 * fontSize), \
         'height', chartHeight, \
         'x', teslaFieldDate, \
         'y', arrayNew(teslaFieldBatteryPercent), \
@@ -148,7 +148,7 @@ async function calibrateMain()
 
     # Powerwall/Grid
     dataLineChart(data, objectNew( \
-        'title', 'Powerwall/Grid', \
+        'title', 'Actual Powerwall/Grid', \
         'width', chartWidth, \
         'height', chartHeight, \
         'x', teslaFieldDate, \
@@ -169,7 +169,7 @@ async function calibrateMain()
 
     # Battery
     dataLineChart(data, objectNew( \
-        'title', 'Battery', \
+        'title', 'Actual Battery', \
         'width', chartWidth - mathFloor(10 * fontSize), \
         'height', chartHeight, \
         'x', teslaFieldDate, \
