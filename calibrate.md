@@ -109,7 +109,7 @@ async function calibrateMain()
         '**Battery:**&nbsp;&nbsp;' + numberToFixed(batteryManhattanDistance, precision), \
         '&nbsp;/&nbsp;' + numberToFixed(batteryEuclidianDistance, precision), \
         '', \
-        'Note: Error values reported as Manhattan distance / Euclidian distance.', \
+        'Note: Error values reported as Manhattan/Euclidian distance.', \
         '', \
         '---' \
     )
