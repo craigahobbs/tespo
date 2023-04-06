@@ -2,16 +2,16 @@
 # https://github.com/craigahobbs/craigahobbs.github.io/blob/main/LICENSE
 
 
-# Simulate a Tesla Powerwall system
-function teslaSimulate(system, data)
+# Simulate a Tesla Powerwall scenario
+function teslaPowerwallSimulate(scenario)
     # Powerwall specifications
-    usableEnergyKwh = objectGet(system, 'usableEnergy')
-    backupPercent = objectGet(system, 'backupPercent')
-    chargeRatio = objectGet(system, 'chargeRatio')
-    dischargeRatio = objectGet(system, 'dischargeRatio')
+    batteryCapacityKwh = objectGet(scenario, 'batteryCapacity')
+    backupPercent = objectGet(scenario, 'backupPercent')
+    chargeRatio = objectGet(scenario, 'chargeRatio')
+    dischargeRatio = objectGet(scenario, 'dischargeRatio')
+    data = objectGet(scenario, 'data')
 
     # Compute the initial battery percentage
-    teslaFillBatteryPercent(data)
     row0 = arrayGet(data, 0)
     row1 = arrayGet(data, 1)
     batteryPercent = 2 * objectGet(row0, teslaFieldBatteryPercent) - objectGet(row1, teslaFieldBatteryPercent)
@@ -19,7 +19,7 @@ function teslaSimulate(system, data)
     # Compute the row duration
     durationHours = (objectGet(row1, teslaFieldDate) - objectGet(row0, teslaFieldDate)) / (60 * 60 * 1000)
 
-    # Simulate the system
+    # Simulate each data row
     simulated = arrayNew()
     foreach row in data do
         # Get the home and solar energy
@@ -27,18 +27,18 @@ function teslaSimulate(system, data)
         solarKw = objectGet(row, teslaFieldSolar)
 
         # Compute battery power and backup power
-        batteryKwh = batteryPercent * usableEnergyKwh / 100
-        backupKwh = backupPercent * usableEnergyKwh / 100
+        batteryKwh = batteryPercent * batteryCapacityKwh / 100
+        backupKwh = backupPercent * batteryCapacityKwh / 100
 
         # Are we generating more solar energy than we're currently using?
         powerwallKw = homeKw - solarKw
         if solarKw > homeKw then
             # Charge the battery - did we exceed the battery's capacity?
             batteryNewKwh = batteryKwh + (solarKw - homeKw) * chargeRatio * durationHours
-            if batteryNewKwh > usableEnergyKwh then
+            if batteryNewKwh > batteryCapacityKwh then
                 # Battery is full - output excess energy to the grid
-                batteryNewKwh = usableEnergyKwh
-                powerwallKw = ((batteryKwh - usableEnergyKwh) / chargeRatio) / durationHours
+                batteryNewKwh = batteryCapacityKwh
+                powerwallKw = ((batteryKwh - batteryCapacityKwh) / chargeRatio) / durationHours
                 gridKw = -solarKw - powerwallKw
             else then
                 # Battery is charging
@@ -61,7 +61,7 @@ function teslaSimulate(system, data)
         endif
 
         # Update the battery percentage
-        batteryPercent = 100 * batteryNewKwh / usableEnergyKwh
+        batteryPercent = 100 * batteryNewKwh / batteryCapacityKwh
 
         # Push the simulated row
         arrayPush(simulated, objectNew( \
@@ -78,15 +78,36 @@ function teslaSimulate(system, data)
 endfunction
 
 
-# Helper to fill battery percentage holes
-function teslaFillBatteryPercent(data)
+# Load a Tesla Powerwall simulation scenario
+async function teslaLoadPowerwallScenario(scenarioURL)
+    # Load the scenario file
+    scenario = schemaValidate(teslaPowerwallTypes, 'PowerwallScenario', fetch(scenarioURL))
+
+    # Fixup relative data URLs
+    dataURLs = objectGet(scenario, 'dataURLs')
+    scenarioBaseURL = teslaGetBaseURL(scenarioURL)
+    foreach dataURL, ixDataURL in dataURLs do
+        if teslaIsRelativeURL(dataURL) then
+            arraySet(dataURLs, ixDataURL, scenarioBaseURL + dataURL)
+        endif
+    endforeach
+
+    # Load the scenario data files
+    dataCSVs = fetch(dataURLs, null, true)
+    data = arrayNew()
+    foreach dataCSV in dataCSVs do
+        arrayExtend(data, dataParseCSV(dataCSV))
+    endforeach
+    dataSort(data, arrayNew(arrayNew(teslaFieldDate)))
+    objectSet(scenario, 'data', data)
+
+    # Fill-in any battery percentage data holes
     ixPrev = null
     foreach row, ixRow in data do
-        # Does this row have a battery percent value?
         batteryPercent = objectGet(row, teslaFieldBatteryPercent)
         if batteryPercent != null then
-            # Set interpolated battery percent values between non-null values
             if ixPrev != null then
+                # Set interpolated battery percent values between non-null values
                 prevPercent = objectGet(arrayGet(data, ixPrev), teslaFieldBatteryPercent)
                 ixHole = ixPrev + 1
                 while ixHole < ixRow do
@@ -95,8 +116,6 @@ function teslaFillBatteryPercent(data)
                     ixHole = ixHole + 1
                 endwhile
             endif
-
-            # Set the previous non-null battery percent row
             ixPrev = ixRow
         endif
     endforeach
@@ -111,33 +130,47 @@ function teslaFillBatteryPercent(data)
             ixHole = ixHole + 1
         endwhile
     endif
+
+    return scenario
 endfunction
 
 
-# Validate a Tesla Powerwall system specification
-function teslaValidateSystem(system)
-    return schemaValidate(teslaTypes, 'PowerwallSystem', system)
+# Is a URL relative?
+function teslaIsRelativeURL(url)
+    return !regexTest(teslaRegexNotRelativeURL, url)
+endfunction
+
+teslaRegexNotRelativeURL = regexNew('^(?:[a-z]+:|\\/|\\?|#)')
+
+
+# Compute a URL's base
+function teslaGetBaseURL(url)
+    return stringSlice(url, 0, stringLastIndexOf(url, '/') + 1)
 endfunction
 
 
-# Tesla Powerwall system specification
-teslaTypes = schemaParse( \
-    '# Tesla Energy system specification', \
-    'struct PowerwallSystem', \
+# Tesla Powerwall simulation scenario JSON schema
+teslaPowerwallTypes = schemaParse( \
+    '# Tesla Powerwall simulation scenario', \
+    'struct PowerwallScenario', \
     '', \
-    '    # The total Powerwall usable energy (kWh)', \
-    '    float(> 0) usableEnergy', \
+    '    # The scenario name', \
+    '    string(len > 0) name', \
     '', \
-    '    # The self-powerered minimum battery percentage', \
-    '    int(> 0, <= 100) backupPercent', \
+    '    # The Powerwall battery capacity (kWh)', \
+    '    float(> 0) batteryCapacity', \
     '', \
-    '    # The Powerwall charge ratio, the ratio of the power provided to charge the battery to', \
-    '    # the amount of power added the battery.', \
+    '    # The self-powerered minimum battery percentage (%)', \
+    '    int(>= 0, <= 100) backupPercent', \
+    '', \
+    '    # The Powerwall charge ratio - the ratio of battery input power to power stored', \
     '    float(> 0) chargeRatio', \
     '', \
-    '    # The Powerwall discharge ratio, the ratio of the power pulled from the battery to the', \
-    '    # amount of power removed from the battery.', \
-    '    float(> 0) dischargeRatio' \
+    '    # The Powerwall discharge ratio - the ratio of battery output power to power discharged', \
+    '    float(> 0) dischargeRatio', \
+    '', \
+    '    # The list of Tesla app daily energy data URLs', \
+    '    string(len > 0)[len > 0] dataURLs' \
 )
 
 

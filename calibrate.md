@@ -4,26 +4,29 @@
 include 'tesla.mds'
 
 
-async function main()
-    # System variable-overrides
-    batteryCapacity = if(vBatteryCapacity, mathMax(1, vBatteryCapacity), 40.5)
-    backupPercent = if(vBackupPercent, mathMax(0, vBackupPercent), 20)
-    chargeRatio = if(vChargeRatio, mathMax(0.1, vChargeRatio), 0.9)
-    dischargeRatio = if(vDischargeRatio, mathMax(0.1, vDischargeRatio), 0.9)
-    precision = if(vPrecision, mathMax(1, mathRound(vPrecision)), 3)
+async function calibrateMain()
+    # Load the scenario
+    scenario = if(vScenarioURL != null, teslaLoadPowerwallScenario(vScenarioURL))
+    if scenario == null then
+        markdownPrint('Failed to load scenario URL "' + vScenarioURL + '"')
+        return
+    endif
+    data = objectGet(scenario, 'data')
+
+    # Variable scenario overrides
+    batteryCapacity = if(vBatteryCapacity, mathMax(1, vBatteryCapacity), objectGet(scenario, 'batteryCapacity'))
+    backupPercent = if(vBackupPercent, mathMax(0, vBackupPercent), objectGet(scenario, 'backupPercent'))
+    chargeRatio = if(vChargeRatio, mathMax(0.1, vChargeRatio), objectGet(scenario, 'chargeRatio'))
+    dischargeRatio = if(vDischargeRatio, mathMax(0.1, vDischargeRatio), objectGet(scenario, 'dischargeRatio'))
+    precision = if(vPrecision, mathMax(1, mathRound(vPrecision)), calibrateDefaultPrecision)
     ratioDelta = 0.1 ** precision
 
-    # Load the data
-    data = dataParseCSV(fetch('data-raw/2023-03-25.csv', null, true))
-
-    # Simulate the data
-    system = objectNew( \
-        'usableEnergy', batteryCapacity, \
-        'backupPercent', backupPercent, \
-        'chargeRatio', chargeRatio, \
-        'dischargeRatio', dischargeRatio \
-    )
-    simulated = teslaSimulate(system, data)
+    # Simulate the scenario
+    objectSet(scenario, 'batteryCapacity', batteryCapacity)
+    objectSet(scenario, 'backupPercent', backupPercent)
+    objectSet(scenario, 'chargeRatio', chargeRatio)
+    objectSet(scenario, 'dischargeRatio', dischargeRatio)
+    simulated = teslaPowerwallSimulate(scenario)
 
     # Compute the differences
     differences = arrayNew()
@@ -78,21 +81,24 @@ async function main()
     # Controls
     markdownPrint( \
         '', \
-        '**Battery Capacity:** ' + numberToFixed(batteryCapacity, precision) + '&nbsp;&nbsp;', \
-        link('Up', batteryCapacity + ratioDelta, backupPercent, chargeRatio, dischargeRatio, precision) + ' |', \
-        link('Down', mathMax(batteryCapacity - ratioDelta, 1), backupPercent, mathMax(chargeRatio, ratioDelta), dischargeRatio, precision) + ' \\', \
-        '**Backup Percent:** ' + numberToFixed(backupPercent, precision) + '&nbsp;&nbsp;', \
-        link('Up', batteryCapacity, mathMin(backupPercent + 1, 100), chargeRatio, dischargeRatio, precision) + ' |', \
-        link('Down', batteryCapacity, mathMax(backupPercent - 1, 0), mathMax(chargeRatio, ratioDelta), dischargeRatio, precision) + ' \\', \
+        '**Scenario:** ' + markdownEscape(objectGet(scenario, 'name')), \
+        '', \
+        '**Battery Capacity:** ' + numberToFixed(batteryCapacity, 1) + '&nbsp;&nbsp;', \
+        '[Up](' + calibrateURL(objectNew('batteryCapacity', mathMin(batteryCapacity + 0.5, 100)), scenario) + ')', \
+        '[Down](' +  calibrateURL(objectNew('batteryCapacity', mathMax(batteryCapacity - 0.5, 1)), scenario) + ') \\', \
+        '**Backup Percent:** ' + backupPercent + '&nbsp;&nbsp;', \
+        '[Up](' + calibrateURL(objectNew('backupPercent', mathMin(backupPercent + 1, 100)), scenario) + ')', \
+        '[Down](' + calibrateURL(objectNew('backupPercent', mathMax(backupPercent - 1, 0)), scenario) + ') \\', \
         '**Charge Ratio:** ' + numberToFixed(chargeRatio, precision) + '&nbsp;&nbsp;', \
-        link('Up', batteryCapacity, backupPercent, chargeRatio + ratioDelta, dischargeRatio, precision) + ' |', \
-        link('Down', batteryCapacity, backupPercent, mathMax(chargeRatio - ratioDelta, ratioDelta), dischargeRatio, precision) + ' \\', \
+        '[Up](' + calibrateURL(objectNew('chargeRatio', chargeRatio + ratioDelta), scenario) + ')', \
+        '[Down](' + calibrateURL(objectNew('chargeRatio', mathMax(chargeRatio - ratioDelta, ratioDelta)), scenario) + ') \\', \
         '**Discharge Ratio:** ' + numberToFixed(dischargeRatio, precision) + '&nbsp;&nbsp;', \
-        link('Up', batteryCapacity, backupPercent, chargeRatio, dischargeRatio + ratioDelta, precision) + ' |', \
-        link('Down', batteryCapacity, backupPercent, chargeRatio, mathMax(dischargeRatio - ratioDelta, ratioDelta), precision) + ' \\', \
+        '[Up](' + calibrateURL(objectNew('dischargeRatio', dischargeRatio + ratioDelta), scenario) + ')', \
+        '[Down](' + calibrateURL(objectNew('dischargeRatio', mathMax(dischargeRatio - ratioDelta, ratioDelta)), scenario) + ') \\', \
         '**Precision:** ' + precision + '&nbsp;&nbsp;', \
-        link('Up', batteryCapacity, backupPercent, chargeRatio, dischargeRatio, precision + 1) + ' |', \
-        link('Down', batteryCapacity, backupPercent, chargeRatio, dischargeRatio, mathMax(1, precision - 1)), \
+        '[Up](' + calibrateURL(objectNew('precision', precision + 1), scenario) + ')', \
+        '[Down](' + calibrateURL(objectNew('precision', mathMax(precision - 1, 1)), scenario) + ') \\', \
+        '[Reset](' + calibrateURL(objectNew('scenarioURL', vScenarioURL), null) + ')', \
         '', \
         '---' \
     )
@@ -168,7 +174,7 @@ async function main()
         'x', teslaFieldDate, \
         'y', arrayNew(teslaFieldBatteryPercent), \
         'yTicks', objectNew('start', 0, 'end', 100), \
-        'yLines', arrayNew(objectNew('value', (backupPercent / 100) * batterySizeKWh)) \
+        'yLines', arrayNew(objectNew('value', backupPercent)) \
     ))
     dataLineChart(simulated, objectNew( \
         'title', 'Simulated Battery', \
@@ -177,7 +183,7 @@ async function main()
         'x', teslaFieldDate, \
         'y', arrayNew(teslaFieldBatteryPercent), \
         'yTicks', objectNew('start', 0, 'end', 100), \
-        'yLines', arrayNew(objectNew('value', (backupPercent / 100) * batterySizeKWh)) \
+        'yLines', arrayNew(objectNew('value', backupPercent)) \
     ))
     markdownPrint('', '---')
 
@@ -198,15 +204,39 @@ async function main()
 endfunction
 
 
-function link(text, batteryCapacity, backupPercent, chargeRatio, dischargeRatio, precision)
-    return '[' + text + '](#' + \
-        'var.vBatteryCapacity=' + numberToFixed(batteryCapacity, precision) + \
-        '&var.vBackupPercent=' + numberToFixed(backupPercent, precision) + \
-        '&var.vChargeRatio=' + numberToFixed(chargeRatio, precision) + \
-        '&var.vDischargeRatio=' + numberToFixed(dischargeRatio, precision) + \
-        '&var.vPrecision=' + precision + ')'
+# Helper to create calibrate application URLs
+function calibrateURL(args, scenario)
+    if scenario != null then
+        # URL arguments
+        batteryCapacity = if(!reset && objectHas(args, 'batteryCapacity'), objectGet(args, 'batteryCapacity'), vBatteryCapacity)
+        backupPercent = if(!reset && objectHas(args, 'backupPercent'), objectGet(args, 'backupPercent'), vBackupPercent)
+        chargeRatio = if(!reset && objectHas(args, 'chargeRatio'), objectGet(args, 'chargeRatio'), vChargeRatio)
+        dischargeRatio = if(!reset && objectHas(args, 'dischargeRatio'), objectGet(args, 'dischargeRatio'), vDischargeRatio)
+        precision = if(!reset && objectHas(args, 'precision'), objectGet(args, 'precision'), vPrecision)
+
+        # Set defaults from the scenario
+        batteryCapacity = if(batteryCapacity != null, batteryCapacity, objectGet(scenario, 'batteryCapacity'))
+        backupPercent = if(backupPercent != null, backupPercent, objectGet(scenario, 'backupPercent'))
+        chargeRatio = if(chargeRatio != null, chargeRatio, objectGet(scenario, 'chargeRatio'))
+        dischargeRatio = if(dischargeRatio != null, dischargeRatio, objectGet(scenario, 'dischargeRatio'))
+    endif
+
+    # Create the URL
+    parts = arrayNew()
+    ratioPrecicion = if(vPrecision != null, vPrecision, calibrateDefaultPrecision)
+    arrayPush(parts, "var.vScenarioURL='" + encodeURIComponent(vScenarioURL) + "'")
+    if(batteryCapacity != null, arrayPush(parts, 'var.vBatteryCapacity=' + batteryCapacity))
+    if(backupPercent != null, arrayPush(parts, 'var.vBackupPercent=' + backupPercent))
+    if(chargeRatio != null, arrayPush(parts, 'var.vChargeRatio=' + mathRound(chargeRatio, ratioPrecicion)))
+    if(dischargeRatio != null, arrayPush(parts, 'var.vDischargeRatio=' + mathRound(dischargeRatio, ratioPrecicion)))
+    if(precision != null, arrayPush(parts, 'var.vPrecision=' + precision))
+    return if(arrayLength(parts), '#' + arrayJoin(parts, '&'), '#var=')
 endfunction
 
 
-main()
+# Variable argument defaults
+calibrateDefaultPrecision = 3
+
+
+calibrateMain()
 ~~~

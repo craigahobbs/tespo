@@ -1,0 +1,16 @@
+{
+    "name": "Seattle, March 2023",
+    "batteryCapacity": 40.5,
+    "backupPercent": 20,
+    "chargeRatio": 0.95,
+    "dischargeRatio": 0.95,
+    "dataURLs": [
+        "2023-03-19-seattle.csv",
+        "2023-03-20-seattle.csv",
+        "2023-03-21-seattle.csv",
+        "2023-03-22-seattle.csv",
+        "2023-03-23-seattle.csv",
+        "2023-03-24-seattle.csv",
+        "2023-03-25-seattle.csv"
+    ]
+}
