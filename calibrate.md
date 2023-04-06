@@ -1,6 +1,9 @@
 # TESPO Simulation Calibration
 
 ~~~ markdown-script
+# Licensed under the MIT License
+# https://github.com/craigahobbs/tespo/blob/main/LICENSE
+
 include 'tesla.mds'
 
 

@@ -1,6 +1,6 @@
 ~~~ markdown-script
 # Licensed under the MIT License
-# https://github.com/craigahobbs/craigahobbs.github.io/blob/main/LICENSE
+# https://github.com/craigahobbs/tespo/blob/main/LICENSE
 
 
 async function main()
