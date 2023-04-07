@@ -8,11 +8,15 @@ include 'tespo.mds'
 
 async function tespoMain()
     # Input/output schema documentation?
-    if vDocOutput || vDocInput then
-        typeName = if(vDocOutput, 'TespoOutput', 'TespoInput')
-        setDocumentTitle(typeName)
+    if vDoc != null then
+        docTypes = if(vDoc == 'powerwall', powerwallTypes, tespoTypes)
+        docTypeName = if(vDoc == 'output', 'TespoOutput', \
+            if(vDoc == 'input', 'TespoInput', \
+            if(vDoc == 'vehicle', 'VehicleScenario', \
+            if(vDoc == 'powerwall', 'PowerwallScenario'))))
+        setDocumentTitle(docTypeName)
         markdownPrint('[Home](#var=)')
-        elementModelRender(schemaElements(tespoTypes, typeName))
+        elementModelRender(schemaElements(docTypes, docTypeName))
         return
     endif
 

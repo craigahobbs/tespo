@@ -116,6 +116,9 @@ tespoTypes = schemaParse( \
     "    # The vehicle's battery power percentage", \
     '    float(>= 0, <= 100) battery', \
     '', \
+    "    # The vehcile's battery capacity (kWh)", \
+    '    int(> 0) batteryCapacity', \
+    '', \
     '    # Is car charging enabled?', \
     '    bool chargingEnabled', \
     '', \
@@ -161,7 +164,37 @@ tespoTypes = schemaParse( \
     '    int(> 0) chargingRate', \
     '', \
     '    # The charging limit, as a percentage', \
-    '    float(>= 0, <= 100) chargingLimit' \
+    '    float(>= 0, <= 100) chargingLimit', \
+    '', \
+    '', \
+    '# A vehicle charging scenario', \
+    'struct VehicleScenario', \
+    '', \
+    '    # The scenario vehicles', \
+    '    Vehicle[len > 0] vehicles', \
+    '', \
+    '    # The vehicle daily activity', \
+    '    VehicleDay[len > 0] days', \
+    '', \
+    '', \
+    '# A vehicle daily activity list', \
+    'typedef VehicleActivity[] VehicleDay', \
+    '', \
+    '', \
+    '# A vehicle activity. Vehicles first depart and later arrive back.', \
+    'struct VehicleActivity', \
+    '', \
+    '    # The vehicle index', \
+    '    int(>= 0) index', \
+    '', \
+    '    # The vehicle departure hour', \
+    '    float(>= 0, <=24) departure', \
+    '', \
+    '    # The vehicle arrival hour', \
+    '    float(>= 0, <=24) arrival', \
+    '', \
+    '    # The battery power used (kWh)', \
+    '    float batteryUsed' \
 )
 
 

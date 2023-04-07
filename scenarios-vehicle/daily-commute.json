@@ -1,0 +1,39 @@
+{
+    "vehicles": [
+        {
+            "id": "MODEL-Y",
+            "battery": 90,
+            "batteryCapacity": 80,
+            "chargingEnabled": true,
+            "chargingRate": 32,
+            "chargingLimit": 90,
+            "minChargingRate": 5,
+            "maxChargingRate": 32,
+            "chargingVoltage": 240
+        }
+    ],
+    "days": [
+        [
+            {"index": 0, "departure": 7, "arrival": 10, "batteryUsed": 4}
+        ],
+        [
+            {"index": 0, "departure": 8, "arrival": 18, "batteryUsed": 8}
+        ],
+        [
+            {"index": 0, "departure": 8, "arrival": 18, "batteryUsed": 8}
+        ],
+        [
+            {"index": 0, "departure": 8, "arrival": 18, "batteryUsed": 8}
+        ],
+        [
+            {"index": 0, "departure": 8, "arrival": 18, "batteryUsed": 8}
+        ],
+        [
+            {"index": 0, "departure": 8, "arrival": 18, "batteryUsed": 8}
+        ],
+        [
+            {"index": 0, "departure": 10, "arrival": 11, "batteryUsed": 4},
+            {"index": 0, "departure": 1, "arrival": 3, "batteryUsed": 4}
+        ]
+    ]
+}
