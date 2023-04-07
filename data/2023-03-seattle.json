@@ -2,8 +2,8 @@
     "name": "Seattle, March 2023",
     "batteryCapacity": 24.5,
     "backupPercent": 20,
-    "chargeRatio": 0.9309,
-    "dischargeRatio": 0.9490,
+    "chargeRatio": 0.929,
+    "dischargeRatio": 0.949,
     "dataURLs": [
         "2023-03-19-seattle.csv",
         "2023-03-20-seattle.csv",

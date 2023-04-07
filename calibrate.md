@@ -13,7 +13,11 @@ async function calibrateMain()
     # Load the scenario
     scenario = if(vScenarioURL != null, teslaLoadPowerwallScenario(vScenarioURL))
     if scenario == null then
-        markdownPrint('Failed to load scenario URL "' + vScenarioURL + '"')
+        markdownPrint( \
+            'Failed to load scenario URL "' + vScenarioURL + '".', \
+            '', \
+            "Check the `var.vScenarioURL='scenario.json'` hash parameter." \
+        )
         return
     endif
     data = objectGet(scenario, 'data')
@@ -51,14 +55,14 @@ async function calibrateMain()
         batteryDiff = objectGet(rowSimulated, teslaFieldBatteryPercent) - objectGet(row, teslaFieldBatteryPercent)
 
         # Update the Manhattan distance sums
-        powerwallManhattanSum = powerwallManhattanSum + powerwallDiff * powerwallDiff
-        gridManhattanSum = gridManhattanSum + gridDiff * gridDiff
-        batteryManhattanSum = batteryManhattanSum + batteryDiff * batteryDiff
+        powerwallManhattanSum = powerwallManhattanSum + mathAbs(powerwallDiff)
+        gridManhattanSum = gridManhattanSum + mathAbs(gridDiff)
+        batteryManhattanSum = batteryManhattanSum + mathAbs(batteryDiff)
 
         # Update the Euclidian distance sums
-        powerwallEuclidianSum = powerwallEuclidianSum + mathAbs(powerwallDiff)
-        gridEuclidianSum = gridEuclidianSum + mathAbs(gridDiff)
-        batteryEuclidianSum = batteryEuclidianSum + mathAbs(batteryDiff)
+        powerwallEuclidianSum = powerwallEuclidianSum + powerwallDiff * powerwallDiff
+        gridEuclidianSum = gridEuclidianSum + gridDiff * gridDiff
+        batteryEuclidianSum = batteryEuclidianSum + batteryDiff * batteryDiff
 
         # Add the differences data row
         arrayPush(differences, objectNew( \
@@ -80,8 +84,8 @@ async function calibrateMain()
     batteryEuclidianDistance = mathSqrt(batteryEuclidianSum)
 
     # Chart constants
-    chartWidth = 1000
-    chartHeight = 210
+    chartWidth = 1250
+    chartHeight = 250
     fontSize = getDocumentFontSize()
 
     # Controls
@@ -117,12 +121,11 @@ async function calibrateMain()
         '**Battery:**&nbsp;&nbsp;' + numberToFixed(batteryManhattanDistance, precision), \
         '&nbsp;/&nbsp;' + numberToFixed(batteryEuclidianDistance, precision), \
         '', \
-        'Note: Error values reported as Manhattan/Euclidian distance.', \
-        '', \
-        '---' \
+        'Note: Error values reported as Manhattan/Euclidian distance.' \
     )
 
     # Difference data
+    markdownPrint('', '---')
     dataLineChart(differences, objectNew( \
         'title', 'Simulated Powerwall/Grid Difference', \
         'width', chartWidth, \
@@ -141,9 +144,9 @@ async function calibrateMain()
         'yTicks', objectNew('count', 2), \
         'yLines', arrayNew(objectNew('value', 0)) \
     ))
-    markdownPrint('', '---')
 
     # Home/Solar data
+    markdownPrint('', '---')
     dataLineChart(data, objectNew( \
         'title', 'Home/Solar', \
         'width', chartWidth - mathFloor(2.5 * fontSize), \
@@ -152,9 +155,9 @@ async function calibrateMain()
         'y', arrayNew(teslaFieldHome, teslaFieldSolar), \
         'yTicks', objectNew('start', 0) \
     ))
-    markdownPrint('', '---')
 
     # Powerwall/Grid
+    markdownPrint('', '---')
     dataLineChart(data, objectNew( \
         'title', 'Actual Powerwall/Grid', \
         'width', chartWidth, \
@@ -173,9 +176,9 @@ async function calibrateMain()
         'yTicks', objectNew('count', 2), \
         'yLines', arrayNew(objectNew('value', 0)) \
     ))
-    markdownPrint('', '---')
 
     # Battery
+    markdownPrint('', '---')
     dataLineChart(data, objectNew( \
         'title', 'Actual Battery', \
         'width', chartWidth - mathFloor(10 * fontSize), \
@@ -194,9 +197,9 @@ async function calibrateMain()
         'yTicks', objectNew('start', 0, 'end', 100), \
         'yLines', arrayNew(objectNew('value', backupPercent)) \
     ))
-    markdownPrint('', '---')
 
     # Simulated data table
+    markdownPrint('', '---')
     dataTable(dataJoin(data, simulated, '[' + teslaFieldDate + ']'), objectNew( \
         'fields', arrayNew( \
             teslaFieldDate, \
