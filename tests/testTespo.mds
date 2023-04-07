@@ -1,0 +1,220 @@
+# Licensed under the MIT License
+# https://github.com/craigahobbs/tespo/blob/main/LICENSE
+
+include '../tespo.mds'
+
+
+function testTespo_allCharged()
+    unittestDeepEquals( \
+        tespo(objectNew( \
+            'solarPower', 8.2, \
+            'homePower', 1.4, \
+            'homeBattery', 90, \
+            'vehicles', arrayNew( \
+                objectNew( \
+                    'id', 'ID-MODELY', \
+                    'battery', 90, \
+                    'chargingEnabled', false, \
+                    'chargingRate', 32, \
+                    'chargingLimit', 50, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 32, \
+                    'chargingVoltage', 240 \
+                ) \
+            ) \
+        )), \
+        objectNew( \
+            'availableSolar', 6.8, \
+            'excessSolar', 6.8, \
+            'vehicles',  arrayNew( \
+                objectNew( \
+                    'id', 'ID-MODELY', \
+                    'chargingEnabled', false, \
+                    'chargingLimit', 50, \
+                    'chargingRate', 32 \
+                ) \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTest('testTespo_allCharged')
+
+
+function testTespo_homeCharged()
+    unittestDeepEquals( \
+        tespo(objectNew( \
+            "solarPower", 9.9, \
+            "homePower", 8.4, \
+            "homeBattery", 90, \
+            "vehicles", arrayNew( \
+                objectNew( \
+                    "id", "ID-MODELY", \
+                    "battery", 80, \
+                    "chargingEnabled", true, \
+                    "chargingRate", 32, \
+                    "chargingLimit", 90, \
+                    "minChargingRate", 5, \
+                    "maxChargingRate", 32, \
+                    "chargingVoltage", 240 \
+                ) \
+            ) \
+        )), \
+        objectNew( \
+            'availableSolar', 9.18, \
+            'excessSolar', 0, \
+            'vehicles',  arrayNew( \
+                objectNew( \
+                    'id', 'ID-MODELY', \
+                    'chargingEnabled', true, \
+                    'chargingLimit', 90, \
+                    'chargingRate', 32 \
+                ) \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTest('testTespo_homeCharged')
+
+
+function testTespo_homeCharged_lowSolar()
+    unittestDeepEquals( \
+        tespo(objectNew( \
+            'solarPower', 3.8, \
+            'homePower', 9.4, \
+            'homeBattery', 90, \
+            'vehicles', arrayNew( \
+                objectNew( \
+                    'id', 'ID-MODELY', \
+                    'battery', 80, \
+                    'chargingEnabled', true, \
+                    'chargingRate', 32, \
+                    'chargingLimit', 90, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 32, \
+                    'chargingVoltage', 240 \
+                ) \
+            ) \
+        )), \
+        objectNew( \
+            'availableSolar', 2.08, \
+            'excessSolar', 0, \
+            'vehicles',  arrayNew( \
+                objectNew( \
+                    'id', 'ID-MODELY', \
+                    'chargingEnabled', true, \
+                    'chargingLimit', 90, \
+                    'chargingRate', 8 \
+                ) \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTest('testTespo_homeCharged_lowSolar')
+
+
+function testTespo_homeCharged_medSolar()
+    unittestDeepEquals( \
+        tespo(objectNew( \
+            'solarPower', 5.8, \
+            'homePower', 9.6, \
+            'homeBattery', 90, \
+            'vehicles', arrayNew( \
+                objectNew( \
+                    'id', 'ID-MODELY', \
+                    'battery', 80, \
+                    'chargingEnabled', true, \
+                    'chargingRate', 32, \
+                    'chargingLimit', 90, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 32, \
+                    'chargingVoltage', 240 \
+                ) \
+            ) \
+        )), \
+        objectNew( \
+            'availableSolar', 3.88, \
+            'excessSolar', 0, \
+            'vehicles',  arrayNew( \
+                objectNew( \
+                    'id', 'ID-MODELY', \
+                    'chargingEnabled', true, \
+                    'chargingLimit', 90, \
+                    'chargingRate', 16 \
+                ) \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTest('testTespo_homeCharged_medSolar')
+
+
+function testTespo_homeCharged_zeroSolar()
+    unittestDeepEquals( \
+        tespo(objectNew( \
+            'solarPower', 0, \
+            'homePower', 8.7, \
+            'homeBattery', 90, \
+            'vehicles', arrayNew( \
+                objectNew( \
+                    'id', 'ID-MODELY', \
+                    'battery', 80, \
+                    'chargingEnabled', true, \
+                    'chargingRate', 32, \
+                    'chargingLimit', 90, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 32, \
+                    'chargingVoltage', 240 \
+                ) \
+            ) \
+        )), \
+        objectNew( \
+            'availableSolar', 0, \
+            'excessSolar', 0, \
+            'vehicles',  arrayNew( \
+                objectNew( \
+                    'id', 'ID-MODELY', \
+                    'chargingEnabled', false, \
+                    'chargingLimit', 50, \
+                    'chargingRate', 32 \
+                ) \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTest('testTespo_homeCharged_zeroSolar')
+
+
+function testTespo_noneCharged()
+    unittestDeepEquals( \
+        tespo(objectNew( \
+            'solarPower', 9.9, \
+            'homePower', 0.4, \
+            'homeBattery', 85, \
+            'vehicles', arrayNew( \
+                objectNew( \
+                    'id', 'ID-MODELY', \
+                    'battery', 80, \
+                    'chargingEnabled', false, \
+                    'chargingRate', 32, \
+                    'chargingLimit', 90, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 32, \
+                    'chargingVoltage', 240 \
+                ) \
+            ) \
+        )), \
+        objectNew( \
+            'availableSolar', 0, \
+            'excessSolar', 0, \
+            'vehicles',  arrayNew( \
+                objectNew( \
+                    'id', 'ID-MODELY', \
+                    'chargingEnabled', false, \
+                    'chargingLimit', 50, \
+                    'chargingRate', 32 \
+                ) \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTest('testTespo_noneCharged')
