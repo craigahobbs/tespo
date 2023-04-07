@@ -2,6 +2,12 @@
 # https://github.com/craigahobbs/tespo/blob/main/LICENSE
 
 
+# Include sentinel
+if getGlobal('tespo') then
+    return
+endif
+
+
 # The TESPO algorithm
 function tespo(input)
     solarPower = objectGet(input, 'solarPower')

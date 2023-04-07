@@ -2,8 +2,14 @@
 # https://github.com/craigahobbs/tespo/blob/main/LICENSE
 
 
+# Include sentinel
+if getGlobal('powerwallSimulate') then
+    return
+endif
+
+
 # Simulate a Tesla Powerwall scenario
-function teslaPowerwallSimulate(scenario)
+function powerwallSimulate(scenario)
     # Powerwall specifications
     batteryCapacityKwh = objectGet(scenario, 'batteryCapacity')
     backupPercent = objectGet(scenario, 'backupPercent')
@@ -14,17 +20,17 @@ function teslaPowerwallSimulate(scenario)
     # Compute the initial battery percentage
     row0 = arrayGet(data, 0)
     row1 = arrayGet(data, 1)
-    batteryPercent = 2 * objectGet(row0, teslaFieldBatteryPercent) - objectGet(row1, teslaFieldBatteryPercent)
+    batteryPercent = 2 * objectGet(row0, powerwallFieldBatteryPercent) - objectGet(row1, powerwallFieldBatteryPercent)
 
     # Compute the row duration
-    durationHours = (objectGet(row1, teslaFieldDate) - objectGet(row0, teslaFieldDate)) / (60 * 60 * 1000)
+    durationHours = (objectGet(row1, powerwallFieldDate) - objectGet(row0, powerwallFieldDate)) / (60 * 60 * 1000)
 
     # Simulate each data row
     simulated = arrayNew()
     foreach row in data do
         # Get the home and solar energy
-        homeKw = objectGet(row, teslaFieldHome)
-        solarKw = objectGet(row, teslaFieldSolar)
+        homeKw = objectGet(row, powerwallFieldHome)
+        solarKw = objectGet(row, powerwallFieldSolar)
 
         # Compute battery power and backup power
         batteryKwh = batteryPercent * batteryCapacityKwh / 100
@@ -65,12 +71,12 @@ function teslaPowerwallSimulate(scenario)
 
         # Push the simulated row
         arrayPush(simulated, objectNew( \
-            teslaFieldDate, objectGet(row, teslaFieldDate), \
-            teslaFieldHome, homeKw, \
-            teslaFieldSolar, solarKw, \
-            teslaFieldPowerwall, powerwallKw, \
-            teslaFieldGrid, gridKw, \
-            teslaFieldBatteryPercent, batteryPercent \
+            powerwallFieldDate, objectGet(row, powerwallFieldDate), \
+            powerwallFieldHome, homeKw, \
+            powerwallFieldSolar, solarKw, \
+            powerwallFieldPowerwall, powerwallKw, \
+            powerwallFieldGrid, gridKw, \
+            powerwallFieldBatteryPercent, batteryPercent \
         ))
     endforeach
 
@@ -78,16 +84,16 @@ function teslaPowerwallSimulate(scenario)
 endfunction
 
 
-# Load a Tesla Powerwall simulation scenario
-async function teslaLoadPowerwallScenario(scenarioURL)
+# Load a Powerwall simulation scenario
+async function powerwallLoadScenario(scenarioURL)
     # Load the scenario file
-    scenario = schemaValidate(teslaPowerwallTypes, 'PowerwallScenario', fetch(scenarioURL))
+    scenario = schemaValidate(powerwallTypes, 'PowerwallScenario', fetch(scenarioURL))
 
     # Fixup relative data URLs
     dataURLs = objectGet(scenario, 'dataURLs')
-    scenarioBaseURL = teslaGetBaseURL(scenarioURL)
+    scenarioBaseURL = powerwallGetBaseURL(scenarioURL)
     foreach dataURL, ixDataURL in dataURLs do
-        if teslaIsRelativeURL(dataURL) then
+        if powerwallIsRelativeURL(dataURL) then
             arraySet(dataURLs, ixDataURL, scenarioBaseURL + dataURL)
         endif
     endforeach
@@ -98,21 +104,21 @@ async function teslaLoadPowerwallScenario(scenarioURL)
     foreach dataCSV in dataCSVs do
         arrayExtend(data, dataParseCSV(dataCSV))
     endforeach
-    dataSort(data, arrayNew(arrayNew(teslaFieldDate)))
+    dataSort(data, arrayNew(arrayNew(powerwallFieldDate)))
     objectSet(scenario, 'data', data)
 
     # Fill-in any battery percentage data holes
     ixPrev = null
     foreach row, ixRow in data do
-        batteryPercent = objectGet(row, teslaFieldBatteryPercent)
+        batteryPercent = objectGet(row, powerwallFieldBatteryPercent)
         if batteryPercent != null then
             if ixPrev != null then
                 # Set interpolated battery percent values between non-null values
-                prevPercent = objectGet(arrayGet(data, ixPrev), teslaFieldBatteryPercent)
+                prevPercent = objectGet(arrayGet(data, ixPrev), powerwallFieldBatteryPercent)
                 ixHole = ixPrev + 1
                 while ixHole < ixRow do
                     holePercent = prevPercent + ((ixHole - ixPrev) / (ixRow - ixPrev)) * (batteryPercent - prevPercent)
-                    objectSet(arrayGet(data, ixHole), teslaFieldBatteryPercent, holePercent)
+                    objectSet(arrayGet(data, ixHole), powerwallFieldBatteryPercent, holePercent)
                     ixHole = ixHole + 1
                 endwhile
             endif
@@ -122,11 +128,11 @@ async function teslaLoadPowerwallScenario(scenarioURL)
 
     # Any trailing nulls? If so, set to the previous value
     if ixPrev != null then
-        prevPercent = objectGet(arrayGet(data, ixPrev), teslaFieldBatteryPercent)
+        prevPercent = objectGet(arrayGet(data, ixPrev), powerwallFieldBatteryPercent)
         dataLength = arrayLength(data)
         ixHole = ixPrev + 1
         while ixHole < dataLength do
-            objectSet(arrayGet(data, ixHole), teslaFieldBatteryPercent, prevPercent)
+            objectSet(arrayGet(data, ixHole), powerwallFieldBatteryPercent, prevPercent)
             ixHole = ixHole + 1
         endwhile
     endif
@@ -136,21 +142,21 @@ endfunction
 
 
 # Is a URL relative?
-function teslaIsRelativeURL(url)
-    return !regexTest(teslaRegexNotRelativeURL, url)
+function powerwallIsRelativeURL(url)
+    return !regexTest(powerwallRegexNotRelativeURL, url)
 endfunction
 
-teslaRegexNotRelativeURL = regexNew('^(?:[a-z]+:|\\/|\\?|#)')
+powerwallRegexNotRelativeURL = regexNew('^(?:[a-z]+:|\\/|\\?|#)')
 
 
 # Compute a URL's base
-function teslaGetBaseURL(url)
+function powerwallGetBaseURL(url)
     return stringSlice(url, 0, stringLastIndexOf(url, '/') + 1)
 endfunction
 
 
-# Tesla Powerwall simulation scenario JSON schema
-teslaPowerwallTypes = schemaParse( \
+# Powerwall simulation scenario JSON schema
+powerwallTypes = schemaParse( \
     '# Tesla Powerwall simulation scenario', \
     'struct PowerwallScenario', \
     '', \
@@ -174,10 +180,10 @@ teslaPowerwallTypes = schemaParse( \
 )
 
 
-# Tesla Energy data field names
-teslaFieldBatteryPercent = 'Energy Remaining (%)'
-teslaFieldDate = 'Date time'
-teslaFieldGrid = 'Grid (kW)'
-teslaFieldHome = 'Home (kW)'
-teslaFieldPowerwall = 'Powerwall (kW)'
-teslaFieldSolar = 'Solar (kW)'
+# Powerwall data field names
+powerwallFieldBatteryPercent = 'Energy Remaining (%)'
+powerwallFieldDate = 'Date time'
+powerwallFieldGrid = 'Grid (kW)'
+powerwallFieldHome = 'Home (kW)'
+powerwallFieldPowerwall = 'Powerwall (kW)'
+powerwallFieldSolar = 'Solar (kW)'

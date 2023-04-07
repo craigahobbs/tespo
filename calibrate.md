@@ -2,7 +2,7 @@
 # Licensed under the MIT License
 # https://github.com/craigahobbs/tespo/blob/main/LICENSE
 
-include 'tesla.mds'
+include 'powerwall.mds'
 
 
 async function calibrateMain()
@@ -11,7 +11,7 @@ async function calibrateMain()
     setDocumentTitle(title)
 
     # Load the scenario
-    scenario = if(vScenarioURL != null, teslaLoadPowerwallScenario(vScenarioURL))
+    scenario = if(vScenarioURL != null, powerwallLoadScenario(vScenarioURL))
     if scenario == null then
         markdownPrint( \
             'Failed to load scenario URL "' + vScenarioURL + '".', \
@@ -36,7 +36,7 @@ async function calibrateMain()
     objectSet(scenario, 'backupPercent', backupPercent)
     objectSet(scenario, 'chargeRatio', chargeRatio)
     objectSet(scenario, 'dischargeRatio', dischargeRatio)
-    simulated = teslaPowerwallSimulate(scenario)
+    simulated = powerwallSimulate(scenario)
 
     # Compute the differences
     differences = arrayNew()
@@ -50,9 +50,9 @@ async function calibrateMain()
         rowSimulated = arrayGet(simulated, ixRow)
 
         # Compute the diffs
-        powerwallDiff = objectGet(rowSimulated, teslaFieldPowerwall) - objectGet(row, teslaFieldPowerwall)
-        gridDiff = objectGet(rowSimulated, teslaFieldGrid) - objectGet(row, teslaFieldGrid)
-        batteryDiff = objectGet(rowSimulated, teslaFieldBatteryPercent) - objectGet(row, teslaFieldBatteryPercent)
+        powerwallDiff = objectGet(rowSimulated, powerwallFieldPowerwall) - objectGet(row, powerwallFieldPowerwall)
+        gridDiff = objectGet(rowSimulated, powerwallFieldGrid) - objectGet(row, powerwallFieldGrid)
+        batteryDiff = objectGet(rowSimulated, powerwallFieldBatteryPercent) - objectGet(row, powerwallFieldBatteryPercent)
 
         # Update the Manhattan distance sums
         powerwallManhattanSum = powerwallManhattanSum + mathAbs(powerwallDiff)
@@ -66,10 +66,10 @@ async function calibrateMain()
 
         # Add the differences data row
         arrayPush(differences, objectNew( \
-            teslaFieldDate, objectGet(row, teslaFieldDate), \
-            teslaFieldPowerwall, powerwallDiff, \
-            teslaFieldGrid, gridDiff, \
-            teslaFieldBatteryPercent, batteryDiff \
+            powerwallFieldDate, objectGet(row, powerwallFieldDate), \
+            powerwallFieldPowerwall, powerwallDiff, \
+            powerwallFieldGrid, gridDiff, \
+            powerwallFieldBatteryPercent, batteryDiff \
         ))
     endforeach
 
@@ -130,8 +130,8 @@ async function calibrateMain()
         'title', 'Simulated Powerwall/Grid Difference', \
         'width', chartWidth, \
         'height', chartHeight, \
-        'x', teslaFieldDate, \
-        'y', arrayNew(teslaFieldPowerwall, teslaFieldGrid), \
+        'x', powerwallFieldDate, \
+        'y', arrayNew(powerwallFieldPowerwall, powerwallFieldGrid), \
         'yTicks', objectNew('count', 2), \
         'yLines', arrayNew(objectNew('value', 0)) \
     ))
@@ -139,8 +139,8 @@ async function calibrateMain()
         'title', 'Simulated Battery Difference', \
         'width', chartWidth - mathFloor(10 * fontSize), \
         'height', chartHeight, \
-        'x', teslaFieldDate, \
-        'y', arrayNew(teslaFieldBatteryPercent), \
+        'x', powerwallFieldDate, \
+        'y', arrayNew(powerwallFieldBatteryPercent), \
         'yTicks', objectNew('count', 2), \
         'yLines', arrayNew(objectNew('value', 0)) \
     ))
@@ -151,8 +151,8 @@ async function calibrateMain()
         'title', 'Home/Solar', \
         'width', chartWidth - mathFloor(2.5 * fontSize), \
         'height', chartHeight, \
-        'x', teslaFieldDate, \
-        'y', arrayNew(teslaFieldHome, teslaFieldSolar), \
+        'x', powerwallFieldDate, \
+        'y', arrayNew(powerwallFieldHome, powerwallFieldSolar), \
         'yTicks', objectNew('start', 0) \
     ))
 
@@ -162,8 +162,8 @@ async function calibrateMain()
         'title', 'Actual Powerwall/Grid', \
         'width', chartWidth, \
         'height', chartHeight, \
-        'x', teslaFieldDate, \
-        'y', arrayNew(teslaFieldPowerwall, teslaFieldGrid), \
+        'x', powerwallFieldDate, \
+        'y', arrayNew(powerwallFieldPowerwall, powerwallFieldGrid), \
         'yTicks', objectNew('count', 2), \
         'yLines', arrayNew(objectNew('value', 0)) \
     ))
@@ -171,8 +171,8 @@ async function calibrateMain()
         'title', 'Simulated Powerwall/Grid', \
         'width', chartWidth, \
         'height', chartHeight, \
-        'x', teslaFieldDate, \
-        'y', arrayNew(teslaFieldPowerwall, teslaFieldGrid), \
+        'x', powerwallFieldDate, \
+        'y', arrayNew(powerwallFieldPowerwall, powerwallFieldGrid), \
         'yTicks', objectNew('count', 2), \
         'yLines', arrayNew(objectNew('value', 0)) \
     ))
@@ -183,8 +183,8 @@ async function calibrateMain()
         'title', 'Actual Battery', \
         'width', chartWidth - mathFloor(10 * fontSize), \
         'height', chartHeight, \
-        'x', teslaFieldDate, \
-        'y', arrayNew(teslaFieldBatteryPercent), \
+        'x', powerwallFieldDate, \
+        'y', arrayNew(powerwallFieldBatteryPercent), \
         'yTicks', objectNew('start', 0, 'end', 100), \
         'yLines', arrayNew(objectNew('value', backupPercent)) \
     ))
@@ -192,25 +192,25 @@ async function calibrateMain()
         'title', 'Simulated Battery', \
         'width', chartWidth - mathFloor(10 * fontSize), \
         'height', chartHeight, \
-        'x', teslaFieldDate, \
-        'y', arrayNew(teslaFieldBatteryPercent), \
+        'x', powerwallFieldDate, \
+        'y', arrayNew(powerwallFieldBatteryPercent), \
         'yTicks', objectNew('start', 0, 'end', 100), \
         'yLines', arrayNew(objectNew('value', backupPercent)) \
     ))
 
     # Simulated data table
     markdownPrint('', '---')
-    dataTable(dataJoin(data, simulated, '[' + teslaFieldDate + ']'), objectNew( \
+    dataTable(dataJoin(data, simulated, '[' + powerwallFieldDate + ']'), objectNew( \
         'fields', arrayNew( \
-            teslaFieldDate, \
-            teslaFieldHome, \
-            teslaFieldSolar, \
-            teslaFieldPowerwall, \
-            teslaFieldGrid, \
-            teslaFieldBatteryPercent, \
-            teslaFieldPowerwall + '2', \
-            teslaFieldGrid + '2', \
-            teslaFieldBatteryPercent + '2' \
+            powerwallFieldDate, \
+            powerwallFieldHome, \
+            powerwallFieldSolar, \
+            powerwallFieldPowerwall, \
+            powerwallFieldGrid, \
+            powerwallFieldBatteryPercent, \
+            powerwallFieldPowerwall + '2', \
+            powerwallFieldGrid + '2', \
+            powerwallFieldBatteryPercent + '2' \
         ) \
     ))
 endfunction
