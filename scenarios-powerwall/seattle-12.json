@@ -1,0 +1,16 @@
+{
+    "name": "Seattle, December 2022",
+    "batteryCapacity": 25.5,
+    "backupPercent": 50,
+    "chargeRatio": 0.937,
+    "dischargeRatio": 0.932,
+    "dataURLs": [
+        "seattle-12-11.csv",
+        "seattle-12-12.csv",
+        "seattle-12-13.csv",
+        "seattle-12-14.csv",
+        "seattle-12-15.csv",
+        "seattle-12-16.csv",
+        "seattle-12-17.csv"
+    ]
+}
