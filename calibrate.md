@@ -91,6 +91,8 @@ async function calibrateMain()
     # Controls
     setDocumentTitle(scenarioName)
     markdownPrint( \
+        '[Home](#url=&var=)', \
+        '', \
         '# ' + title, \
         '', \
         '**Scenario:** ' + markdownEscape(scenarioName), \
