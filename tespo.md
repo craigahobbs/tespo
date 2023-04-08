@@ -26,7 +26,20 @@ async function tespoMain()
     markdownPrint( \
         '# ' + markdownEscape(title), \
         '', \
-        'Coming soon!' \
+        'Coming soon!', \
+        '', \
+        '## Powerwall Scenarios', \
+        '', \
+        "[Seattle, May 2022](#url=calibrate.md&var.vScenarioURL='scenarios-powerwall/seattle-05.json')", \
+        '', \
+        "[Seattle, June 2022](#url=calibrate.md&var.vScenarioURL='scenarios-powerwall/seattle-06.json')", \
+        '', \
+        "[Seattle, September 2022](#url=calibrate.md&var.vScenarioURL='scenarios-powerwall/seattle-09.json')", \
+        '', \
+        "[Seattle, December 2022](#url=calibrate.md&var.vScenarioURL='scenarios-powerwall/seattle-12.json')", \
+        '', \
+        "[Seattle, March 2023](#url=calibrate.md&var.vScenarioURL='scenarios-powerwall/seattle-03.json')", \
+        '' \
     )
 endfunction
 
