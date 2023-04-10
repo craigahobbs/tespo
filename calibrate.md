@@ -98,8 +98,8 @@ async function calibrateMain()
         '**Scenario:** ' + markdownEscape(scenarioName), \
         '', \
         '**Battery Capacity:** ' + numberToFixed(batteryCapacity, 1) + '&nbsp;&nbsp;', \
-        '[Up](' + calibrateURL(objectNew('batteryCapacity', mathMin(batteryCapacity + 0.5, 100)), scenario) + ')', \
-        '[Down](' +  calibrateURL(objectNew('batteryCapacity', mathMax(batteryCapacity - 0.5, 1)), scenario) + ') \\', \
+        '[Up](' + calibrateURL(objectNew('batteryCapacity', mathMin(batteryCapacity + 0.1, 100)), scenario) + ')', \
+        '[Down](' +  calibrateURL(objectNew('batteryCapacity', mathMax(batteryCapacity - 0.1, 1)), scenario) + ') \\', \
         '**Backup Percent:** ' + backupPercent + '&nbsp;&nbsp;', \
         '[Up](' + calibrateURL(objectNew('backupPercent', mathMin(backupPercent + 1, 100)), scenario) + ')', \
         '[Down](' + calibrateURL(objectNew('backupPercent', mathMax(backupPercent - 1, 0)), scenario) + ') \\', \
