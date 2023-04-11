@@ -1,7 +1,7 @@
 {
     "vehicles": [
         {
-            "id": "MODEL-Y",
+            "id": "ID-1",
             "battery": 90,
             "batteryCapacity": 80,
             "chargingEnabled": true,

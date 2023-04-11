@@ -19,8 +19,9 @@ function tespo(input)
     availableSolar = solarPower - homePower
     foreach vehicle in vehicles do
         # P = V * I
-        chargingPower = objectGet(vehicle, 'chargingRate') * objectGet(vehicle, 'chargingVoltage') / 1000
-        availableSolar = availableSolar + if(objectGet(vehicle, 'chargingEnabled'), chargingPower, 0)
+        if objectGet(vehicle, 'battery') < objectGet(vehicle, 'chargingLimit') then
+            availableSolar = availableSolar + objectGet(vehicle, 'chargingRate') * objectGet(vehicle, 'chargingVoltage') / 1000
+        endif
     endforeach
 
     # Is the home battery charged?
@@ -36,31 +37,28 @@ function tespo(input)
         maxChargingRate = objectGet(vehicle, 'maxChargingRate')
 
         # Set vehicle charging off
-        actionCharging = false
-        actionChargingRate = maxChargingRate
+        actionChargingRate = minChargingRate
         actionChargingLimit = tespoMinChargingLimit
 
         # Home battery not yet fully charged?
         if isHomeBatteryCharged then
-
             # Vehicle fully charged?
-            isVehicleCharged = battery >= tespoMaxChargingLimit
+            isVehicleCharged = (battery >= tespoMaxChargingLimit)
             allBatteriesCharged = allBatteriesCharged && isVehicleCharged
             if !isVehicleCharged then
-
                 # Enough solar power to charge the vehicle?
                 # I = P / V
-                availableSolarRate = (availableSolar * 1000) / objectGet(vehicle, 'chargingVoltage')
+                chargingVoltage = objectGet(vehicle, 'chargingVoltage')
+                availableSolarRate = (availableSolar * 1000) / chargingVoltage
                 bestChargingRate = 0
                 chargingRateTest = minChargingRate
                 while chargingRateTest <= maxChargingRate do
-                    bestChargingRate = if(chargingRateTest <= availableSolarRate, mathMax(bestChargingRate, \
-                        chargingRateTest), bestChargingRate)
+                    bestChargingRate = if(chargingRateTest <= availableSolarRate, \
+                        mathMax(bestChargingRate, chargingRateTest), bestChargingRate)
                     chargingRateTest = chargingRateTest + 1
                 endwhile
                 if bestChargingRate != 0 then
                     # Charge the vehicle
-                    actionCharging = true
                     actionChargingRate = bestChargingRate
                     actionChargingLimit = tespoMaxChargingLimit
 
@@ -74,7 +72,6 @@ function tespo(input)
         # Add the vehicle model
         arrayPush(vehicleChargings, objectNew( \
             'id', objectGet(vehicle, 'id'), \
-            'chargingEnabled', actionCharging, \
             'chargingRate', actionChargingRate, \
             'chargingLimit', actionChargingLimit \
         ))
@@ -119,19 +116,16 @@ tespoTypes = schemaParse( \
     "    # The vehcile's battery capacity (kWh)", \
     '    int(> 0) batteryCapacity', \
     '', \
-    '    # Is car charging enabled?', \
-    '    bool chargingEnabled', \
-    '', \
-    '    # The charging rate (A)', \
-    '    int(> 0) chargingRate', \
-    '', \
     '    # The charging limit, as a percentage', \
     '    float(>= 0, <= 100) chargingLimit', \
     '', \
-    '    # The minimum charging rate (A)', \
+    '    # The charging rate (amps)', \
+    '    int(> 0) chargingRate', \
+    '', \
+    '    # The minimum charging rate (amps)', \
     '    int(> 0) minChargingRate', \
     '', \
-    '    # The maximum charging rate (A)', \
+    '    # The maximum charging rate (amps)', \
     '    int(> 0) maxChargingRate', \
     '', \
     '    # The charging voltage (V)', \
@@ -157,10 +151,7 @@ tespoTypes = schemaParse( \
     '    # The vehicle ID', \
     '    string(len > 0) id', \
     '', \
-    '    # Is car charging enabled?', \
-    '    bool chargingEnabled', \
-    '', \
-    '    # The charging rate (A)', \
+    '    # The charging rate (amps)', \
     '    int(> 0) chargingRate', \
     '', \
     '    # The charging limit, as a percentage', \

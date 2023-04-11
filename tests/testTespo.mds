@@ -12,10 +12,9 @@ function testTespo_allCharged()
             'homeBattery', 90, \
             'vehicles', arrayNew( \
                 objectNew( \
-                    'id', 'ID-MODELY', \
+                    'id', 'ID-1', \
                     'battery', 90, \
-                    'chargingEnabled', false, \
-                    'chargingRate', 32, \
+                    'chargingRate', 5, \
                     'chargingLimit', 50, \
                     'minChargingRate', 5, \
                     'maxChargingRate', 32, \
@@ -28,10 +27,9 @@ function testTespo_allCharged()
             'excessSolar', 6.8, \
             'vehicles',  arrayNew( \
                 objectNew( \
-                    'id', 'ID-MODELY', \
-                    'chargingEnabled', false, \
+                    'id', 'ID-1', \
                     'chargingLimit', 50, \
-                    'chargingRate', 32 \
+                    'chargingRate', 5 \
                 ) \
             ) \
         ) \
@@ -48,9 +46,8 @@ function testTespo_homeCharged()
             "homeBattery", 90, \
             "vehicles", arrayNew( \
                 objectNew( \
-                    "id", "ID-MODELY", \
+                    "id", "ID-1", \
                     "battery", 80, \
-                    "chargingEnabled", true, \
                     "chargingRate", 32, \
                     "chargingLimit", 90, \
                     "minChargingRate", 5, \
@@ -60,12 +57,11 @@ function testTespo_homeCharged()
             ) \
         )), \
         objectNew( \
-            'availableSolar', 9.18, \
+            'availableSolar', 1.5, \
             'excessSolar', 0, \
             'vehicles',  arrayNew( \
                 objectNew( \
-                    'id', 'ID-MODELY', \
-                    'chargingEnabled', true, \
+                    'id', 'ID-1', \
                     'chargingLimit', 90, \
                     'chargingRate', 32 \
                 ) \
@@ -84,9 +80,8 @@ function testTespo_homeCharged_lowSolar()
             'homeBattery', 90, \
             'vehicles', arrayNew( \
                 objectNew( \
-                    'id', 'ID-MODELY', \
+                    'id', 'ID-1', \
                     'battery', 80, \
-                    'chargingEnabled', true, \
                     'chargingRate', 32, \
                     'chargingLimit', 90, \
                     'minChargingRate', 5, \
@@ -96,12 +91,11 @@ function testTespo_homeCharged_lowSolar()
             ) \
         )), \
         objectNew( \
-            'availableSolar', 2.08, \
+            'availableSolar', 0.16, \
             'excessSolar', 0, \
             'vehicles',  arrayNew( \
                 objectNew( \
-                    'id', 'ID-MODELY', \
-                    'chargingEnabled', true, \
+                    'id', 'ID-1', \
                     'chargingLimit', 90, \
                     'chargingRate', 8 \
                 ) \
@@ -120,9 +114,8 @@ function testTespo_homeCharged_medSolar()
             'homeBattery', 90, \
             'vehicles', arrayNew( \
                 objectNew( \
-                    'id', 'ID-MODELY', \
+                    'id', 'ID-1', \
                     'battery', 80, \
-                    'chargingEnabled', true, \
                     'chargingRate', 32, \
                     'chargingLimit', 90, \
                     'minChargingRate', 5, \
@@ -132,12 +125,11 @@ function testTespo_homeCharged_medSolar()
             ) \
         )), \
         objectNew( \
-            'availableSolar', 3.88, \
+            'availableSolar', 0.04, \
             'excessSolar', 0, \
             'vehicles',  arrayNew( \
                 objectNew( \
-                    'id', 'ID-MODELY', \
-                    'chargingEnabled', true, \
+                    'id', 'ID-1', \
                     'chargingLimit', 90, \
                     'chargingRate', 16 \
                 ) \
@@ -156,9 +148,8 @@ function testTespo_homeCharged_zeroSolar()
             'homeBattery', 90, \
             'vehicles', arrayNew( \
                 objectNew( \
-                    'id', 'ID-MODELY', \
+                    'id', 'ID-1', \
                     'battery', 80, \
-                    'chargingEnabled', true, \
                     'chargingRate', 32, \
                     'chargingLimit', 90, \
                     'minChargingRate', 5, \
@@ -172,10 +163,9 @@ function testTespo_homeCharged_zeroSolar()
             'excessSolar', 0, \
             'vehicles',  arrayNew( \
                 objectNew( \
-                    'id', 'ID-MODELY', \
-                    'chargingEnabled', false, \
+                    'id', 'ID-1', \
                     'chargingLimit', 50, \
-                    'chargingRate', 32 \
+                    'chargingRate', 5 \
                 ) \
             ) \
         ) \
@@ -192,9 +182,8 @@ function testTespo_noneCharged()
             'homeBattery', 85, \
             'vehicles', arrayNew( \
                 objectNew( \
-                    'id', 'ID-MODELY', \
+                    'id', 'ID-1', \
                     'battery', 80, \
-                    'chargingEnabled', false, \
                     'chargingRate', 32, \
                     'chargingLimit', 90, \
                     'minChargingRate', 5, \
@@ -208,10 +197,9 @@ function testTespo_noneCharged()
             'excessSolar', 0, \
             'vehicles',  arrayNew( \
                 objectNew( \
-                    'id', 'ID-MODELY', \
-                    'chargingEnabled', false, \
+                    'id', 'ID-1', \
                     'chargingLimit', 50, \
-                    'chargingRate', 32 \
+                    'chargingRate', 5 \
                 ) \
             ) \
         ) \

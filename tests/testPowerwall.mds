@@ -1,0 +1,10 @@
+# Licensed under the MIT License
+# https://github.com/craigahobbs/tespo/blob/main/LICENSE
+
+include '../tespo.mds'
+
+
+function testPowerwall()
+    unittestEquals(1 + 1, 2)
+endfunction
+unittestRunTest('testPowerwall')
