@@ -201,8 +201,14 @@ async function calibrateMain()
     ))
 
     # Simulated data table
+    foreach row, ixRow in data do
+        rowSimulated = arrayGet(simulated, ixRow)
+        objectSet(row, 'Simulated ' + powerwallFieldPowerwall, objectGet(rowSimulated, powerwallFieldPowerwall))
+        objectSet(row, 'Simulated ' + powerwallFieldGrid, objectGet(rowSimulated, powerwallFieldGrid))
+        objectSet(row, 'Simulated ' + powerwallFieldBatteryPercent, objectGet(rowSimulated, powerwallFieldBatteryPercent))
+    endforeach
     markdownPrint('', '---')
-    dataTable(dataJoin(data, simulated, '[' + powerwallFieldDate + ']'), objectNew( \
+    dataTable(data, objectNew( \
         'fields', arrayNew( \
             powerwallFieldDate, \
             powerwallFieldHome, \
@@ -210,9 +216,9 @@ async function calibrateMain()
             powerwallFieldPowerwall, \
             powerwallFieldGrid, \
             powerwallFieldBatteryPercent, \
-            powerwallFieldPowerwall + '2', \
-            powerwallFieldGrid + '2', \
-            powerwallFieldBatteryPercent + '2' \
+            'Simulated ' + powerwallFieldPowerwall, \
+            'Simulated ' + powerwallFieldGrid, \
+            'Simulated ' + powerwallFieldBatteryPercent \
         ) \
     ))
 endfunction
@@ -239,8 +245,8 @@ function calibrateURL(args, scenario)
     parts = arrayNew()
     ratioPrecicion = if(vPrecision != null, vPrecision, calibrateDefaultPrecision)
     arrayPush(parts, "var.vScenarioURL='" + encodeURIComponent(vScenarioURL) + "'")
-    if(batteryCapacity != null, arrayPush(parts, 'var.vBatteryCapacity=' + batteryCapacity))
-    if(backupPercent != null, arrayPush(parts, 'var.vBackupPercent=' + backupPercent))
+    if(batteryCapacity != null, arrayPush(parts, 'var.vBatteryCapacity=' + mathRound(batteryCapacity, 1)))
+    if(backupPercent != null, arrayPush(parts, 'var.vBackupPercent=' + mathRound(backupPercent, 1)))
     if(chargeRatio != null, arrayPush(parts, 'var.vChargeRatio=' + mathRound(chargeRatio, ratioPrecicion)))
     if(dischargeRatio != null, arrayPush(parts, 'var.vDischargeRatio=' + mathRound(dischargeRatio, ratioPrecicion)))
     if(precision != null, arrayPush(parts, 'var.vPrecision=' + precision))
