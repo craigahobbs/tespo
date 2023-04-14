@@ -168,15 +168,18 @@ tespoTypes = schemaParse( \
     '    VehicleDay[len > 0] days', \
     '', \
     '', \
-    '# A vehicle daily activity list', \
-    'typedef VehicleActivity[] VehicleDay', \
+    "# A vehicle's daily activity", \
+    'struct VehicleDay', \
+    '', \
+    "    # The vehicle's departures", \
+    '    VehicleDeparture[] departures', \
     '', \
     '', \
-    '# A vehicle activity. Vehicles first depart and later arrive back.', \
-    'struct VehicleActivity', \
+    '# A vehicle departure and arrival', \
+    'struct VehicleDeparture', \
     '', \
-    '    # The vehicle index', \
-    '    int(>= 0) index', \
+    '    # The vehicle ID', \
+    '    string(len > 0) id', \
     '', \
     '    # The vehicle departure hour', \
     '    float(>= 0, <=24) departure', \
@@ -185,7 +188,7 @@ tespoTypes = schemaParse( \
     '    float(>= 0, <=24) arrival', \
     '', \
     '    # The battery power used (kWh)', \
-    '    float batteryUsed' \
+    '    float batteryPercentChange' \
 )
 
 
