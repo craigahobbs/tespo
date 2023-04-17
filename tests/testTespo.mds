@@ -24,7 +24,7 @@ function testTespo_allCharged()
         )), \
         objectNew( \
             'availableSolar', 6.8, \
-            'excessSolar', 6.8, \
+            'spilling', true, \
             'vehicles',  arrayNew( \
                 objectNew( \
                     'id', 'ID-1', \
@@ -58,7 +58,7 @@ function testTespo_homeCharged()
         )), \
         objectNew( \
             'availableSolar', 1.5, \
-            'excessSolar', 0, \
+            'spilling', false, \
             'vehicles',  arrayNew( \
                 objectNew( \
                     'id', 'ID-1', \
@@ -92,7 +92,7 @@ function testTespo_homeCharged_lowSolar()
         )), \
         objectNew( \
             'availableSolar', 0.16, \
-            'excessSolar', 0, \
+            'spilling', false, \
             'vehicles',  arrayNew( \
                 objectNew( \
                     'id', 'ID-1', \
@@ -126,7 +126,7 @@ function testTespo_homeCharged_medSolar()
         )), \
         objectNew( \
             'availableSolar', 0.04, \
-            'excessSolar', 0, \
+            'spilling', false, \
             'vehicles',  arrayNew( \
                 objectNew( \
                     'id', 'ID-1', \
@@ -160,7 +160,7 @@ function testTespo_homeCharged_zeroSolar()
         )), \
         objectNew( \
             'availableSolar', 0, \
-            'excessSolar', 0, \
+            'spilling', false, \
             'vehicles',  arrayNew( \
                 objectNew( \
                     'id', 'ID-1', \
@@ -194,7 +194,7 @@ function testTespo_noneCharged()
         )), \
         objectNew( \
             'availableSolar', 0, \
-            'excessSolar', 0, \
+            'spilling', false, \
             'vehicles',  arrayNew( \
                 objectNew( \
                     'id', 'ID-1', \

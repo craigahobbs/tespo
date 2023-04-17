@@ -38,66 +38,60 @@ function tespo(input)
     isHomeBatteryCharged = (homeBattery >= homeBatteryFull)
     allBatteriesCharged = isHomeBatteryCharged
 
-    # Create the output object
-    chargingVehicles = arrayNew()
-    output = objectNew('vehicles', chargingVehicles)
-
     # Sort the input vehicle array by maximum charging rate, ascending. Vehicles with lower maximum
     # charging rates will have lower charging rates on average. Therefore, more of the available
     # solar power is available to subsequent vehicles for charging.
     dataSort(vehicles, arrayNew(arrayNew('maxChargingRate')))
 
-    # Add the charging action for each vehicle
+    # Create the output object
+    chargingVehicles = arrayNew()
+    output = objectNew('vehicles', chargingVehicles)
+
+    # Compute the new charging settings for each vehicle
     foreach vehicle in vehicles do
-        battery = objectGet(vehicle, 'battery')
-        minChargingRate = objectGet(vehicle, 'minChargingRate')
-        maxChargingRate = objectGet(vehicle, 'maxChargingRate')
+        vehicleID = objectGet(vehicle, 'id')
+        vehicleBattery = objectGet(vehicle, 'battery')
+        vehicleMinChargingRate = objectGet(vehicle, 'minChargingRate')
+        vehicleMaxChargingRate = objectGet(vehicle, 'maxChargingRate')
+        vehicleChargingVoltage = objectGet(vehicle, 'chargingVoltage')
 
-        # Set vehicle charging off
-        actionChargingRate = minChargingRate
-        actionChargingLimit = minVehicleChargingLimit
+        # Set vehicle charging to minimum
+        newChargingRate = vehicleMinChargingRate
+        newChargingLimit = minVehicleChargingLimit
 
-        # Home battery not yet fully charged?
-        if isHomeBatteryCharged then
-            # Vehicle fully charged?
-            isVehicleCharged = (battery >= maxVehicleChargingLimit)
-            allBatteriesCharged = allBatteriesCharged && isVehicleCharged
-            if !isVehicleCharged then
-                # Enough solar power to charge the vehicle?
-                # I = P / V
-                chargingVoltage = objectGet(vehicle, 'chargingVoltage')
-                availableSolarRate = (availableSolar * 1000) / chargingVoltage
-                bestChargingRate = 0
-                chargingRateTest = minChargingRate
-                while chargingRateTest <= maxChargingRate do
-                    bestChargingRate = if(chargingRateTest <= availableSolarRate, \
-                        mathMax(bestChargingRate, chargingRateTest), bestChargingRate)
-                    chargingRateTest = chargingRateTest + 1
-                endwhile
-                if bestChargingRate != 0 then
-                    # Charge the vehicle
-                    actionChargingRate = bestChargingRate
-                    actionChargingLimit = maxVehicleChargingLimit
+        # Is this vehicle not yet fully charged? Only charge vehicles if the home battery is full.
+        if isHomeBatteryCharged && vehicleBattery < maxVehicleChargingLimit then
+            # Not all batteries are fully charged
+            allBatteriesCharged = false
 
-                    # Reduce the available solar power
-                    chargingPower = actionChargingRate * chargingVoltage / 1000
-                    availableSolar = availableSolar - chargingPower
+            # Compute the vehicle's charging rate (I = P / V)
+            availableSolarRate = (availableSolar * 1000) / vehicleChargingVoltage
+            newChargingRate = vehicleMaxChargingRate
+            while newChargingRate > vehicleMinChargingRate do
+                # Do we have enough power to charge at this rate?
+                if newChargingRate < availableSolarRate then
+                    # Yes, set to charge fully
+                    newChargingLimit = maxVehicleChargingLimit
+
+                    # Reduce the available solar power (P = I * V)
+                    availableSolar = availableSolar - newChargingRate * vehicleChargingVoltage / 1000
+                    break
                 endif
-            endif
+                newChargingRate = newChargingRate - 1
+            endwhile
         endif
 
         # Add the vehicle model
         arrayPush(chargingVehicles, objectNew( \
-            'id', objectGet(vehicle, 'id'), \
-            'chargingRate', actionChargingRate, \
-            'chargingLimit', actionChargingLimit \
+            'id', vehicleID, \
+            'chargingRate', newChargingRate, \
+            'chargingLimit', newChargingLimit \
         ))
     endforeach
 
-    # Set the excess solar power
-    excessSolar = if(allBatteriesCharged && availableSolar > minSolarExcess, availableSolar, 0)
+    # Set available solar power and the spilling state
     objectSet(output, 'availableSolar', if(isHomeBatteryCharged, mathRound(mathMax(availableSolar, 0), 3), 0))
-    objectSet(output, 'excessSolar', mathRound(excessSolar, 3))
+    objectSet(output, 'spilling', allBatteriesCharged && availableSolar > minSolarExcess)
 
     return output
 endfunction
@@ -165,14 +159,14 @@ tespoTypes = schemaParse( \
     '# The Tesla Energy Self-Powered Optimizer (TESPO) algorithm output', \
     'struct TespoOutput', \
     '', \
-    '    # The vehicle-charging actions', \
+    '    # The new vehicle charging settings', \
     '    VehicleCharging[] vehicles', \
     '', \
     '    # The available solar power (kW)', \
     '    float(>= 0) availableSolar', \
     '', \
-    '    # The excess solar power (kW)', \
-    '    float(>= 0) excessSolar', \
+    '    # If true, there is solar spillage to the grid', \
+    '    bool spilling', \
     '', \
     '', \
     "# Set a vehicle's charging on or off", \
