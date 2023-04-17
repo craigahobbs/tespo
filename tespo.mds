@@ -14,23 +14,33 @@ function tespo(input)
     homePower = objectGet(input, 'homePower')
     homeBattery = objectGet(input, 'homeBattery')
     vehicles = objectGet(input, 'vehicles')
+    homeBatteryFull = objectGet(input, 'homeBatteryFull', tespoDefaultHomeBatteryFull)
+    vehicleChargingLimitMin = objectGet(input, 'vehicleChargingLimitMin', tespoDefaultVehicleChargingLimitMin)
+    vehicleChargingLimitMax = objectGet(input, 'vehicleChargingLimitMax', tespoDefaultVehicleChargingLimitMax)
+    solarExcessMin = objectGet(input, 'solarExcessMin', tespoDefaultSolarExcessMin)
 
-    # Compute the available solar power (remove current vehicle charging power)
+    # Compute the available solar power
     availableSolar = solarPower - homePower
     foreach vehicle in vehicles do
-        # P = V * I
-        if objectGet(vehicle, 'battery') < objectGet(vehicle, 'chargingLimit') then
-            availableSolar = availableSolar + objectGet(vehicle, 'chargingRate') * objectGet(vehicle, 'chargingVoltage') / 1000
+        # If vehicle is charging, add the power back to available power so we can re-compute the
+        # optimal charging rate below
+        vehicleBattery = objectGet(vehicle, 'battery')
+        vehicleChargingLimit = objectGet(vehicle, 'chargingLimit')
+        if vehicleBattery < vehicleChargingLimit then
+            # P = V * I
+            vehicleChargingRate = objectGet(vehicle, 'chargingRate')
+            vehicleChargingVoltage = objectGet(vehicle, 'chargingVoltage')
+            availableSolar = availableSolar + vehicleChargingRate * vehicleChargingVoltage / 1000
         endif
     endforeach
 
     # Is the home battery charged?
-    isHomeBatteryCharged = homeBattery >= tespoHomeLimit
+    isHomeBatteryCharged = (homeBattery >= homeBatteryFull)
     allBatteriesCharged = isHomeBatteryCharged
 
     # Add the charging action for each vehicle
-    vehicleChargings = arrayNew()
-    output = objectNew('vehicles', vehicleChargings)
+    chargingVehicles = arrayNew()
+    output = objectNew('vehicles', chargingVehicles)
     foreach vehicle in vehicles do
         battery = objectGet(vehicle, 'battery')
         minChargingRate = objectGet(vehicle, 'minChargingRate')
@@ -38,12 +48,12 @@ function tespo(input)
 
         # Set vehicle charging off
         actionChargingRate = minChargingRate
-        actionChargingLimit = tespoMinChargingLimit
+        actionChargingLimit = vehicleChargingLimitMin
 
         # Home battery not yet fully charged?
         if isHomeBatteryCharged then
             # Vehicle fully charged?
-            isVehicleCharged = (battery >= tespoMaxChargingLimit)
+            isVehicleCharged = (battery >= vehicleChargingLimitMax)
             allBatteriesCharged = allBatteriesCharged && isVehicleCharged
             if !isVehicleCharged then
                 # Enough solar power to charge the vehicle?
@@ -60,7 +70,7 @@ function tespo(input)
                 if bestChargingRate != 0 then
                     # Charge the vehicle
                     actionChargingRate = bestChargingRate
-                    actionChargingLimit = tespoMaxChargingLimit
+                    actionChargingLimit = vehicleChargingLimitMax
 
                     # Reduce the available solar power
                     chargingPower = actionChargingRate * chargingVoltage / 1000
@@ -70,7 +80,7 @@ function tespo(input)
         endif
 
         # Add the vehicle model
-        arrayPush(vehicleChargings, objectNew( \
+        arrayPush(chargingVehicles, objectNew( \
             'id', objectGet(vehicle, 'id'), \
             'chargingRate', actionChargingRate, \
             'chargingLimit', actionChargingLimit \
@@ -78,7 +88,7 @@ function tespo(input)
     endforeach
 
     # Set the excess solar power
-    excessSolar = if(allBatteriesCharged && availableSolar > tespoMinSolarExcess, availableSolar, 0)
+    excessSolar = if(allBatteriesCharged && availableSolar > solarExcessMin, availableSolar, 0)
     objectSet(output, 'availableSolar', if(isHomeBatteryCharged, mathRound(mathMax(availableSolar, 0), 3), 0))
     objectSet(output, 'excessSolar', mathRound(excessSolar, 3))
 
@@ -88,7 +98,7 @@ endfunction
 
 # TESPO schemas
 tespoTypes = schemaParse( \
-    '# The Tesla Energy Self-Powered Optimizer (TESPO) service input', \
+    '# The Tesla Energy Self-Powered Optimizer (TESPO) algorithm input', \
     'struct TespoInput', \
     '', \
     '    # The current average solar power generation (kW)', \
@@ -100,8 +110,21 @@ tespoTypes = schemaParse( \
     '    # The home battery power percentage', \
     '    float(>= 0, <= 100) homeBattery', \
     '', \
-    '    # The connected battery-powered electric vehicles', \
+    '    # The vehicles connected to the home with charging enabled', \
     '    Vehicle[] vehicles', \
+    '', \
+    "    # Optional home battery-full percentage (default is 90). Vehicles aren't charged until the", \
+    '    # home battery is full.', \
+    '    optional int(> 0, <=100) homeBatteryFull = 90', \
+    '', \
+    '    # Optional minimum vehicle charging limit as a percentage (default is 50)', \
+    '    optional int(> 0, <= 100) vehicleChargingLimitMin', \
+    '', \
+    '    # Optional maximum vehicle charging limit as a percentage (default is 90)', \
+    '    optional int(> 0, <= 100) vehicleChargingLimitMax', \
+    '', \
+    '    # The minimum solar power that is considered excess solar power (kW)', \
+    '    optional float(> 0) solarExcessMin', \
     '', \
     '', \
     '# A battery-powered electric vehicle', \
@@ -132,7 +155,7 @@ tespoTypes = schemaParse( \
     '    int(> 0) chargingVoltage', \
     '', \
     '', \
-    '# The Tesla Energy Self-Powered Optimizer (TESPO) service output', \
+    '# The Tesla Energy Self-Powered Optimizer (TESPO) algorithm output', \
     'struct TespoOutput', \
     '', \
     '    # The vehicle-charging actions', \
@@ -192,12 +215,8 @@ tespoTypes = schemaParse( \
 )
 
 
-# The percentage at which the home battery is considered full
-tespoHomeLimit = 90
-
-# The minimum/maximum charging limits for vehicles
-tespoMinChargingLimit = 50
-tespoMaxChargingLimit = 90
-
-# The minimum solar power (kWh) that is considered excess solar power
-tespoMinSolarExcess = 1
+# TESPO input defaults
+tespoDefaultHomeBatteryFull = 90
+tespoDefaultVehicleChargingLimitMin = 50
+tespoDefaultVehicleChargingLimitMax = 90
+tespoDefaultSolarExcessMin = 1
