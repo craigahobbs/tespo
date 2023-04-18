@@ -40,6 +40,7 @@ function tespo(input)
             availableSolar = availableSolar + vehicleChargingVoltage * vehicleChargingRate / 1000
         endif
     endforeach
+    availableSolar = mathMax(availableSolar, 0)
 
     # Determine each vehicle's charging state
     chargingSolar = availableSolar
@@ -104,7 +105,7 @@ function tespo(input)
     jumpif (chargingChanged) chargingLoop
 
     # Set available solar power and the spilling state
-    objectSet(output, 'availableSolar', if(isHomeBatteryCharged, mathRound(mathMax(availableSolar, 0), 3), 0))
+    objectSet(output, 'availableSolar', if(isHomeBatteryCharged, mathRound(availableSolar, 3), 0))
     objectSet(output, 'spilling', isHomeBatteryCharged && availableSolar > 0 && availableSolar == chargingSolar)
 
     return output
