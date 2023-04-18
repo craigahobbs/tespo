@@ -57,7 +57,7 @@ function testTespo_homeCharged()
             ) \
         )), \
         objectNew( \
-            'availableSolar', 1.5, \
+            'availableSolar', 9.18, \
             'spilling', false, \
             'vehicles',  arrayNew( \
                 objectNew( \
@@ -91,7 +91,7 @@ function testTespo_homeCharged_lowSolar()
             ) \
         )), \
         objectNew( \
-            'availableSolar', 0.16, \
+            'availableSolar', 2.08, \
             'spilling', false, \
             'vehicles',  arrayNew( \
                 objectNew( \
@@ -125,7 +125,7 @@ function testTespo_homeCharged_medSolar()
             ) \
         )), \
         objectNew( \
-            'availableSolar', 0.04, \
+            'availableSolar', 3.88, \
             'spilling', false, \
             'vehicles',  arrayNew( \
                 objectNew( \
@@ -206,3 +206,51 @@ function testTespo_noneCharged()
     )
 endfunction
 unittestRunTest('testTespo_noneCharged')
+
+
+function testTespo_multipleVehicles_minChargeRate()
+    unittestDeepEquals( \
+        tespo(objectNew( \
+            'solarPower', 3, \
+            'homePower', 2.9, \
+            'homeBattery', 90, \
+            'vehicles', arrayNew( \
+                objectNew( \
+                    'id', 'ID-1', \
+                    'battery', 80, \
+                    'chargingRate', 5, \
+                    'chargingLimit', 90, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 32, \
+                    'chargingVoltage', 240 \
+                ), \
+                objectNew( \
+                    'id', 'ID-2', \
+                    'battery', 80, \
+                    'chargingRate', 5, \
+                    'chargingLimit', 90, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 12, \
+                    'chargingVoltage', 120 \
+                ) \
+            ) \
+        )), \
+        objectNew( \
+            'availableSolar', 1.9, \
+            'spilling', false, \
+            'vehicles',  arrayNew( \
+                objectNew( \
+                    'id', 'ID-1', \
+                    'chargingLimit', 90, \
+                    'chargingRate', 5 \
+                ), \
+                objectNew( \
+                    'id', 'ID-2', \
+                    'chargingLimit', 90, \
+                    'chargingRate', 5 \
+                ) \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTest('testTespo_multipleVehicles_minChargeRate')

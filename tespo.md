@@ -28,6 +28,16 @@ async function tespoMain()
         '', \
         'Coming soon!', \
         '', \
+        '## Documentation', \
+        '', \
+        "[TESPO Input](#var.vDoc='input')", \
+        '', \
+        "[TESPO Output](#var.vDoc='output')", \
+        '', \
+        "[Powerwall Scenario](#var.vDoc='powerwall')", \
+        '', \
+        "[Vehicle Scenario](#var.vDoc='vehicle')", \
+        '', \
         '## Powerwall Scenarios', \
         '', \
         "[Seattle, May 2022](#url=calibrate.md&var.vScenarioURL='scenarios-powerwall/seattle-05.json')", \

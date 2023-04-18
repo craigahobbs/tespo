@@ -163,17 +163,17 @@ powerwallTypes = schemaParse( \
     '    # The scenario name', \
     '    string(len > 0) name', \
     '', \
-    '    # The Powerwall battery capacity (kWh)', \
+    '    # The Powerwall battery capacity in kWh', \
     '    float(> 0) batteryCapacity', \
     '', \
-    '    # The self-powerered minimum battery percentage (%)', \
+    '    # The self-powerered minimum battery percentage', \
     '    int(>= 0, <= 100) backupPercent', \
     '', \
-    '    # The Powerwall charge ratio - the ratio of battery input power to power stored', \
-    '    float(> 0) chargeRatio', \
+    '    # The Powerwall charge loss ratio - the ratio of battery input power to power stored', \
+    '    float(> 0, < 1) chargeRatio', \
     '', \
-    '    # The Powerwall discharge ratio - the ratio of battery output power to power discharged', \
-    '    float(> 0) dischargeRatio', \
+    '    # The Powerwall discharge loss ratio - the ratio of battery output power to power discharged', \
+    '    float(> 0, < 1) dischargeRatio', \
     '', \
     '    # The list of Tesla app daily energy data URLs', \
     '    string(len > 0)[len > 0] dataURLs' \
