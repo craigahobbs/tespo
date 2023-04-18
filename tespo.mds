@@ -112,6 +112,12 @@ function tespo(input)
 endfunction
 
 
+# Validate a TESPO input object
+function tespoValidateInput(input)
+    return schemaValidate(tespoTypes, 'TespoInput', input)
+endfunction
+
+
 # TESPO input defaults
 tespoDefaultHomeBatteryFull = 90
 tespoDefaultVehicleChargingLimitMin = 50

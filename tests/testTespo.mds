@@ -6,7 +6,7 @@ include '../tespo.mds'
 
 function testTespo_allCharged()
     unittestDeepEquals( \
-        tespo(objectNew( \
+        tespo(tespoValidateInput(objectNew( \
             'solarPower', 8.2, \
             'homePower', 1.4, \
             'homeBattery', 90, \
@@ -14,6 +14,7 @@ function testTespo_allCharged()
                 objectNew( \
                     'id', 'ID-1', \
                     'battery', 90, \
+                    'batteryCapacity', 80, \
                     'chargingRate', 5, \
                     'chargingLimit', 50, \
                     'minChargingRate', 5, \
@@ -21,7 +22,7 @@ function testTespo_allCharged()
                     'chargingVoltage', 240 \
                 ) \
             ) \
-        )), \
+        ))), \
         objectNew( \
             'availableSolar', 6.8, \
             'spilling', true, \
@@ -40,14 +41,15 @@ unittestRunTest('testTespo_allCharged')
 
 function testTespo_homeCharged()
     unittestDeepEquals( \
-        tespo(objectNew( \
+        tespo(tespoValidateInput(objectNew( \
             "solarPower", 9.9, \
             "homePower", 8.4, \
             "homeBattery", 90, \
             "vehicles", arrayNew( \
                 objectNew( \
                     "id", "ID-1", \
-                    "battery", 80, \
+                    "battery", 75, \
+                    'batteryCapacity', 80, \
                     "chargingRate", 32, \
                     "chargingLimit", 90, \
                     "minChargingRate", 5, \
@@ -55,7 +57,7 @@ function testTespo_homeCharged()
                     "chargingVoltage", 240 \
                 ) \
             ) \
-        )), \
+        ))), \
         objectNew( \
             'availableSolar', 9.18, \
             'spilling', false, \
@@ -74,14 +76,15 @@ unittestRunTest('testTespo_homeCharged')
 
 function testTespo_homeCharged_lowSolar()
     unittestDeepEquals( \
-        tespo(objectNew( \
+        tespo(tespoValidateInput(objectNew( \
             'solarPower', 3.8, \
             'homePower', 9.4, \
             'homeBattery', 90, \
             'vehicles', arrayNew( \
                 objectNew( \
                     'id', 'ID-1', \
-                    'battery', 80, \
+                    'battery', 75, \
+                    'batteryCapacity', 80, \
                     'chargingRate', 32, \
                     'chargingLimit', 90, \
                     'minChargingRate', 5, \
@@ -89,7 +92,7 @@ function testTespo_homeCharged_lowSolar()
                     'chargingVoltage', 240 \
                 ) \
             ) \
-        )), \
+        ))), \
         objectNew( \
             'availableSolar', 2.08, \
             'spilling', false, \
@@ -108,14 +111,15 @@ unittestRunTest('testTespo_homeCharged_lowSolar')
 
 function testTespo_homeCharged_medSolar()
     unittestDeepEquals( \
-        tespo(objectNew( \
+        tespo(tespoValidateInput(objectNew( \
             'solarPower', 5.8, \
             'homePower', 9.6, \
             'homeBattery', 90, \
             'vehicles', arrayNew( \
                 objectNew( \
                     'id', 'ID-1', \
-                    'battery', 80, \
+                    'battery', 75, \
+                    'batteryCapacity', 80, \
                     'chargingRate', 32, \
                     'chargingLimit', 90, \
                     'minChargingRate', 5, \
@@ -123,7 +127,7 @@ function testTespo_homeCharged_medSolar()
                     'chargingVoltage', 240 \
                 ) \
             ) \
-        )), \
+        ))), \
         objectNew( \
             'availableSolar', 3.88, \
             'spilling', false, \
@@ -142,14 +146,15 @@ unittestRunTest('testTespo_homeCharged_medSolar')
 
 function testTespo_homeCharged_zeroSolar()
     unittestDeepEquals( \
-        tespo(objectNew( \
+        tespo(tespoValidateInput(objectNew( \
             'solarPower', 0, \
             'homePower', 8.7, \
             'homeBattery', 90, \
             'vehicles', arrayNew( \
                 objectNew( \
                     'id', 'ID-1', \
-                    'battery', 80, \
+                    'battery', 75, \
+                    'batteryCapacity', 80, \
                     'chargingRate', 32, \
                     'chargingLimit', 90, \
                     'minChargingRate', 5, \
@@ -157,7 +162,7 @@ function testTespo_homeCharged_zeroSolar()
                     'chargingVoltage', 240 \
                 ) \
             ) \
-        )), \
+        ))), \
         objectNew( \
             'availableSolar', 0, \
             'spilling', false, \
@@ -176,14 +181,15 @@ unittestRunTest('testTespo_homeCharged_zeroSolar')
 
 function testTespo_noneCharged()
     unittestDeepEquals( \
-        tespo(objectNew( \
+        tespo(tespoValidateInput(objectNew( \
             'solarPower', 9.9, \
             'homePower', 0.4, \
             'homeBattery', 85, \
             'vehicles', arrayNew( \
                 objectNew( \
                     'id', 'ID-1', \
-                    'battery', 80, \
+                    'battery', 75, \
+                    'batteryCapacity', 80, \
                     'chargingRate', 32, \
                     'chargingLimit', 90, \
                     'minChargingRate', 5, \
@@ -191,7 +197,7 @@ function testTespo_noneCharged()
                     'chargingVoltage', 240 \
                 ) \
             ) \
-        )), \
+        ))), \
         objectNew( \
             'availableSolar', 0, \
             'spilling', false, \
@@ -208,16 +214,17 @@ endfunction
 unittestRunTest('testTespo_noneCharged')
 
 
-function testTespo_multipleVehicles_minChargeRate()
+function testTespo_multipleVehicles()
     unittestDeepEquals( \
-        tespo(objectNew( \
-            'solarPower', 3, \
+        tespo(tespoValidateInput(objectNew( \
+            'solarPower', 5, \
             'homePower', 2.9, \
             'homeBattery', 90, \
             'vehicles', arrayNew( \
                 objectNew( \
                     'id', 'ID-1', \
-                    'battery', 80, \
+                    'battery', 75, \
+                    'batteryCapacity', 80, \
                     'chargingRate', 5, \
                     'chargingLimit', 90, \
                     'minChargingRate', 5, \
@@ -226,7 +233,8 @@ function testTespo_multipleVehicles_minChargeRate()
                 ), \
                 objectNew( \
                     'id', 'ID-2', \
-                    'battery', 80, \
+                    'battery', 75, \
+                    'batteryCapacity', 80, \
                     'chargingRate', 5, \
                     'chargingLimit', 90, \
                     'minChargingRate', 5, \
@@ -234,7 +242,157 @@ function testTespo_multipleVehicles_minChargeRate()
                     'chargingVoltage', 120 \
                 ) \
             ) \
-        )), \
+        ))), \
+        objectNew( \
+            'availableSolar', 3.9, \
+            'spilling', false, \
+            'vehicles',  arrayNew( \
+                objectNew( \
+                    'id', 'ID-1', \
+                    'chargingLimit', 90, \
+                    'chargingRate', 11 \
+                ), \
+                objectNew( \
+                    'id', 'ID-2', \
+                    'chargingLimit', 90, \
+                    'chargingRate', 10 \
+                ) \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTest('testTespo_multipleVehicles')
+
+
+function testTespo_multipleVehicles_allCharged()
+    unittestDeepEquals( \
+        tespo(tespoValidateInput(objectNew( \
+            'solarPower', 5, \
+            'homePower', 1.1, \
+            'homeBattery', 90, \
+            'vehicles', arrayNew( \
+                objectNew( \
+                    'id', 'ID-1', \
+                    'battery', 90, \
+                    'batteryCapacity', 80, \
+                    'chargingRate', 5, \
+                    'chargingLimit', 50, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 32, \
+                    'chargingVoltage', 240 \
+                ), \
+                objectNew( \
+                    'id', 'ID-2', \
+                    'battery', 90, \
+                    'batteryCapacity', 80, \
+                    'chargingRate', 5, \
+                    'chargingLimit', 50, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 12, \
+                    'chargingVoltage', 120 \
+                ) \
+            ) \
+        ))), \
+        objectNew( \
+            'availableSolar', 3.9, \
+            'spilling', true, \
+            'vehicles',  arrayNew( \
+                objectNew( \
+                    'id', 'ID-1', \
+                    'chargingLimit', 50, \
+                    'chargingRate', 5 \
+                ), \
+                objectNew( \
+                    'id', 'ID-2', \
+                    'chargingLimit', 50, \
+                    'chargingRate', 5 \
+                ) \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTest('testTespo_multipleVehicles_allCharged')
+
+
+function testTespo_multipleVehicles_oneCharged()
+    unittestDeepEquals( \
+        tespo(tespoValidateInput(objectNew( \
+            'solarPower', 5, \
+            'homePower', 2.3, \
+            'homeBattery', 90, \
+            'vehicles', arrayNew( \
+                objectNew( \
+                    'id', 'ID-1', \
+                    'battery', 90, \
+                    'batteryCapacity', 80, \
+                    'chargingRate', 5, \
+                    'chargingLimit', 50, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 32, \
+                    'chargingVoltage', 240 \
+                ), \
+                objectNew( \
+                    'id', 'ID-2', \
+                    'battery', 75, \
+                    'batteryCapacity', 80, \
+                    'chargingRate', 10, \
+                    'chargingLimit', 90, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 12, \
+                    'chargingVoltage', 120 \
+                ) \
+            ) \
+        ))), \
+        objectNew( \
+            'availableSolar', 3.9, \
+            'spilling', false, \
+            'vehicles',  arrayNew( \
+                objectNew( \
+                    'id', 'ID-1', \
+                    'chargingLimit', 50, \
+                    'chargingRate', 5 \
+                ), \
+                objectNew( \
+                    'id', 'ID-2', \
+                    'chargingLimit', 90, \
+                    'chargingRate', 12 \
+                ) \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTest('testTespo_multipleVehicles_oneCharged')
+
+
+function testTespo_multipleVehicles_minChargeRate()
+    unittestDeepEquals( \
+        tespo(tespoValidateInput(objectNew( \
+            'solarPower', 3, \
+            'homePower', 2.9, \
+            'homeBattery', 90, \
+            'vehicles', arrayNew( \
+                objectNew( \
+                    'id', 'ID-1', \
+                    'battery', 75, \
+                    'batteryCapacity', 80, \
+                    'chargingRate', 5, \
+                    'chargingLimit', 90, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 32, \
+                    'chargingVoltage', 240 \
+                ), \
+                objectNew( \
+                    'id', 'ID-2', \
+                    'battery', 75, \
+                    'batteryCapacity', 80, \
+                    'chargingRate', 5, \
+                    'chargingLimit', 90, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 12, \
+                    'chargingVoltage', 120 \
+                ) \
+            ) \
+        ))), \
         objectNew( \
             'availableSolar', 1.9, \
             'spilling', false, \
@@ -254,3 +412,103 @@ function testTespo_multipleVehicles_minChargeRate()
     )
 endfunction
 unittestRunTest('testTespo_multipleVehicles_minChargeRate')
+
+
+function testTespo_multipleVehicles_minChargeRateSingle()
+    unittestDeepEquals( \
+        tespo(tespoValidateInput(objectNew( \
+            'solarPower', 2.8, \
+            'homePower', 2.9, \
+            'homeBattery', 90, \
+            'vehicles', arrayNew( \
+                objectNew( \
+                    'id', 'ID-1', \
+                    'battery', 75, \
+                    'batteryCapacity', 80, \
+                    'chargingRate', 5, \
+                    'chargingLimit', 90, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 32, \
+                    'chargingVoltage', 240 \
+                ), \
+                objectNew( \
+                    'id', 'ID-2', \
+                    'battery', 75, \
+                    'batteryCapacity', 80, \
+                    'chargingRate', 5, \
+                    'chargingLimit', 90, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 12, \
+                    'chargingVoltage', 120 \
+                ) \
+            ) \
+        ))), \
+        objectNew( \
+            'availableSolar', 1.7, \
+            'spilling', false, \
+            'vehicles',  arrayNew( \
+                objectNew( \
+                    'id', 'ID-1', \
+                    'chargingLimit', 90, \
+                    'chargingRate', 7 \
+                ), \
+                objectNew( \
+                    'id', 'ID-2', \
+                    'chargingLimit', 50, \
+                    'chargingRate', 5 \
+                ) \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTest('testTespo_multipleVehicles_minChargeRateSingle')
+
+
+function testTespoValidateInput()
+    unittestDeepEquals( \
+        tespoValidateInput(objectNew( \
+            'solarPower', 2.8, \
+            'homePower', 2.9, \
+            'homeBattery', 90, \
+            'vehicles', arrayNew( \
+                objectNew( \
+                    'id', 'ID-1', \
+                    'battery', 75, \
+                    'batteryCapacity', 80, \
+                    'chargingRate', 5, \
+                    'chargingLimit', 90, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 32, \
+                    'chargingVoltage', 240 \
+                ) \
+            ) \
+        )), \
+        objectNew( \
+            'solarPower', 2.8, \
+            'homePower', 2.9, \
+            'homeBattery', 90, \
+            'vehicles', arrayNew( \
+                objectNew( \
+                    'id', 'ID-1', \
+                    'battery', 75, \
+                    'batteryCapacity', 80, \
+                    'chargingRate', 5, \
+                    'chargingLimit', 90, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 32, \
+                    'chargingVoltage', 240 \
+                ) \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTest('testTespoValidateInput')
+
+
+function testTespoValidateInput_fail()
+    unittestDeepEquals( \
+        tespoValidateInput(objectNew()), \
+        null \
+    )
+endfunction
+unittestRunTest('testTespoValidateInput_fail')
