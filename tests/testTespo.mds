@@ -4,6 +4,11 @@
 include '../tespo.mds'
 
 
+#
+# TESPO tests
+#
+
+
 function testTespo_allCharged()
     unittestDeepEquals( \
         tespo(tespoValidateInput(objectNew( \
@@ -464,51 +469,84 @@ endfunction
 unittestRunTest('testTespo_multipleVehicles_minChargeRateSingle')
 
 
+#
+# tespoValidateInput tests
+#
+
+
 function testTespoValidateInput()
-    unittestDeepEquals( \
-        tespoValidateInput(objectNew( \
-            'solarPower', 2.8, \
-            'homePower', 2.9, \
-            'homeBattery', 90, \
-            'vehicles', arrayNew( \
-                objectNew( \
-                    'id', 'ID-1', \
-                    'battery', 75, \
-                    'batteryCapacity', 80, \
-                    'chargingRate', 5, \
-                    'chargingLimit', 90, \
-                    'minChargingRate', 5, \
-                    'maxChargingRate', 32, \
-                    'chargingVoltage', 240 \
-                ) \
-            ) \
-        )), \
-        objectNew( \
-            'solarPower', 2.8, \
-            'homePower', 2.9, \
-            'homeBattery', 90, \
-            'vehicles', arrayNew( \
-                objectNew( \
-                    'id', 'ID-1', \
-                    'battery', 75, \
-                    'batteryCapacity', 80, \
-                    'chargingRate', 5, \
-                    'chargingLimit', 90, \
-                    'minChargingRate', 5, \
-                    'maxChargingRate', 32, \
-                    'chargingVoltage', 240 \
-                ) \
+    input = objectNew( \
+        'solarPower', 2.8, \
+        'homePower', 2.9, \
+        'homeBattery', 90, \
+        'vehicles', arrayNew( \
+            objectNew( \
+                'id', 'ID-1', \
+                'battery', 75, \
+                'batteryCapacity', 80, \
+                'chargingRate', 5, \
+                'chargingLimit', 90, \
+                'minChargingRate', 5, \
+                'maxChargingRate', 32, \
+                'chargingVoltage', 240 \
             ) \
         ) \
     )
+    unittestDeepEquals(tespoValidateInput(input), input)
 endfunction
 unittestRunTest('testTespoValidateInput')
 
 
 function testTespoValidateInput_fail()
-    unittestDeepEquals( \
-        tespoValidateInput(objectNew()), \
-        null \
-    )
+    unittestDeepEquals(tespoValidateInput(objectNew()), null)
 endfunction
 unittestRunTest('testTespoValidateInput_fail')
+
+
+#
+# tespoValidateVehicleScenario tests
+#
+
+
+function testTespoValidateVehicleScenario()
+    vehicleScenario = objectNew( \
+        'vehicles', arrayNew( \
+            objectNew( \
+                'id', 'ID-1', \
+                'battery', 75, \
+                'batteryCapacity', 80, \
+                'chargingRate', 5, \
+                'chargingLimit', 90, \
+                'minChargingRate', 5, \
+                'maxChargingRate', 32, \
+                'chargingVoltage', 240 \
+            ) \
+        ), \
+        'days', arrayNew( \
+            objectNew( \
+                'departures', arrayNew( \
+                    objectNew( \
+                        'id', 'ID-1', \
+                        'departure', 9, \
+                        'arrival', 11, \
+                        'batteryPercentChange', -10 \
+                    ), \
+                    objectNew( \
+                        'id', 'ID-1', \
+                        'departure', 18, \
+                        'arrival', 21, \
+                        'batteryPercentChange', -20 \
+                    ) \
+                ) \
+            ) \
+        ) \
+    )
+    unittestDeepEquals(tespoValidateVehicleScenario(vehicleScenario), vehicleScenario)
+endfunction
+unittestRunTest('testTespoValidateVehicleScenario')
+
+
+function testTespoValidateVehicleScenario_fail()
+    unittestDeepEquals(tespoValidateVehicleScenario(objectNew()), vehicleScenario)
+endfunction
+unittestRunTest('testTespoValidateVehicleScenario_fail')
