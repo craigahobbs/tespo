@@ -504,6 +504,100 @@ unittestRunTest('testTespoValidateInput_fail')
 
 
 #
+# tespoVehicleDeparted tests
+#
+
+
+function testTespoVehicleDeparted()
+    unittestDeepEquals( \
+        tespoVehicleDeparted( \
+            objectNew( \
+                'departures', arrayNew( \
+                    objectNew( \
+                        'id', 'ID-1', \
+                        'departure', 9, \
+                        'arrival', 11, \
+                        'batteryPercentChange', -10 \
+                    ), \
+                    objectNew( \
+                        'id', 'ID-1', \
+                        'departure', 18, \
+                        'arrival', 21, \
+                        'batteryPercentChange', -20 \
+                    ) \
+                ) \
+            ), \
+            'ID-1', \
+            19 \
+        ), \
+        objectNew( \
+            'id', 'ID-1', \
+            'departure', 18, \
+            'arrival', 21, \
+            'batteryPercentChange', -20 \
+        ) \
+    )
+endfunction
+unittestRunTest('testTespoVehicleDeparted')
+
+
+function testTespoVehicleDeparted_connected()
+    unittestDeepEquals( \
+        tespoVehicleDeparted( \
+            objectNew( \
+                'departures', arrayNew( \
+                    objectNew( \
+                        'id', 'ID-1', \
+                        'departure', 9, \
+                        'arrival', 11, \
+                        'batteryPercentChange', -10 \
+                    ), \
+                    objectNew( \
+                        'id', 'ID-1', \
+                        'departure', 18, \
+                        'arrival', 21, \
+                        'batteryPercentChange', -20 \
+                    ) \
+                ) \
+            ), \
+            'ID-1', \
+            12 \
+        ), \
+        null \
+    )
+endfunction
+unittestRunTest('testTespoVehicleDeparted_connected')
+
+
+function testTespoVehicleDeparted_connected_id()
+    unittestDeepEquals( \
+        tespoVehicleDeparted( \
+            objectNew( \
+                'departures', arrayNew( \
+                    objectNew( \
+                        'id', 'ID-1', \
+                        'departure', 9, \
+                        'arrival', 11, \
+                        'batteryPercentChange', -10 \
+                    ), \
+                    objectNew( \
+                        'id', 'ID-1', \
+                        'departure', 18, \
+                        'arrival', 21, \
+                        'batteryPercentChange', -20 \
+                    ) \
+                ) \
+            ), \
+            'ID-2', \
+            19 \
+        ), \
+        null \
+    )
+endfunction
+unittestRunTest('testTespoVehicleDeparted_connected_id')
+
+
+#
 # tespoValidateVehicleScenario tests
 #
 
