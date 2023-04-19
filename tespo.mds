@@ -158,8 +158,8 @@ tespoTypes = schemaParse( \
     '    # Optional maximum vehicle charging limit as a percentage (default is ' + tespoDefaultVehicleChargingLimitMax + '%)', \
     '    optional int(> 0, <= 100) maxVehicleChargingLimit', \
     '', \
-    '    # Optional vehicle charging rate increment in amps (default is ' + tespoDefaultChargingRateIncrement + \
-        ' amp' + if(tespoDefaultChargingRateIncrement == 1, '', 's') + ')', \
+    '    # Optional vehicle charging rate increment in amps (default is ' + tespoDefaultChargingRateIncrement, \
+    '    # ' + if(tespoDefaultChargingRateIncrement == 1, 'amp', 'amps') + ')', \
     '    optional int(> 0) chargingRateIncrement', \
     '', \
     '', \
