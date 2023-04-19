@@ -4,6 +4,11 @@
 include '../powerwall.mds'
 
 
+#
+# powerwallSimulate tests
+#
+
+
 function testPowerwallSimulate_zeroHome_zeroSolar()
     unittestDeepEquals( \
         powerwallSimulate(objectNew( \
@@ -38,3 +43,146 @@ function testPowerwallSimulate_zeroHome_zeroSolar()
     )
 endfunction
 unittestRunTest('testPowerwallSimulate_zeroHome_zeroSolar')
+
+
+#
+# powerwallVehicleDeparted tests
+#
+
+
+function testPowerwallVehicleDeparted()
+    unittestDeepEquals( \
+        powerwallVehicleDeparted( \
+            objectNew( \
+                'departures', arrayNew( \
+                    objectNew( \
+                        'id', 'ID-1', \
+                        'departure', 9, \
+                        'arrival', 11, \
+                        'batteryPercentChange', -10 \
+                    ), \
+                    objectNew( \
+                        'id', 'ID-1', \
+                        'departure', 18, \
+                        'arrival', 21, \
+                        'batteryPercentChange', -20 \
+                    ) \
+                ) \
+            ), \
+            'ID-1', \
+            19 \
+        ), \
+        objectNew( \
+            'id', 'ID-1', \
+            'departure', 18, \
+            'arrival', 21, \
+            'batteryPercentChange', -20 \
+        ) \
+    )
+endfunction
+unittestRunTest('testPowerwallVehicleDeparted')
+
+
+function testPowerwallVehicleDeparted_connected()
+    unittestDeepEquals( \
+        powerwallVehicleDeparted( \
+            objectNew( \
+                'departures', arrayNew( \
+                    objectNew( \
+                        'id', 'ID-1', \
+                        'departure', 9, \
+                        'arrival', 11, \
+                        'batteryPercentChange', -10 \
+                    ), \
+                    objectNew( \
+                        'id', 'ID-1', \
+                        'departure', 18, \
+                        'arrival', 21, \
+                        'batteryPercentChange', -20 \
+                    ) \
+                ) \
+            ), \
+            'ID-1', \
+            12 \
+        ), \
+        null \
+    )
+endfunction
+unittestRunTest('testPowerwallVehicleDeparted_connected')
+
+
+function testPowerwallVehicleDeparted_connected_id()
+    unittestDeepEquals( \
+        powerwallVehicleDeparted( \
+            objectNew( \
+                'departures', arrayNew( \
+                    objectNew( \
+                        'id', 'ID-1', \
+                        'departure', 9, \
+                        'arrival', 11, \
+                        'batteryPercentChange', -10 \
+                    ), \
+                    objectNew( \
+                        'id', 'ID-1', \
+                        'departure', 18, \
+                        'arrival', 21, \
+                        'batteryPercentChange', -20 \
+                    ) \
+                ) \
+            ), \
+            'ID-2', \
+            19 \
+        ), \
+        null \
+    )
+endfunction
+unittestRunTest('testPowerwallVehicleDeparted_connected_id')
+
+
+#
+# powerwallValidateVehicleScenario tests
+#
+
+
+function testPowerwallValidateVehicleScenario()
+    vehicleScenario = objectNew( \
+        'vehicles', arrayNew( \
+            objectNew( \
+                'id', 'ID-1', \
+                'battery', 75, \
+                'batteryCapacity', 80, \
+                'chargingRate', 5, \
+                'chargingLimit', 90, \
+                'minChargingRate', 5, \
+                'maxChargingRate', 32, \
+                'chargingVoltage', 240 \
+            ) \
+        ), \
+        'days', arrayNew( \
+            objectNew( \
+                'departures', arrayNew( \
+                    objectNew( \
+                        'id', 'ID-1', \
+                        'departure', 9, \
+                        'arrival', 11, \
+                        'batteryPercentChange', -10 \
+                    ), \
+                    objectNew( \
+                        'id', 'ID-1', \
+                        'departure', 18, \
+                        'arrival', 21, \
+                        'batteryPercentChange', -20 \
+                    ) \
+                ) \
+            ) \
+        ) \
+    )
+    unittestDeepEquals(powerwallValidateVehicleScenario(vehicleScenario), vehicleScenario)
+endfunction
+unittestRunTest('testPowerwallValidateVehicleScenario')
+
+
+function testPowerwallValidateVehicleScenario_fail()
+    unittestDeepEquals(powerwallValidateVehicleScenario(objectNew()), vehicleScenario)
+endfunction
+unittestRunTest('testPowerwallValidateVehicleScenario_fail')

@@ -8,6 +8,9 @@ if getGlobal('powerwallSimulate') then
 endif
 
 
+include 'tespo.mds'
+
+
 # Simulate a Tesla Powerwall scenario
 function powerwallSimulate(scenario)
     # Powerwall specifications
@@ -84,6 +87,27 @@ function powerwallSimulate(scenario)
 endfunction
 
 
+# Determine if a vehicle is away from the home
+function powerwallVehicleDeparted(vehicleDay, vehicleID, hourOfDay)
+    departures = objectGet(vehicleDay, 'departures')
+    foreach departure in departures do
+        departureID = objectGet(departure, 'id')
+        departureHour = objectGet(departure, 'departure')
+        arrivalHour = objectGet(departure, 'arrival')
+        if vehicleID == departureID && hourOfDay >= departureHour && hourOfDay <= arrivalHour then
+            return departure
+        endif
+    endforeach
+    return null
+endfunction
+
+
+# Validate a vehicle scenario object
+function powerwallValidateVehicleScenario(vehicleScenario)
+    return schemaValidate(powerwallTypes, 'VehicleScenario', vehicleScenario)
+endfunction
+
+
 # Load a Powerwall simulation scenario
 async function powerwallLoadScenario(scenarioURL)
     # Load the scenario file
@@ -156,27 +180,63 @@ endfunction
 
 
 # Powerwall simulation scenario JSON schema
-powerwallTypes = schemaParse( \
-    '# Tesla Powerwall simulation scenario', \
-    'struct PowerwallScenario', \
-    '', \
-    '    # The scenario name', \
-    '    string(len > 0) name', \
-    '', \
-    '    # The Powerwall battery capacity in kWh', \
-    '    float(> 0) batteryCapacity', \
-    '', \
-    '    # The self-powerered minimum battery percentage', \
-    '    int(>= 0, <= 100) backupPercent', \
-    '', \
-    '    # The Powerwall charge loss ratio - the ratio of battery input power to power stored', \
-    '    float(> 0, < 1) chargeRatio', \
-    '', \
-    '    # The Powerwall discharge loss ratio - the ratio of battery output power to power discharged', \
-    '    float(> 0, < 1) dischargeRatio', \
-    '', \
-    '    # The list of Tesla app daily energy data URLs', \
-    '    string(len > 0)[len > 0] dataURLs' \
+powerwallTypes = schemaParseEx( \
+    arrayNew( \
+        '# Tesla Powerwall simulation scenario', \
+        'struct PowerwallScenario', \
+        '', \
+        '    # The scenario name', \
+        '    string(len > 0) name', \
+        '', \
+        '    # The Powerwall battery capacity in kWh', \
+        '    float(> 0) batteryCapacity', \
+        '', \
+        '    # The self-powerered minimum battery percentage', \
+        '    int(>= 0, <= 100) backupPercent', \
+        '', \
+        '    # The Powerwall charge loss ratio - the ratio of battery input power to power stored', \
+        '    float(> 0, < 1) chargeRatio', \
+        '', \
+        '    # The Powerwall discharge loss ratio - the ratio of battery output power to power discharged', \
+        '    float(> 0, < 1) dischargeRatio', \
+        '', \
+        '    # The list of Tesla app daily energy data URLs', \
+        '    string(len > 0)[len > 0] dataURLs', \
+        '', \
+        '', \
+        '# A vehicle charging scenario', \
+        'struct VehicleScenario', \
+        '', \
+        '    # The scenario vehicles', \
+        '    Vehicle[len > 0] vehicles', \
+        '', \
+        '    # The vehicle daily activity', \
+        '    VehicleDay[len > 0] days', \
+        '', \
+        '', \
+        "# A vehicle's daily activity", \
+        'struct VehicleDay', \
+        '', \
+        "    # The vehicle's departures", \
+        '    VehicleDeparture[] departures', \
+        '', \
+        '', \
+        '# A vehicle departure and arrival', \
+        'struct VehicleDeparture', \
+        '', \
+        '    # The vehicle ID', \
+        '    string(len > 0) id', \
+        '', \
+        '    # The vehicle departure hour', \
+        '    float(>= 0, <=24) departure', \
+        '', \
+        '    # The vehicle arrival hour', \
+        '    float(>= 0, <=24) arrival', \
+        '', \
+        '    # The battery charge change as percentage', \
+        '    float batteryPercentChange' \
+    ), \
+    objectCopy(tespoTypes) \
 )
 
 

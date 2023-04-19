@@ -118,27 +118,6 @@ function tespoValidateInput(input)
 endfunction
 
 
-# Determine if a vehicle is away from the home
-function tespoVehicleDeparted(vehicleDay, vehicleID, hourOfDay)
-    departures = objectGet(vehicleDay, 'departures')
-    foreach departure in departures do
-        departureID = objectGet(departure, 'id')
-        departureHour = objectGet(departure, 'departure')
-        arrivalHour = objectGet(departure, 'arrival')
-        if vehicleID == departureID && hourOfDay >= departureHour && hourOfDay <= arrivalHour then
-            return departure
-        endif
-    endforeach
-    return null
-endfunction
-
-
-# Validate a vehicle scenario object
-function tespoValidateVehicleScenario(vehicleScenario)
-    return schemaValidate(tespoTypes, 'VehicleScenario', vehicleScenario)
-endfunction
-
-
 # TESPO input defaults
 tespoDefaultHomeBatteryFull = 90
 tespoDefaultVehicleChargingLimitMin = 50
@@ -229,38 +208,5 @@ tespoTypes = schemaParse( \
     '    int(> 0) chargingRate', \
     '', \
     '    # The charging limit as a percentage', \
-    '    float(> 0, <= 100) chargingLimit', \
-    '', \
-    '', \
-    '# A vehicle charging scenario', \
-    'struct VehicleScenario', \
-    '', \
-    '    # The scenario vehicles', \
-    '    Vehicle[len > 0] vehicles', \
-    '', \
-    '    # The vehicle daily activity', \
-    '    VehicleDay[len > 0] days', \
-    '', \
-    '', \
-    "# A vehicle's daily activity", \
-    'struct VehicleDay', \
-    '', \
-    "    # The vehicle's departures", \
-    '    VehicleDeparture[] departures', \
-    '', \
-    '', \
-    '# A vehicle departure and arrival', \
-    'struct VehicleDeparture', \
-    '', \
-    '    # The vehicle ID', \
-    '    string(len > 0) id', \
-    '', \
-    '    # The vehicle departure hour', \
-    '    float(>= 0, <=24) departure', \
-    '', \
-    '    # The vehicle arrival hour', \
-    '    float(>= 0, <=24) arrival', \
-    '', \
-    '    # The battery charge change as percentage', \
-    '    float batteryPercentChange' \
+    '    float(> 0, <= 100) chargingLimit' \
 )

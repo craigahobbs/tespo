@@ -9,7 +9,7 @@ include 'tespo.mds'
 async function tespoMain()
     # Input/output schema documentation?
     if vDoc != null then
-        docTypes = if(vDoc == 'powerwall', powerwallTypes, tespoTypes)
+        docTypes = if(vDoc == 'powerwall' || vDoc == 'vehicle', powerwallTypes, tespoTypes)
         docTypeName = if(vDoc == 'output', 'TespoOutput', \
             if(vDoc == 'input', 'TespoInput', \
             if(vDoc == 'vehicle', 'VehicleScenario', \
