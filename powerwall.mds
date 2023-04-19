@@ -48,30 +48,42 @@ function powerwallSimulate(scenario, batteryPercent)
         # Are we generating more solar energy than we're currently using?
         powerwallKw = homeKw - solarKw
         if solarKw > homeKw then
-            # Charge the battery - did we exceed the battery's capacity?
-            batteryNewKwh = batteryKwh + (solarKw - homeKw) * chargeRatio * durationHours
-            if batteryNewKwh > batteryCapacityKwh then
-                # Battery is full - output excess energy to the grid
-                batteryNewKwh = batteryCapacityKwh
-                powerwallKw = ((batteryKwh - batteryCapacityKwh) / chargeRatio) / durationHours
-                gridKw = -solarKw - powerwallKw
+            if batteryPercent >= 100 then
+                gridKw = powerwallKw
+                powerwallKw = 0
+                batteryNewKwh = batteryKwh
             else then
-                # Battery is charging
-                gridKw = 0
+                # Charge the battery - did we exceed the battery's capacity?
+                batteryNewKwh = batteryKwh - powerwallKw * chargeRatio * durationHours
+                if batteryNewKwh > batteryCapacityKwh then
+                    # Battery is full - output excess energy to the grid
+                    batteryNewKwh = batteryCapacityKwh
+                    powerwallKw = ((batteryKwh - batteryCapacityKwh) / chargeRatio) / durationHours
+                    gridKw = homeKw - solarKw - powerwallKw
+                else then
+                    # Battery is charging
+                    gridKw = 0
+                endif
             endif
 
         # No, we are using more energy than we are generating
         else then
-            # Discharge the battery - did we run out of battery power?
-            batteryNewKwh = batteryKwh - ((homeKw - solarKw) / dischargeRatio) * durationHours
-            if batteryNewKwh < backupKwh then
-                # Battery is empty - pull from the grid
-                batteryNewKwh = backupKwh
-                powerwallKw = ((batteryKwh - backupKwh) * dischargeRatio) / durationHours
-                gridKw = homeKw - powerwallKw
+            if batteryPercent <= backupPercent then
+                gridKw = powerwallKw
+                powerwallKw = 0
+                batteryNewKwh = batteryPercent * batteryCapacityKwh / 100
             else then
-                # Battery is discharging
-                gridKw = 0
+                # Discharge the battery - did we run out of battery power?
+                batteryNewKwh = batteryKwh - ((homeKw - solarKw) / dischargeRatio) * durationHours
+                if batteryNewKwh < backupKwh then
+                    # Battery is empty - pull from the grid
+                    batteryNewKwh = backupKwh
+                    powerwallKw = ((batteryKwh - backupKwh) * dischargeRatio) / durationHours
+                    gridKw = homeKw - solarKw - powerwallKw
+                else then
+                    # Battery is discharging
+                    gridKw = 0
+                endif
             endif
         endif
 

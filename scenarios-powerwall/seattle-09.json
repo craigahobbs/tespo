@@ -2,7 +2,7 @@
     "name": "Seattle, September 2022",
     "batteryCapacity": 25.5,
     "backupPercent": 20,
-    "chargeRatio": 0.944,
+    "chargeRatio": 0.945,
     "dischargeRatio": 0.929,
     "dataURLs": [
         "seattle-09-18.csv",
