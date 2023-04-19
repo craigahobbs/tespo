@@ -11,8 +11,17 @@ endif
 include 'tespo.mds'
 
 
+# Compute the initial battery charge percentage for a Powerwall scenario
+function powerwallBatteryPercent(powerwallScenario)
+    data = objectGet(powerwallScenario, 'data')
+    row0 = arrayGet(data, 0)
+    row1 = arrayGet(data, 1)
+    return 2 * objectGet(row0, powerwallFieldBatteryPercent) - objectGet(row1, powerwallFieldBatteryPercent)
+endfunction
+
+
 # Simulate a Tesla Powerwall scenario
-function powerwallSimulate(scenario)
+function powerwallSimulate(scenario, batteryPercent)
     # Powerwall specifications
     batteryCapacityKwh = objectGet(scenario, 'batteryCapacity')
     backupPercent = objectGet(scenario, 'backupPercent')
@@ -20,12 +29,9 @@ function powerwallSimulate(scenario)
     dischargeRatio = objectGet(scenario, 'dischargeRatio')
     data = objectGet(scenario, 'data')
 
-    # Compute the initial battery percentage
+    # Compute the row duration
     row0 = arrayGet(data, 0)
     row1 = arrayGet(data, 1)
-    batteryPercent = 2 * objectGet(row0, powerwallFieldBatteryPercent) - objectGet(row1, powerwallFieldBatteryPercent)
-
-    # Compute the row duration
     durationHours = (objectGet(row1, powerwallFieldDate) - objectGet(row0, powerwallFieldDate)) / (60 * 60 * 1000)
 
     # Simulate each data row

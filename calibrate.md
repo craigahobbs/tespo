@@ -36,7 +36,7 @@ async function calibrateMain()
     objectSet(scenario, 'backupPercent', backupPercent)
     objectSet(scenario, 'chargeRatio', chargeRatio)
     objectSet(scenario, 'dischargeRatio', dischargeRatio)
-    simulated = powerwallSimulate(scenario)
+    simulated = powerwallSimulate(scenario, powerwallBatteryPercent(scenario))
 
     # Compute the differences
     differences = arrayNew()
