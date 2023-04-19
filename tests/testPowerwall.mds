@@ -41,7 +41,7 @@ unittestRunTest('testPowerwallBatteryPercent')
 #
 
 
-function testPowerwallSimulate_zeroHome_zeroSolar()
+function testPowerwallSimulate_allZeroes()
     unittestDeepEquals( \
         powerwallSimulate( \
             objectNew( \
@@ -77,7 +77,7 @@ function testPowerwallSimulate_zeroHome_zeroSolar()
         ) \
     )
 endfunction
-unittestRunTest('testPowerwallSimulate_zeroHome_zeroSolar')
+unittestRunTest('testPowerwallSimulate_allZeroes')
 
 
 function testPowerwallSimulate_solarSurplus()
