@@ -148,8 +148,8 @@ tespoTypes = schemaParse( \
     '    # The vehicles connected to the home with charging enabled', \
     '    Vehicle[] vehicles', \
     '', \
-    '    # Optional home battery-full percentage (default is ' + tespoDefaultHomeBatteryFull + "%). Vehicles aren't charged until the", \
-    '    # home battery is full.', \
+    '    # Optional home battery-full percentage (default is ' + tespoDefaultHomeBatteryFull + '%).', \
+    "    # Vehicles aren't charged until the home battery is full.", \
     '    optional int(> 0, <=100) homeBatteryFull', \
     '', \
     '    # Optional minimum vehicle charging limit as a percentage (default is ' + tespoDefaultVehicleChargingLimitMin + '%)', \
@@ -163,7 +163,7 @@ tespoTypes = schemaParse( \
     '    optional int(> 0) chargingRateIncrement', \
     '', \
     '', \
-    '# A battery-powered electric vehicle', \
+    '# A connected battery-powered electric vehicle with charging enabled', \
     'struct Vehicle', \
     '', \
     '    # The vehicle ID', \
