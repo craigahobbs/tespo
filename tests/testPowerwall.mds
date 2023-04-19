@@ -80,7 +80,7 @@ endfunction
 unittestRunTest('testPowerwallSimulate_zeroHome_zeroSolar')
 
 
-function testPowerwallSimulate_solarSurplus_battery100()
+function testPowerwallSimulate_solarSurplus()
     unittestDeepEquals( \
         powerwallSimulate( \
             objectNew( \
@@ -125,7 +125,55 @@ function testPowerwallSimulate_solarSurplus_battery100()
         ) \
     )
 endfunction
-unittestRunTest('testPowerwallSimulate_solarSurplus_battery100')
+unittestRunTest('testPowerwallSimulate_solarSurplus')
+
+
+function testPowerwallSimulate_solarDeficit()
+    unittestDeepEquals( \
+        powerwallSimulate( \
+            objectNew( \
+                'name', 'Powerwall Scenario', \
+                'batteryCapacity', 40, \
+                'backupPercent', 20, \
+                'chargeRatio', 0.95, \
+                'dischargeRatio', 0.95, \
+                'data', arrayNew( \
+                    objectNew( \
+                        powerwallFieldDate, datetimeNew(2023, 4, 18, 4, 35), \
+                        powerwallFieldHome, 6.4, powerwallFieldSolar, 0.6 \
+                    ), \
+                    objectNew( \
+                        powerwallFieldDate, datetimeNew(2023, 4, 18, 4, 40), \
+                        powerwallFieldHome, 5.5, powerwallFieldSolar, 1.2 \
+                    ), \
+                    objectNew( \
+                        powerwallFieldDate, datetimeNew(2023, 4, 18, 4, 45), \
+                        powerwallFieldHome, 6.1, powerwallFieldSolar, 0.8 \
+                    ) \
+                ) \
+            ), \
+            21.5 \
+        ), \
+        arrayNew( \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 18, 4, 35), \
+                powerwallFieldHome, 6.4, powerwallFieldSolar, 0.6, \
+                powerwallFieldGrid, 0, powerwallFieldPowerwall, 5.8, powerwallFieldBatteryPercent, 20.228 \
+            ), \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 18, 4, 40), \
+                powerwallFieldHome, 5.5, powerwallFieldSolar, 1.2, \
+                powerwallFieldGrid, 4.46, powerwallFieldPowerwall, 1.04, powerwallFieldBatteryPercent, 20 \
+            ), \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 18, 4, 45), \
+                powerwallFieldHome, 6.1, powerwallFieldSolar, 0.8, \
+                powerwallFieldGrid, 6.1, powerwallFieldPowerwall, 0, powerwallFieldBatteryPercent, 20 \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTest('testPowerwallSimulate_solarDeficit')
 
 
 #
