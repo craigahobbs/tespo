@@ -81,11 +81,11 @@ function powerwallSimulate(scenario, batteryPercent)
         # Push the simulated row
         arrayPush(simulated, objectNew( \
             powerwallFieldDate, objectGet(row, powerwallFieldDate), \
-            powerwallFieldHome, homeKw, \
-            powerwallFieldSolar, solarKw, \
-            powerwallFieldPowerwall, powerwallKw, \
-            powerwallFieldGrid, gridKw, \
-            powerwallFieldBatteryPercent, batteryPercent \
+            powerwallFieldHome, mathRound(homeKw, 3), \
+            powerwallFieldSolar, mathRound(solarKw, 3), \
+            powerwallFieldPowerwall, mathRound(powerwallKw, 3), \
+            powerwallFieldGrid, mathRound(gridKw, 3), \
+            powerwallFieldBatteryPercent, mathRound(batteryPercent, 3) \
         ))
     endforeach
 

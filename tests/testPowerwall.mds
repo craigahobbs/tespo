@@ -80,6 +80,54 @@ endfunction
 unittestRunTest('testPowerwallSimulate_zeroHome_zeroSolar')
 
 
+function testPowerwallSimulate_solarSurplus_battery100()
+    unittestDeepEquals( \
+        powerwallSimulate( \
+            objectNew( \
+                'name', 'Powerwall Scenario', \
+                'batteryCapacity', 40, \
+                'backupPercent', 20, \
+                'chargeRatio', 0.95, \
+                'dischargeRatio', 0.95, \
+                'data', arrayNew( \
+                    objectNew( \
+                        powerwallFieldDate, datetimeNew(2023, 4, 18, 4, 35), \
+                        powerwallFieldHome, 0.6, powerwallFieldSolar, 6.4 \
+                    ), \
+                    objectNew( \
+                        powerwallFieldDate, datetimeNew(2023, 4, 18, 4, 40), \
+                        powerwallFieldHome, 1.2, powerwallFieldSolar, 5.5 \
+                    ), \
+                    objectNew( \
+                        powerwallFieldDate, datetimeNew(2023, 4, 18, 4, 45), \
+                        powerwallFieldHome, 0.8, powerwallFieldSolar, 6.1 \
+                    ) \
+                ) \
+            ), \
+            98.5 \
+        ), \
+        arrayNew( \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 18, 4, 35), \
+                powerwallFieldHome, 0.6, powerwallFieldSolar, 6.4, \
+                powerwallFieldGrid, 0, powerwallFieldPowerwall, -5.8, powerwallFieldBatteryPercent, 99.648 \
+            ), \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 18, 4, 40), \
+                powerwallFieldHome, 1.2, powerwallFieldSolar, 5.5, \
+                powerwallFieldGrid, -3.721, powerwallFieldPowerwall, -1.779, powerwallFieldBatteryPercent, 100 \
+            ), \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 18, 4, 45), \
+                powerwallFieldHome, 0.8, powerwallFieldSolar, 6.1, \
+                powerwallFieldGrid, -6.1, powerwallFieldPowerwall, 0, powerwallFieldBatteryPercent, 100 \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTest('testPowerwallSimulate_solarSurplus_battery100')
+
+
 #
 # powerwallVehicleDeparted tests
 #
