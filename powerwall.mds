@@ -16,7 +16,7 @@ function powerwallBatteryPercent(powerwallScenario)
     data = objectGet(powerwallScenario, 'data')
     row0 = arrayGet(data, 0)
     row1 = arrayGet(data, 1)
-    return 2 * objectGet(row0, powerwallFieldBatteryPercent) - objectGet(row1, powerwallFieldBatteryPercent)
+    return 0.5 * (objectGet(row0, powerwallFieldBatteryPercent) + objectGet(row1, powerwallFieldBatteryPercent))
 endfunction
 
 
