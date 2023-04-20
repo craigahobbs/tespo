@@ -369,6 +369,131 @@ unittestRunTest('testPowerwallSimulate_solarDeficit_belowBackup')
 
 
 #
+# powerwallSimulate tests with vehicle scenario
+#
+
+
+function testPowerwallSimulate_vehicleScenario()
+    data = powerwallSimulate( \
+        objectNew( \
+            'name', 'Powerwall Scenario', \
+            'batteryCapacity', 40, \
+            'backupPercent', 20, \
+            'chargeRatio', 0.95, \
+            'dischargeRatio', 0.95, \
+            'data', arrayNew( \
+                objectNew(powerwallFieldDate, datetimeNew(2023, 4, 18, 0),  powerwallFieldHome, 0.4, powerwallFieldSolar, 0), \
+                objectNew(powerwallFieldDate, datetimeNew(2023, 4, 18, 4),  powerwallFieldHome, 0.6, powerwallFieldSolar, 0), \
+                objectNew(powerwallFieldDate, datetimeNew(2023, 4, 18, 8),  powerwallFieldHome, 1.8, powerwallFieldSolar, 1.3), \
+                objectNew(powerwallFieldDate, datetimeNew(2023, 4, 18, 12), powerwallFieldHome, 0.7, powerwallFieldSolar, 6.3), \
+                objectNew(powerwallFieldDate, datetimeNew(2023, 4, 18, 16), powerwallFieldHome, 1.2, powerwallFieldSolar, 5.8), \
+                objectNew(powerwallFieldDate, datetimeNew(2023, 4, 18, 20), powerwallFieldHome, 2.2, powerwallFieldSolar, 0.8), \
+                objectNew(powerwallFieldDate, datetimeNew(2023, 4, 19, 0),  powerwallFieldHome, 0.4, powerwallFieldSolar, 0), \
+                objectNew(powerwallFieldDate, datetimeNew(2023, 4, 19, 4),  powerwallFieldHome, 0.6, powerwallFieldSolar, 0), \
+                objectNew(powerwallFieldDate, datetimeNew(2023, 4, 19, 8),  powerwallFieldHome, 1.8, powerwallFieldSolar, 1.3), \
+                objectNew(powerwallFieldDate, datetimeNew(2023, 4, 19, 12), powerwallFieldHome, 0.7, powerwallFieldSolar, 6.3), \
+                objectNew(powerwallFieldDate, datetimeNew(2023, 4, 19, 16), powerwallFieldHome, 1.2, powerwallFieldSolar, 5.8), \
+                objectNew(powerwallFieldDate, datetimeNew(2023, 4, 19, 20), powerwallFieldHome, 2.2, powerwallFieldSolar, 0.8) \
+            ) \
+        ), \
+        75, \
+        powerwallValidateVehicleScenario(objectNew( \
+            'vehicles', arrayNew( \
+                objectNew( \
+                    'id', 'ID-1', \
+                    'battery', 90, \
+                    'batteryCapacity', 80, \
+                    'chargingLimit', 90, \
+                    'chargingRate', 5, \
+                    'minChargingRate', 5, \
+                    'maxChargingRate', 12, \
+                    'chargingVoltage', 120 \
+                ) \
+            ), \
+            'days', arrayNew( \
+                objectNew( \
+                    'departures', arrayNew( \
+                        objectNew( \
+                            'id', 'ID-1', \
+                            'departure', 9, \
+                            'arrival', 17, \
+                            'batteryChange', -10 \
+                        ) \
+                    ) \
+                ) \
+            ) \
+        )) \
+    )
+    unittestDeepEquals( \
+        data, \
+        arrayNew( \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 18, 0), powerwallFieldHome, 0.4, powerwallFieldSolar, 0, \
+                powerwallFieldGrid, 0, powerwallFieldPowerwall, 0.4, powerwallFieldBatteryPercent, 70.789, \
+                'Vehicle ID-1 (kWh)', 0, 'Vehicle ID-1 Battery (%)', 90 \
+            ), \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 18, 4), powerwallFieldHome, 0.6, powerwallFieldSolar, 0, \
+                powerwallFieldGrid, 0, powerwallFieldPowerwall, 0.6, powerwallFieldBatteryPercent, 64.474, \
+                'Vehicle ID-1 (kWh)', 0, 'Vehicle ID-1 Battery (%)', 90 \
+            ), \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 18, 8), powerwallFieldHome, 1.8, powerwallFieldSolar, 1.3, \
+                powerwallFieldGrid, 0, powerwallFieldPowerwall, 0.5, powerwallFieldBatteryPercent, 59.211, \
+                'Vehicle ID-1 (kWh)', 0, 'Vehicle ID-1 Battery (%)', 90 \
+            ), \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 18, 12), powerwallFieldHome, 0.7, powerwallFieldSolar, 6.3, \
+                powerwallFieldGrid, -1.306, powerwallFieldPowerwall, -4.294, powerwallFieldBatteryPercent, 100, \
+                'Vehicle ID-1 (kWh)', 0, 'Vehicle ID-1 Battery (%)', 90 \
+            ), \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 18, 16), powerwallFieldHome, 1.2, powerwallFieldSolar, 5.8, \
+                powerwallFieldGrid, -4.6, powerwallFieldPowerwall, 0, powerwallFieldBatteryPercent, 100, \
+                'Vehicle ID-1 (kWh)', 0, 'Vehicle ID-1 Battery (%)', 90 \
+            ), \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 18, 20), powerwallFieldHome, 2.8, powerwallFieldSolar, 0.8, \
+                powerwallFieldGrid, 0, powerwallFieldPowerwall, 2, powerwallFieldBatteryPercent, 78.947, \
+                'Vehicle ID-1 (kWh)', 0.6, 'Vehicle ID-1 Battery (%)', 83 \
+            ), \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 19, 0), powerwallFieldHome, 1, powerwallFieldSolar, 0, \
+                powerwallFieldGrid, 0, powerwallFieldPowerwall, 1, powerwallFieldBatteryPercent, 68.421, \
+                'Vehicle ID-1 (kWh)', 0.6, 'Vehicle ID-1 Battery (%)', 86 \
+            ), \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 19, 4), powerwallFieldHome, 1.2, powerwallFieldSolar, 0, \
+                powerwallFieldGrid, 0, powerwallFieldPowerwall, 1.2, powerwallFieldBatteryPercent, 55.789, \
+                'Vehicle ID-1 (kWh)', 0.6, 'Vehicle ID-1 Battery (%)', 89 \
+            ), \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 19, 8), powerwallFieldHome, 2, powerwallFieldSolar, 1.3, \
+                powerwallFieldGrid, 0, powerwallFieldPowerwall, 0.7, powerwallFieldBatteryPercent, 48.421, \
+                'Vehicle ID-1 (kWh)', 0.2, 'Vehicle ID-1 Battery (%)', 90 \
+            ), \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 19, 12), powerwallFieldHome, 0.7, powerwallFieldSolar, 6.3, \
+                powerwallFieldGrid, -0.171, powerwallFieldPowerwall, -5.429, powerwallFieldBatteryPercent, 100, \
+                'Vehicle ID-1 (kWh)', 0, 'Vehicle ID-1 Battery (%)', 90 \
+            ), \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 19, 16), powerwallFieldHome, 1.2, powerwallFieldSolar, 5.8, \
+                powerwallFieldGrid, -4.6, powerwallFieldPowerwall, 0, powerwallFieldBatteryPercent, 100, \
+                'Vehicle ID-1 (kWh)', 0, 'Vehicle ID-1 Battery (%)', 90 \
+            ), \
+            objectNew( \
+                powerwallFieldDate, datetimeNew(2023, 4, 19, 20), powerwallFieldHome, 2.8, powerwallFieldSolar, 0.8, \
+                powerwallFieldGrid, 0, powerwallFieldPowerwall, 2, powerwallFieldBatteryPercent, 78.947, \
+                'Vehicle ID-1 (kWh)', 0.6, 'Vehicle ID-1 Battery (%)', 83 \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTest('testPowerwallSimulate_vehicleScenario')
+
+
+#
 # powerwallLoadScenario tests
 #
 
@@ -592,13 +717,13 @@ function testPowerwallVehicleDeparted()
                         'id', 'ID-1', \
                         'departure', 9, \
                         'arrival', 11, \
-                        'batteryPercentChange', -10 \
+                        'batteryChange', -10 \
                     ), \
                     objectNew( \
                         'id', 'ID-1', \
                         'departure', 18, \
                         'arrival', 21, \
-                        'batteryPercentChange', -20 \
+                        'batteryChange', -20 \
                     ) \
                 ) \
             ), \
@@ -609,7 +734,7 @@ function testPowerwallVehicleDeparted()
             'id', 'ID-1', \
             'departure', 18, \
             'arrival', 21, \
-            'batteryPercentChange', -20 \
+            'batteryChange', -20 \
         ) \
     )
 endfunction
@@ -625,13 +750,13 @@ function testPowerwallVehicleDeparted_connected()
                         'id', 'ID-1', \
                         'departure', 9, \
                         'arrival', 11, \
-                        'batteryPercentChange', -10 \
+                        'batteryChange', -10 \
                     ), \
                     objectNew( \
                         'id', 'ID-1', \
                         'departure', 18, \
                         'arrival', 21, \
-                        'batteryPercentChange', -20 \
+                        'batteryChange', -20 \
                     ) \
                 ) \
             ), \
@@ -653,13 +778,13 @@ function testPowerwallVehicleDeparted_connected_id()
                         'id', 'ID-1', \
                         'departure', 9, \
                         'arrival', 11, \
-                        'batteryPercentChange', -10 \
+                        'batteryChange', -10 \
                     ), \
                     objectNew( \
                         'id', 'ID-1', \
                         'departure', 18, \
                         'arrival', 21, \
-                        'batteryPercentChange', -20 \
+                        'batteryChange', -20 \
                     ) \
                 ) \
             ), \
@@ -698,13 +823,13 @@ function testPowerwallValidateVehicleScenario()
                         'id', 'ID-1', \
                         'departure', 9, \
                         'arrival', 11, \
-                        'batteryPercentChange', -10 \
+                        'batteryChange', -10 \
                     ), \
                     objectNew( \
                         'id', 'ID-1', \
                         'departure', 18, \
                         'arrival', 21, \
-                        'batteryPercentChange', -20 \
+                        'batteryChange', -20 \
                     ) \
                 ) \
             ) \

@@ -20,6 +20,19 @@ function powerwallBatteryPercent(powerwallScenario)
 endfunction
 
 
+# Powerwall data field names
+powerwallFieldBatteryPercent = 'Energy Remaining (%)'
+powerwallFieldDate = 'Date time'
+powerwallFieldGrid = 'Grid (kW)'
+powerwallFieldHome = 'Home (kW)'
+powerwallFieldPowerwall = 'Powerwall (kW)'
+powerwallFieldSolar = 'Solar (kW)'
+
+
+# The simulation number precision
+powerwallSimulationPrecision = 3
+
+
 # Simulate a Tesla Powerwall scenario
 function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario)
     # Powerwall specifications
@@ -33,13 +46,16 @@ function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario)
     row0 = arrayGet(data, 0)
     row1 = arrayGet(data, 1)
     durationHours = (objectGet(row1, powerwallFieldDate) - objectGet(row0, powerwallFieldDate)) / (60 * 60 * 1000)
+    rowsPerDay = 24 / durationHours
 
     # Compute backup energy
     backupKwh = backupPercent * batteryCapacityKwh / 100
 
     # Simulate each data row
     simulated = arrayNew()
-    foreach row in data do
+    foreach row, ixRow in data do
+        simulatedRow = objectNew(powerwallFieldDate, objectGet(row, powerwallFieldDate))
+
         # Get the home and solar energy
         homeKw = objectGet(row, powerwallFieldHome)
         solarKw = objectGet(row, powerwallFieldSolar)
@@ -49,7 +65,61 @@ function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario)
 
         # Add simulated vehicle charging power usage
         if vehicleScenario then
-            #!!
+            days = objectGet(vehicleScenario, 'days')
+            vehicles = objectGet(vehicleScenario, 'vehicles')
+
+            # Get this day's departures
+            ixDay = mathFloor(ixRow / rowsPerDay)
+            hourOfDay = (ixRow % rowsPerDay) * durationHours
+            vehicleDay = arrayGet(days, ixDay % arrayLength(days))
+
+            # Simulate each connected vehicle
+            foreach vehicle in vehicles do
+                vehicleID = objectGet(vehicle, 'id')
+                vehicleBatteryPercent = objectGet(vehicle, 'battery')
+                vehicleBatteryCapacity = objectGet(vehicle, 'batteryCapacity')
+                vehicleChargingLimit = objectGet(vehicle, 'chargingLimit')
+                vehicleChargingRate = objectGet(vehicle, 'chargingRate')
+                vehicleChargingVoltage = objectGet(vehicle, 'chargingVoltage')
+                vehicleBatteryKwh = vehicleBatteryPercent * vehicleBatteryCapacity / 100
+                vehicleChargingLimitKwh = vehicleChargingLimit * vehicleBatteryCapacity / 100
+
+                # Is the vehicle connnected?
+                vehicleChargeKw = 0
+                if !powerwallVehicleDeparted(vehicleDay, vehicleID, hourOfDay) then
+                    # Did the vehicle just arrive?
+                    vehicleDeparture = if(hourOfDay > 0, powerwallVehicleDeparted(vehicleDay, vehicleID, hourOfDay - durationHours))
+                    if vehicleDeparture then
+                        # Yes, update the vehicle's battery percentage
+                        vehicleBatteryPercentChange = objectGet(vehicleDeparture, 'batteryChange')
+                        vehicleBatteryPercent = vehicleBatteryPercent + vehicleBatteryPercentChange
+                        vehicleBatteryKwh = vehicleBatteryPercent * vehicleBatteryCapacity / 100
+                        objectSet(vehicle, 'battery', mathRound(mathMax(0, mathMin(100, vehicleBatteryPercent)), powerwallSimulationPrecision))
+                    endif
+
+                    # Is the vehicle charging?
+                    if vehicleBatteryPercent < vehicleChargingLimit then
+                        # Add the vehicle charge energy to the home power usage
+                        vehicleChargeKw = vehicleChargingRate * vehicleChargingVoltage / 1000
+                        vehicleChargeKwh = vehicleChargeKw * durationHours
+                        vehicleChargeMaxKwh = vehicleChargingLimitKwh - vehicleBatteryKwh
+                        if vehicleChargeKwh > vehicleChargeMaxKwh then
+                            vehicleChargeKw = vehicleChargeMaxKwh / durationHours
+                            vehicleChargeKwh = vehicleChargeMaxKwh
+                        endif
+                        homeKw = homeKw + vehicleChargeKw
+
+                        # Compute the new battery energy
+                        vehicleBatteryKwh = vehicleBatteryKwh + vehicleChargeKwh
+                        vehicleBatteryPercent = 100 * vehicleBatteryKwh / vehicleBatteryCapacity
+                        objectSet(vehicle, 'battery', vehicleBatteryPercent)
+                    endif
+                endif
+
+                # Add the vehicle fields
+                objectSet(simulatedRow, 'Vehicle ' + vehicleID + ' (kWh)', mathRound(vehicleChargeKw, powerwallSimulationPrecision))
+                objectSet(simulatedRow, 'Vehicle ' + vehicleID + ' Battery (%)', mathRound(vehicleBatteryPercent, powerwallSimulationPrecision))
+            endforeach
         endif
 
         # Are we generating more solar energy than we're currently using?
@@ -100,14 +170,12 @@ function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario)
         batteryPercent = 100 * batteryNewKwh / batteryCapacityKwh
 
         # Push the simulated row
-        arrayPush(simulated, objectNew( \
-            powerwallFieldDate, objectGet(row, powerwallFieldDate), \
-            powerwallFieldHome, mathRound(homeKw, 3), \
-            powerwallFieldSolar, mathRound(solarKw, 3), \
-            powerwallFieldPowerwall, mathRound(powerwallKw, 3), \
-            powerwallFieldGrid, mathRound(gridKw, 3), \
-            powerwallFieldBatteryPercent, mathRound(batteryPercent, 3) \
-        ))
+        objectSet(simulatedRow, powerwallFieldHome, mathRound(homeKw, powerwallSimulationPrecision))
+        objectSet(simulatedRow, powerwallFieldSolar, mathRound(solarKw, powerwallSimulationPrecision))
+        objectSet(simulatedRow, powerwallFieldPowerwall, mathRound(powerwallKw, powerwallSimulationPrecision))
+        objectSet(simulatedRow, powerwallFieldGrid, mathRound(gridKw, powerwallSimulationPrecision))
+        objectSet(simulatedRow, powerwallFieldBatteryPercent, mathRound(batteryPercent, powerwallSimulationPrecision))
+        arrayPush(simulated, simulatedRow)
     endforeach
 
     return simulated
@@ -269,16 +337,7 @@ powerwallTypes = schemaParseEx( \
         '    float(>= 0, <=24) arrival', \
         '', \
         '    # The battery charge change as percentage', \
-        '    float batteryPercentChange' \
+        '    float batteryChange' \
     ), \
     objectCopy(tespoTypes) \
 )
-
-
-# Powerwall data field names
-powerwallFieldBatteryPercent = 'Energy Remaining (%)'
-powerwallFieldDate = 'Date time'
-powerwallFieldGrid = 'Grid (kW)'
-powerwallFieldHome = 'Home (kW)'
-powerwallFieldPowerwall = 'Powerwall (kW)'
-powerwallFieldSolar = 'Solar (kW)'
