@@ -21,13 +21,13 @@ endfunction
 
 
 # Simulate a Tesla Powerwall scenario
-function powerwallSimulate(scenario, batteryPercent)
+function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario)
     # Powerwall specifications
-    batteryCapacityKwh = objectGet(scenario, 'batteryCapacity')
-    backupPercent = objectGet(scenario, 'backupPercent')
-    chargeRatio = objectGet(scenario, 'chargeRatio')
-    dischargeRatio = objectGet(scenario, 'dischargeRatio')
-    data = objectGet(scenario, 'data')
+    batteryCapacityKwh = objectGet(powerwallScenario, 'batteryCapacity')
+    backupPercent = objectGet(powerwallScenario, 'backupPercent')
+    chargeRatio = objectGet(powerwallScenario, 'chargeRatio')
+    dischargeRatio = objectGet(powerwallScenario, 'dischargeRatio')
+    data = objectGet(powerwallScenario, 'data')
 
     # Compute the row duration
     row0 = arrayGet(data, 0)
@@ -46,6 +46,11 @@ function powerwallSimulate(scenario, batteryPercent)
 
         # Compute battery energy
         batteryKwh = batteryPercent * batteryCapacityKwh / 100
+
+        # Add simulated vehicle charging power usage
+        if vehicleScenario then
+            #!!
+        endif
 
         # Are we generating more solar energy than we're currently using?
         powerwallKw = homeKw - solarKw
@@ -133,14 +138,14 @@ endfunction
 # Load a Powerwall simulation scenario
 async function powerwallLoadScenario(scenarioURL)
     # Load the scenario file
-    scenario = fetch(scenarioURL)
-    scenario = if(scenario != null, schemaValidate(powerwallTypes, 'PowerwallScenario', scenario))
-    if scenario == null then
+    powerwallScenario = fetch(scenarioURL)
+    powerwallScenario = if(powerwallScenario != null, schemaValidate(powerwallTypes, 'PowerwallScenario', powerwallScenario))
+    if powerwallScenario == null then
         return null
     endif
 
     # Fixup relative data URLs
-    dataURLs = objectGet(scenario, 'dataURLs')
+    dataURLs = objectGet(powerwallScenario, 'dataURLs')
     scenarioBaseURL = powerwallGetBaseURL(scenarioURL)
     foreach dataURL, ixDataURL in dataURLs do
         if powerwallIsRelativeURL(dataURL) then
@@ -159,7 +164,7 @@ async function powerwallLoadScenario(scenarioURL)
         arrayExtend(data, dataPart)
     endforeach
     dataSort(data, arrayNew(arrayNew(powerwallFieldDate)))
-    objectSet(scenario, 'data', data)
+    objectSet(powerwallScenario, 'data', data)
 
     # Fill-in any battery percentage data holes
     ixPrev = null
@@ -191,7 +196,7 @@ async function powerwallLoadScenario(scenarioURL)
         endwhile
     endif
 
-    return scenario
+    return powerwallScenario
 endfunction
 
 
