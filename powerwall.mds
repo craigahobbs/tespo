@@ -34,6 +34,9 @@ function powerwallSimulate(scenario, batteryPercent)
     row1 = arrayGet(data, 1)
     durationHours = (objectGet(row1, powerwallFieldDate) - objectGet(row0, powerwallFieldDate)) / (60 * 60 * 1000)
 
+    # Compute backup energy
+    backupKwh = backupPercent * batteryCapacityKwh / 100
+
     # Simulate each data row
     simulated = arrayNew()
     foreach row in data do
@@ -41,13 +44,13 @@ function powerwallSimulate(scenario, batteryPercent)
         homeKw = objectGet(row, powerwallFieldHome)
         solarKw = objectGet(row, powerwallFieldSolar)
 
-        # Compute battery power and backup power
+        # Compute battery energy
         batteryKwh = batteryPercent * batteryCapacityKwh / 100
-        backupKwh = backupPercent * batteryCapacityKwh / 100
 
         # Are we generating more solar energy than we're currently using?
         powerwallKw = homeKw - solarKw
         if solarKw > homeKw then
+            # Is the battery fully charged? If so, "spill" to the grid.
             if batteryPercent >= 100 then
                 gridKw = powerwallKw
                 powerwallKw = 0
@@ -68,6 +71,7 @@ function powerwallSimulate(scenario, batteryPercent)
 
         # No, we are using more energy than we are generating
         else then
+            # Is the battery at or below the backup limit? If so, pull from the grid.
             if batteryPercent <= backupPercent then
                 gridKw = powerwallKw
                 powerwallKw = 0
