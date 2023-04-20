@@ -129,7 +129,11 @@ endfunction
 # Load a Powerwall simulation scenario
 async function powerwallLoadScenario(scenarioURL)
     # Load the scenario file
-    scenario = schemaValidate(powerwallTypes, 'PowerwallScenario', fetch(scenarioURL))
+    scenario = fetch(scenarioURL)
+    scenario = if(scenario != null, schemaValidate(powerwallTypes, 'PowerwallScenario', scenario))
+    if scenario == null then
+        return null
+    endif
 
     # Fixup relative data URLs
     dataURLs = objectGet(scenario, 'dataURLs')
@@ -144,7 +148,11 @@ async function powerwallLoadScenario(scenarioURL)
     dataCSVs = fetch(dataURLs, null, true)
     data = arrayNew()
     foreach dataCSV in dataCSVs do
-        arrayExtend(data, dataParseCSV(dataCSV))
+        dataPart = if(dataCSV != null, dataParseCSV(dataCSV))
+        if dataPart == null then
+            return null
+        endif
+        arrayExtend(data, dataPart)
     endforeach
     dataSort(data, arrayNew(arrayNew(powerwallFieldDate)))
     objectSet(scenario, 'data', data)
