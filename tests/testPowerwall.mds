@@ -394,29 +394,43 @@ function testPowerwallLoadScenario_fetch(url, options, text)
             'backupPercent', 20, \
             'chargeRatio', 0.95, \
             'dischargeRatio', 0.95, \
-            'dataURLs', arrayNew('data3.json', 'data4.json', 'data5.json') \
+            'dataURLs', arrayNew('data1.json', 'data3.json', 'data2.json') \
         )
-    else if arrayLength(url) == 2 then
-        unittestEquals(text, true)
-        return arrayNew( \
-            'Date time,Home (kW),Solar (kW),Powerwall (kW),Grid (kW),Energy Remaining (%)' + stringFromCharCode(10) + \
+    else if url == 'data/scenario3.json' then
+        unittestEquals(text, null)
+        return objectNew( \
+            'name', 'Powerwall Scenario 3', \
+            'batteryCapacity', 40, \
+            'backupPercent', 20, \
+            'chargeRatio', 0.95, \
+            'dischargeRatio', 0.95, \
+            'dataURLs', arrayNew('data2.json') \
+        )
+    else if url == 'data/scenario4.json' then
+        unittestEquals(text, null)
+        return objectNew( \
+            'name', 'Powerwall Scenario 4', \
+            'batteryCapacity', 40, \
+            'backupPercent', 20, \
+            'chargeRatio', 0.95, \
+            'dischargeRatio', 0.95, \
+            'dataURLs', arrayNew('/data2.json') \
+        )
+    else if stringEndsWith(url, 'data1.json') then
+        return 'Date time,Home (kW),Solar (kW),Powerwall (kW),Grid (kW),Energy Remaining (%)' + stringFromCharCode(10) + \
             '2023-03-25T12:10:00-07:00,1.0,4.2,-3.2,0,' + stringFromCharCode(10) + \
-            '2023-03-25T12:15:00-07:00,1.0,5.6,-4.6,0,58', \
-            'Date time,Home (kW),Solar (kW),Powerwall (kW),Grid (kW),Energy Remaining (%)' + stringFromCharCode(10) + \
+            '2023-03-25T12:15:00-07:00,1.0,5.6,-4.6,0,58'
+    else if stringEndsWith(url, 'data2.json') then
+        return 'Date time,Home (kW),Solar (kW),Powerwall (kW),Grid (kW),Energy Remaining (%)' + stringFromCharCode(10) + \
             '2023-03-25T12:00:00-07:00,1.0,4.1,-3.1,0,55' + stringFromCharCode(10) + \
-            '2023-03-25T12:05:00-07:00,1.0,3.7,-2.7,0,' \
-        )
-    else if arrayLength(url) == 3 then
-        unittestEquals(text, true)
-        return arrayNew( \
-            'Date time,Home (kW),Solar (kW),Powerwall (kW),Grid (kW),Energy Remaining (%)' + stringFromCharCode(10) + \
-            '2023-03-25T12:10:00-07:00,1.0,4.2,-3.2,0,' + stringFromCharCode(10) + \
-            '2023-03-25T12:15:00-07:00,1.0,5.6,-4.6,0,58', \
-            null, \
-            'Date time,Home (kW),Solar (kW),Powerwall (kW),Grid (kW),Energy Remaining (%)' + stringFromCharCode(10) + \
-            '2023-03-25T12:00:00-07:00,1.0,4.1,-3.1,0,55' + stringFromCharCode(10) + \
-            '2023-03-25T12:05:00-07:00,1.0,3.7,-2.7,0,' \
-        )
+            '2023-03-25T12:05:00-07:00,1.0,3.7,-2.7,0,'
+    else if arrayLength(url) != null then
+        responses = arrayNew()
+        foreach url_ in url do
+            response = testPowerwallLoadScenario_fetch(url_, options, text)
+            arrayPush(responses, response)
+        endforeach
+        return responses
     endif
     return null
 endfunction
@@ -472,6 +486,74 @@ async function testPowerwallLoadScenario()
     )
 endfunction
 unittestRunTestAsync('testPowerwallLoadScenario')
+
+
+async function testPowerwallLoadScenario_relative()
+    unittestDeepEquals( \
+        powerwallLoadScenario('data/scenario3.json'), \
+        objectNew( \
+            'name', 'Powerwall Scenario 3', \
+            'batteryCapacity', 40, \
+            'backupPercent', 20, \
+            'chargeRatio', 0.95, \
+            'dischargeRatio', 0.95, \
+            'dataURLs', arrayNew('data/data2.json'), \
+            'data', arrayNew( \
+                objectNew( \
+                    powerwallFieldDate, '2023-03-25T19:00:00.000Z', \
+                    powerwallFieldHome, 1, \
+                    powerwallFieldSolar, 4.1, \
+                    powerwallFieldPowerwall, -3.1, \
+                    powerwallFieldGrid, 0, \
+                    powerwallFieldBatteryPercent, 55 \
+                ), \
+                objectNew( \
+                    powerwallFieldDate, '2023-03-25T19:05:00.000Z', \
+                    powerwallFieldHome, 1, \
+                    powerwallFieldSolar, 3.7, \
+                    powerwallFieldPowerwall, -2.7, \
+                    powerwallFieldGrid, 0, \
+                    powerwallFieldBatteryPercent, 55 \
+                ) \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTestAsync('testPowerwallLoadScenario_relative')
+
+
+async function testPowerwallLoadScenario_absolute()
+    unittestDeepEquals( \
+        powerwallLoadScenario('data/scenario4.json'), \
+        objectNew( \
+            'name', 'Powerwall Scenario 4', \
+            'batteryCapacity', 40, \
+            'backupPercent', 20, \
+            'chargeRatio', 0.95, \
+            'dischargeRatio', 0.95, \
+            'dataURLs', arrayNew('/data2.json'), \
+            'data', arrayNew( \
+                objectNew( \
+                    powerwallFieldDate, '2023-03-25T19:00:00.000Z', \
+                    powerwallFieldHome, 1, \
+                    powerwallFieldSolar, 4.1, \
+                    powerwallFieldPowerwall, -3.1, \
+                    powerwallFieldGrid, 0, \
+                    powerwallFieldBatteryPercent, 55 \
+                ), \
+                objectNew( \
+                    powerwallFieldDate, '2023-03-25T19:05:00.000Z', \
+                    powerwallFieldHome, 1, \
+                    powerwallFieldSolar, 3.7, \
+                    powerwallFieldPowerwall, -2.7, \
+                    powerwallFieldGrid, 0, \
+                    powerwallFieldBatteryPercent, 55 \
+                ) \
+            ) \
+        ) \
+    )
+endfunction
+unittestRunTestAsync('testPowerwallLoadScenario_absolute')
 
 
 async function testPowerwallLoadScenario_notFound()
