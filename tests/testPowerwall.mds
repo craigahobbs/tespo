@@ -455,22 +455,22 @@ function testPowerwallSimulate_vehicleScenario()
             objectNew( \
                 powerwallFieldDate, datetimeNew(2023, 4, 18, 20), powerwallFieldHome, 2.8, powerwallFieldSolar, 0.8, \
                 powerwallFieldGrid, 0, powerwallFieldPowerwall, 2, powerwallFieldBatteryPercent, 78.947, \
-                'Vehicle ID-1 (kWh)', 0.6, 'Vehicle ID-1 Battery (%)', 83 \
+                'Vehicle ID-1 (kWh)', -0.6, 'Vehicle ID-1 Battery (%)', 83 \
             ), \
             objectNew( \
                 powerwallFieldDate, datetimeNew(2023, 4, 19, 0), powerwallFieldHome, 1, powerwallFieldSolar, 0, \
                 powerwallFieldGrid, 0, powerwallFieldPowerwall, 1, powerwallFieldBatteryPercent, 68.421, \
-                'Vehicle ID-1 (kWh)', 0.6, 'Vehicle ID-1 Battery (%)', 86 \
+                'Vehicle ID-1 (kWh)', -0.6, 'Vehicle ID-1 Battery (%)', 86 \
             ), \
             objectNew( \
                 powerwallFieldDate, datetimeNew(2023, 4, 19, 4), powerwallFieldHome, 1.2, powerwallFieldSolar, 0, \
                 powerwallFieldGrid, 0, powerwallFieldPowerwall, 1.2, powerwallFieldBatteryPercent, 55.789, \
-                'Vehicle ID-1 (kWh)', 0.6, 'Vehicle ID-1 Battery (%)', 89 \
+                'Vehicle ID-1 (kWh)', -0.6, 'Vehicle ID-1 Battery (%)', 89 \
             ), \
             objectNew( \
                 powerwallFieldDate, datetimeNew(2023, 4, 19, 8), powerwallFieldHome, 2, powerwallFieldSolar, 1.3, \
                 powerwallFieldGrid, 0, powerwallFieldPowerwall, 0.7, powerwallFieldBatteryPercent, 48.421, \
-                'Vehicle ID-1 (kWh)', 0.2, 'Vehicle ID-1 Battery (%)', 90 \
+                'Vehicle ID-1 (kWh)', -0.2, 'Vehicle ID-1 Battery (%)', 90 \
             ), \
             objectNew( \
                 powerwallFieldDate, datetimeNew(2023, 4, 19, 12), powerwallFieldHome, 0.7, powerwallFieldSolar, 6.3, \
@@ -485,7 +485,7 @@ function testPowerwallSimulate_vehicleScenario()
             objectNew( \
                 powerwallFieldDate, datetimeNew(2023, 4, 19, 20), powerwallFieldHome, 2.8, powerwallFieldSolar, 0.8, \
                 powerwallFieldGrid, 0, powerwallFieldPowerwall, 2, powerwallFieldBatteryPercent, 78.947, \
-                'Vehicle ID-1 (kWh)', 0.6, 'Vehicle ID-1 Battery (%)', 83 \
+                'Vehicle ID-1 (kWh)', -0.6, 'Vehicle ID-1 Battery (%)', 83 \
             ) \
         ) \
     )

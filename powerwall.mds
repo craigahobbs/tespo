@@ -117,7 +117,7 @@ function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario)
                 endif
 
                 # Add the vehicle fields
-                objectSet(simulatedRow, 'Vehicle ' + vehicleID + ' (kWh)', mathRound(vehicleChargeKw, powerwallSimulationPrecision))
+                objectSet(simulatedRow, 'Vehicle ' + vehicleID + ' (kWh)', mathRound(-vehicleChargeKw, powerwallSimulationPrecision))
                 objectSet(simulatedRow, 'Vehicle ' + vehicleID + ' Battery (%)', mathRound(vehicleBatteryPercent, powerwallSimulationPrecision))
             endforeach
         endif
