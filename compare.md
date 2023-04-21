@@ -21,14 +21,14 @@ dataTespoEnabled = powerwallSimulate( \
 )
 
 chartWidth = 1200
-chartHeight = 320
+chartHeight = 300
 
 dataLineChart(dataTespoDisabled, objectNew( \
     'title', 'Simulation without TESPO', \
     'width', chartWidth, \
     'height', chartHeight, \
     'x', powerwallFieldDate, \
-    'y', arrayNew(powerwallFieldBatteryPercent, 'Vehicle ID-1 Battery (%)', 'Vehicle ID-1 Charging Limit (%)'), \
+    'y', arrayNew(powerwallFieldBatteryPercent, powerwallFieldBackupPercent, 'Vehicle ID-1 Battery (%)', 'Vehicle ID-1 Charging Limit (%)'), \
     'yTicks', objectNew('start', 0, 'end', 100) \
 ))
 
@@ -37,7 +37,7 @@ dataLineChart(dataTespoEnabled, objectNew( \
     'width', chartWidth, \
     'height', chartHeight, \
     'x', powerwallFieldDate, \
-    'y', arrayNew(powerwallFieldBatteryPercent, 'Vehicle ID-1 Battery (%)', 'Vehicle ID-1 Charging Limit (%)'), \
+    'y', arrayNew(powerwallFieldBatteryPercent, powerwallFieldBackupPercent, 'Vehicle ID-1 Battery (%)', 'Vehicle ID-1 Charging Limit (%)'), \
     'yTicks', objectNew('start', 0, 'end', 100) \
 ))
 

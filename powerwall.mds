@@ -29,6 +29,10 @@ powerwallFieldPowerwall = 'Powerwall (kW)'
 powerwallFieldSolar = 'Solar (kW)'
 
 
+# Simulated data field names
+powerwallFieldBackupPercent = 'Backup (%)'
+
+
 # The simulation number precision
 powerwallSimulationPrecision = 3
 
@@ -222,6 +226,7 @@ function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, t
         objectSet(simulatedRow, powerwallFieldPowerwall, mathRound(powerwallKw, powerwallSimulationPrecision))
         objectSet(simulatedRow, powerwallFieldGrid, mathRound(gridKw, powerwallSimulationPrecision))
         objectSet(simulatedRow, powerwallFieldBatteryPercent, mathRound(batteryPercent, powerwallSimulationPrecision))
+        objectSet(simulatedRow, powerwallFieldBackupPercent, backupPercent)
         arrayPush(simulated, simulatedRow)
     endforeach
 
