@@ -11,12 +11,21 @@ endif
 include 'tespo.mds'
 
 
-# Compute the initial battery charge percentage for a Powerwall scenario
+# Compute the Powerwall scenario's initial battery charge percentage
 function powerwallBatteryPercent(powerwallScenario)
     data = objectGet(powerwallScenario, 'data')
     row0 = arrayGet(data, 0)
     row1 = arrayGet(data, 1)
     return 0.5 * (objectGet(row0, powerwallFieldBatteryPercent) + objectGet(row1, powerwallFieldBatteryPercent))
+endfunction
+
+
+# Compute the Powerwall scenario's data row duration
+function powerwallRowDuration(powerwallScenario)
+    data = objectGet(powerwallScenario, 'data')
+    row0 = arrayGet(data, 0)
+    row1 = arrayGet(data, 1)
+    return (objectGet(row1, powerwallFieldDate) - objectGet(row0, powerwallFieldDate)) / (60 * 60 * 1000)
 endfunction
 
 
@@ -47,9 +56,7 @@ function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, t
     data = objectGet(powerwallScenario, 'data')
 
     # Compute the row duration
-    row0 = arrayGet(data, 0)
-    row1 = arrayGet(data, 1)
-    durationHours = (objectGet(row1, powerwallFieldDate) - objectGet(row0, powerwallFieldDate)) / (60 * 60 * 1000)
+    durationHours = powerwallRowDuration(powerwallScenario)
     rowsPerDay = 24 / durationHours
 
     # Compute backup energy
@@ -361,6 +368,9 @@ powerwallTypes = schemaParseEx( \
         '', \
         '# A vehicle charging scenario', \
         'struct VehicleScenario', \
+        '', \
+        '    # The scenario name', \
+        '    string(len > 0) name', \
         '', \
         '    # The scenario vehicles', \
         '    Vehicle[len > 0] vehicles', \

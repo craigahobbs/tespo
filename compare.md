@@ -3,8 +3,13 @@
 ~~~ markdown-script
 include 'powerwall.mds'
 
-powerwallScenario = powerwallLoadScenario('scenarios-powerwall/seattle-03.json')
-vehicleScenario = powerwallValidateVehicleScenario(fetch('scenarios-vehicle/daily-commute.json'))
+powerwallScenario = powerwallLoadScenario(vPowerwallScenario)
+vehicleScenario = fetch(vVehicleScenario)
+
+markdownPrint( \
+    '**Powerwall Scenario:** ' + markdownEscape(objectGet(powerwallScenario, 'name')) + ' \\', \
+    '**Vehicle Scenario:** ' + markdownEscape(objectGet(vehicleScenario, 'name')) \
+)
 
 dataTespoDisabled = powerwallSimulate( \
     powerwallScenario, \

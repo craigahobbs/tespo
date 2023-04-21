@@ -425,6 +425,7 @@ function testPowerwallSimulate_vehicleScenario()
         ), \
         75, \
         powerwallValidateVehicleScenario(objectNew( \
+            'name', 'Vehicle Scenario', \
             'vehicles', arrayNew( \
                 objectNew( \
                     'id', 'ID-1', \
@@ -581,6 +582,7 @@ function testPowerwallSimulate_vehicleScenario_tespo()
         ), \
         75, \
         powerwallValidateVehicleScenario(objectNew( \
+            'name', 'Vehicle Scenario', \
             'vehicles', arrayNew( \
                 objectNew( \
                     'id', 'ID-1', \
@@ -1024,6 +1026,7 @@ unittestRunTest('testPowerwallVehicleDeparted_connected_id')
 
 function testPowerwallValidateVehicleScenario()
     vehicleScenario = objectNew( \
+        'name', 'Vehicle Scenario', \
         'vehicles', arrayNew( \
             objectNew( \
                 'id', 'ID-1', \
