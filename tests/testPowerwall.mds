@@ -10,7 +10,7 @@ include '../powerwall.mds'
 
 
 function testPowerwallBatteryPercent()
-    unittestDeepEquals( \
+    unittestEquals( \
         powerwallBatteryPercent( \
             objectNew( \
                 'name', 'Powerwall Scenario', \

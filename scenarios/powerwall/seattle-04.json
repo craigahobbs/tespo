@@ -1,0 +1,30 @@
+{
+    "name": "Seattle, April 2023",
+    "batteryCapacity": 24.6,
+    "backupPercent": 20,
+    "chargeRatio": 0.924,
+    "dischargeRatio": 0.932,
+    "dataURLs": [
+        "../../data/seattle-2023-04-01.csv",
+        "../../data/seattle-2023-04-02.csv",
+        "../../data/seattle-2023-04-03.csv",
+        "../../data/seattle-2023-04-04.csv",
+        "../../data/seattle-2023-04-05.csv",
+        "../../data/seattle-2023-04-06.csv",
+        "../../data/seattle-2023-04-07.csv",
+        "../../data/seattle-2023-04-08.csv",
+        "../../data/seattle-2023-04-09.csv",
+        "../../data/seattle-2023-04-10.csv",
+        "../../data/seattle-2023-04-11.csv",
+        "../../data/seattle-2023-04-12.csv",
+        "../../data/seattle-2023-04-13.csv",
+        "../../data/seattle-2023-04-14.csv",
+        "../../data/seattle-2023-04-15.csv",
+        "../../data/seattle-2023-04-16.csv",
+        "../../data/seattle-2023-04-17.csv",
+        "../../data/seattle-2023-04-18.csv",
+        "../../data/seattle-2023-04-19.csv",
+        "../../data/seattle-2023-04-20.csv",
+        "../../data/seattle-2023-04-21.csv"
+    ]
+}
