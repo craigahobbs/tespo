@@ -297,7 +297,7 @@ async function powerwallLoadScenario(scenarioURL)
     ixPrev = null
     foreach row, ixRow in data do
         batteryPercent = objectGet(row, powerwallFieldBatteryPercent)
-        if batteryPercent != null then
+        if batteryPercent then
             if ixPrev != null then
                 # Set interpolated battery percent values between non-null values
                 prevPercent = objectGet(arrayGet(data, ixPrev), powerwallFieldBatteryPercent)
