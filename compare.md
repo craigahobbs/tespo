@@ -49,5 +49,20 @@ dataLineChart(dataTespoEnabled, objectNew( \
     'yTicks', objectNew('start', 0, 'end', 100) \
 ))
 
-dataTable(dataTespoEnabled)
+dataTable(dataTespoEnabled, objectNew( \
+    'fields', arrayNew( \
+        powerwallFieldDate, \
+        powerwallFieldHome, \
+        powerwallFieldSolar, \
+        powerwallFieldGrid, \
+        powerwallFieldPowerwall, \
+        powerwallFieldBatteryPercent, \
+        powerwallFieldBackupPercent, \
+        'Vehicle ID-1 Connected', \
+        'Vehicle ID-1 (kWh)', \
+        'Vehicle ID-1 Battery (%)', \
+        'Vehicle ID-1 Charging Rate (amps)', \
+        'Vehicle ID-1 Charging Limit (%)' \
+    ) \
+))
 ~~~
