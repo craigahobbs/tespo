@@ -3,16 +3,11 @@
 ~~~ markdown-script
 include 'powerwall.mds'
 
-# Powerwall scenarios
-powerwallScenarioURLs = fetch('scenarios/powerwallScenarioURLs.json')
-
-# Vehicle scenarios
-vehicleScenarioURLs = fetch('scenarios/vehicleScenarios.json')
 
 # Run each powerwall scenario with each vehicle scenario
 scenarioData = arrayNew()
-foreach powerwallScenarioURL in powerwallScenarioURLs do
-    foreach vehicleScenarioURL in vehicleScenarioURLs do
+foreach powerwallScenarioURL in fetch('scenarios/powerwallScenarioURLs.json') do
+    foreach vehicleScenarioURL in fetch('scenarios/vehicleScenarios.json') do
         # Load each scenario
         powerwallScenario = powerwallLoadScenario(powerwallScenarioURL)
         batteryPercent = powerwallBatteryPercent(powerwallScenario)
@@ -95,7 +90,6 @@ foreach powerwallScenarioURL in powerwallScenarioURLs do
             'To Grid Difference (%)', if(noTespoToGrid != 0, 100 * (tespoToGrid - noTespoToGrid) / noTespoToGrid, 0) \
         )
         arrayPush(scenarioData, scenarioRow)
-        break
     endforeach
 endforeach
 
