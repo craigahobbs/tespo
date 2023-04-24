@@ -3,7 +3,7 @@
     "vehicles": [
         {
             "id": "ID-1",
-            "battery": 90,
+            "battery": 50,
             "batteryCapacity": 80,
             "chargingRate": 32,
             "chargingLimit": 90,

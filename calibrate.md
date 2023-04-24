@@ -24,11 +24,12 @@ async function calibrateIndex()
     markdownPrint('[Home](#url=&var=)', '', '# ' + markdownEscape(title))
 
     # Fetch the scenario files
-    scenarioJSONs = fetch(scenarioURLs)
+    powerwallScenarioURLs = fetch('scenarios/powerwallScenarioURLs.json')
+    powerwallScenarioJSONs = fetch(powerwallScenarioURLs)
 
     # Create the scenario data table
     scenarioTable = arrayNew()
-    foreach scenarioJSON, ixScenario in scenarioJSONs do
+    foreach scenarioJSON, ixScenario in powerwallScenarioJSONs do
         scenarioName = objectGet(scenarioJSON, 'name')
         arrayPush(scenarioTable, objectNew( \
             'Scenario', '[' + markdownEscape(scenarioName) + "](#var.vScenarioURL='" + arrayGet(scenarioURLs, ixScenario) + "')", \
@@ -242,7 +243,6 @@ async function calibrateDetail()
     ))
 
     # Simulated data table
-    return
     foreach row, ixRow in data do
         rowSimulated = arrayGet(simulated, ixRow)
         objectSet(row, 'Simulated ' + powerwallFieldPowerwall, objectGet(rowSimulated, powerwallFieldPowerwall))
@@ -298,63 +298,6 @@ endfunction
 
 # Variable argument defaults
 calibrateDefaultPrecision = 2
-
-
-# The list of Powerwall scenario files
-scenarioURLs = arrayNew( \
-    'scenarios/powerwall/seattle-01.json', \
-    'scenarios/powerwall/seattle-02.json', \
-    'scenarios/powerwall/seattle-03.json', \
-    'scenarios/powerwall/seattle-04.json', \
-    'scenarios/powerwall/seattle-05.json', \
-    'scenarios/powerwall/seattle-06.json', \
-    'scenarios/powerwall/seattle-07.json', \
-    'scenarios/powerwall/seattle-08.json', \
-    'scenarios/powerwall/seattle-09.json', \
-    'scenarios/powerwall/seattle-10.json', \
-    'scenarios/powerwall/seattle-11.json', \
-    'scenarios/powerwall/seattle-12.json', \
-    'scenarios/powerwall/seattle-13.json', \
-    'scenarios/powerwall/seattle-14.json', \
-    'scenarios/powerwall/seattle-15.json', \
-    'scenarios/powerwall/seattle-16.json', \
-    'scenarios/powerwall/seattle-17.json', \
-    'scenarios/powerwall/seattle-18.json', \
-    'scenarios/powerwall/seattle-19.json', \
-    'scenarios/powerwall/seattle-20.json', \
-    'scenarios/powerwall/seattle-21.json', \
-    'scenarios/powerwall/seattle-22.json', \
-    'scenarios/powerwall/seattle-23.json', \
-    'scenarios/powerwall/seattle-24.json', \
-    'scenarios/powerwall/seattle-25.json', \
-    'scenarios/powerwall/seattle-26.json', \
-    'scenarios/powerwall/seattle-27.json', \
-    'scenarios/powerwall/seattle-28.json', \
-    'scenarios/powerwall/seattle-29.json', \
-    'scenarios/powerwall/seattle-30.json', \
-    'scenarios/powerwall/seattle-31.json', \
-    'scenarios/powerwall/seattle-32.json', \
-    'scenarios/powerwall/seattle-33.json', \
-    'scenarios/powerwall/seattle-34.json', \
-    'scenarios/powerwall/seattle-35.json', \
-    'scenarios/powerwall/seattle-36.json', \
-    'scenarios/powerwall/seattle-37.json', \
-    'scenarios/powerwall/seattle-38.json', \
-    'scenarios/powerwall/seattle-39.json', \
-    'scenarios/powerwall/seattle-40.json', \
-    'scenarios/powerwall/seattle-41.json', \
-    'scenarios/powerwall/seattle-42.json', \
-    'scenarios/powerwall/seattle-43.json', \
-    'scenarios/powerwall/seattle-44.json', \
-    'scenarios/powerwall/seattle-45.json', \
-    'scenarios/powerwall/seattle-46.json', \
-    'scenarios/powerwall/seattle-47.json', \
-    'scenarios/powerwall/seattle-48.json', \
-    'scenarios/powerwall/seattle-49.json', \
-    'scenarios/powerwall/seattle-50.json', \
-    'scenarios/powerwall/seattle-51.json', \
-    'scenarios/powerwall/seattle-52.json' \
-)
 
 
 calibrateMain()

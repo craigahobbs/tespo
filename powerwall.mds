@@ -16,7 +16,7 @@ function powerwallBatteryPercent(powerwallScenario)
     data = objectGet(powerwallScenario, 'data')
     row0 = arrayGet(data, 0)
     row1 = arrayGet(data, 1)
-    return 0.5 * (objectGet(row0, powerwallFieldBatteryPercent) + objectGet(row1, powerwallFieldBatteryPercent))
+    return 2 * objectGet(row0, powerwallFieldBatteryPercent) - objectGet(row1, powerwallFieldBatteryPercent)
 endfunction
 
 
@@ -295,30 +295,34 @@ async function powerwallLoadScenario(scenarioURL)
 
     # Fill-in any battery percentage data holes
     ixPrev = null
+    batteryPercentPrev = null
+    batteryDeltaPrev = 0
     foreach row, ixRow in data do
         batteryPercent = objectGet(row, powerwallFieldBatteryPercent)
         if batteryPercent then
             if ixPrev != null then
                 # Set interpolated battery percent values between non-null values
-                prevPercent = objectGet(arrayGet(data, ixPrev), powerwallFieldBatteryPercent)
                 ixHole = ixPrev + 1
                 while ixHole < ixRow do
-                    holePercent = prevPercent + ((ixHole - ixPrev) / (ixRow - ixPrev)) * (batteryPercent - prevPercent)
+                    holePercent = batteryPercentPrev + ((ixHole - ixPrev) / (ixRow - ixPrev)) * (batteryPercent - batteryPercentPrev)
                     objectSet(arrayGet(data, ixHole), powerwallFieldBatteryPercent, holePercent)
                     ixHole = ixHole + 1
                 endwhile
+                batteryDeltaPrev = batteryPercent - batteryPercentPrev
             endif
             ixPrev = ixRow
+            batteryPercentPrev = batteryPercent
         endif
     endforeach
 
-    # Any trailing nulls? If so, set to the previous value
-    if ixPrev != null then
-        prevPercent = objectGet(arrayGet(data, ixPrev), powerwallFieldBatteryPercent)
+    # Any trailing holes? If so, set to the previous value
+    if batteryPercentPrev != null then
         dataLength = arrayLength(data)
         ixHole = ixPrev + 1
+        holePercent = batteryPercentPrev
         while ixHole < dataLength do
-            objectSet(arrayGet(data, ixHole), powerwallFieldBatteryPercent, prevPercent)
+            holePercent = holePercent + batteryDeltaPrev
+            objectSet(arrayGet(data, ixHole), powerwallFieldBatteryPercent, holePercent)
             ixHole = ixHole + 1
         endwhile
     endif

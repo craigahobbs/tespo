@@ -4,29 +4,32 @@
 include 'powerwall.mds'
 
 powerwallScenario = powerwallLoadScenario(vPowerwallScenario)
+initialBatteryPercent = powerwallBatteryPercent(powerwallScenario)
 vehicleScenario = fetch(vVehicleScenario)
 
-markdownPrint( \
-    '**Powerwall Scenario:** ' + markdownEscape(objectGet(powerwallScenario, 'name')) + ' \\', \
-    '**Vehicle Scenario:** ' + markdownEscape(objectGet(vehicleScenario, 'name')) \
-)
-
+vehicleScenarioCopy = jsonParse(jsonStringify(vehicleScenario))
 dataTespoDisabled = powerwallSimulate( \
     powerwallScenario, \
-    powerwallBatteryPercent(powerwallScenario), \
-    vehicleScenario, \
+    initialBatteryPercent, \
+    vehicleScenarioCopy, \
     false \
 )
 
+vehicleScenarioCopy = jsonParse(jsonStringify(vehicleScenario))
 dataTespoEnabled = powerwallSimulate( \
     powerwallScenario, \
-    powerwallBatteryPercent(powerwallScenario), \
-    vehicleScenario, \
+    initialBatteryPercent, \
+    vehicleScenarioCopy, \
     true \
 )
 
 chartWidth = 1200
 chartHeight = 300
+
+markdownPrint( \
+    '**Powerwall Scenario:** ' + markdownEscape(objectGet(powerwallScenario, 'name')) + ' \\', \
+    '**Vehicle Scenario:** ' + markdownEscape(objectGet(vehicleScenario, 'name')) \
+)
 
 dataLineChart(dataTespoDisabled, objectNew( \
     'title', 'Simulation without TESPO', \

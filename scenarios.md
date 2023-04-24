@@ -4,14 +4,10 @@
 include 'powerwall.mds'
 
 # Powerwall scenarios
-powerwallScenarioURLs = arrayNew( \
-    'scenarios/powerwall/seattle.json' \
-)
+powerwallScenarioURLs = fetch('scenarios/powerwallScenarioURLs.json')
 
 # Vehicle scenarios
-vehicleScenarioURLs = arrayNew( \
-    'scenarios/vehicle/daily-commute.json' \
-)
+vehicleScenarioURLs = fetch('scenarios/vehicleScenarios.json')
 
 # Run each powerwall scenario with each vehicle scenario
 scenarioData = arrayNew()
@@ -19,12 +15,16 @@ foreach powerwallScenarioURL in powerwallScenarioURLs do
     foreach vehicleScenarioURL in vehicleScenarioURLs do
         # Load each scenario
         powerwallScenario = powerwallLoadScenario(powerwallScenarioURL)
+        batteryPercent = powerwallBatteryPercent(powerwallScenario)
         vehicleScenario = powerwallValidateVehicleScenario(fetch(vehicleScenarioURL))
 
-        # Run the scenario simulation with and without TESPO
-        batteryPercent = powerwallBatteryPercent(powerwallScenario)
-        dataNoTespo = powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, false)
-        dataTespo = powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, true)
+        # Run the scenario simulation without TESPO
+        vehicleScenarioCopy = jsonParse(jsonStringify(vehicleScenario))
+        dataNoTespo = powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenarioCopy, false)
+
+        # Run the scenario simulation with TESPO
+        vehicleScenarioCopy = jsonParse(jsonStringify(vehicleScenario))
+        dataTespo = powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenarioCopy, true)
 
         # Add the powerwall and grid to/from fields
         aggDatum = arrayNew()
@@ -91,8 +91,8 @@ foreach powerwallScenarioURL in powerwallScenarioURLs do
                 ')', \
             'Vehicle Scenario', vehicleScenarioName, \
             'Self-Powered Difference (%)', 100 * (tespoSelfPowered - noTespoSelfPowered) / noTespoSelfPowered, \
-            'From Grid Difference (%)', if(noTespoFromGrid > 0, 100 * (tespoFromGrid - noTespoFromGrid) / noTespoFromGrid, 0), \
-            'To Grid Difference (%)', if(tespoFromGrid > 0, 100 * (tespoToGrid - noTespoToGrid) / noTespoToGrid, 0) \
+            'From Grid Difference (%)', if(noTespoFromGrid != 0, 100 * (tespoFromGrid - noTespoFromGrid) / noTespoFromGrid, 0), \
+            'To Grid Difference (%)', if(noTespoToGrid != 0, 100 * (tespoToGrid - noTespoToGrid) / noTespoToGrid, 0) \
         )
         arrayPush(scenarioData, scenarioRow)
         break
