@@ -1,0 +1,16 @@
+{
+    "name": "Seattle, Week #18",
+    "batteryCapacity": 24.5,
+    "backupPercent": 20,
+    "chargeRatio": 0.95,
+    "dischargeRatio": 0.95,
+    "dataURLs": [
+        "seattle/2022-05-02.csv",
+        "seattle/2022-05-03.csv",
+        "seattle/2022-05-04.csv",
+        "seattle/2022-05-05.csv",
+        "seattle/2022-05-06.csv",
+        "seattle/2022-05-07.csv",
+        "seattle/2022-05-08.csv"
+    ]
+}

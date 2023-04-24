@@ -5,12 +5,7 @@ include 'powerwall.mds'
 
 # Powerwall scenarios
 powerwallScenarioURLs = arrayNew( \
-    'scenarios/powerwall/seattle-03.json', \
-    'scenarios/powerwall/seattle-04.json', \
-    'scenarios/powerwall/seattle-05.json', \
-    'scenarios/powerwall/seattle-06.json', \
-    'scenarios/powerwall/seattle-09.json', \
-    'scenarios/powerwall/seattle-12.json' \
+    'scenarios/powerwall/seattle.json' \
 )
 
 # Vehicle scenarios

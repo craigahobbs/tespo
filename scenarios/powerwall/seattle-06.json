@@ -1,16 +1,16 @@
 {
-    "name": "Seattle, June 2022",
-    "batteryCapacity": 24.3,
+    "name": "Seattle, Week #6",
+    "batteryCapacity": 24.5,
     "backupPercent": 20,
-    "chargeRatio": 0.861,
-    "dischargeRatio": 0.948,
+    "chargeRatio": 0.95,
+    "dischargeRatio": 0.95,
     "dataURLs": [
-        "../../data/seattle-06-19.csv",
-        "../../data/seattle-06-20.csv",
-        "../../data/seattle-06-21.csv",
-        "../../data/seattle-06-22.csv",
-        "../../data/seattle-06-23.csv",
-        "../../data/seattle-06-24.csv",
-        "../../data/seattle-06-25.csv"
+        "seattle/2023-02-07.csv",
+        "seattle/2023-02-08.csv",
+        "seattle/2023-02-09.csv",
+        "seattle/2023-02-10.csv",
+        "seattle/2023-02-11.csv",
+        "seattle/2023-02-12.csv",
+        "seattle/2023-02-13.csv"
     ]
 }

@@ -37,20 +37,9 @@ async function tespoMain()
         '', \
         "[Vehicle Scenario](#var.vDoc='vehicle')", \
         '', \
-        '## Powerwall Scenarios', \
+        '## Scenario Calibration', \
         '', \
-        "[Seattle, March](#url=calibrate.md&var.vScenarioURL='scenarios/powerwall/seattle-03.json')", \
-        '', \
-        "[Seattle, April](#url=calibrate.md&var.vScenarioURL='scenarios/powerwall/seattle-04.json')", \
-        '', \
-        "[Seattle, May](#url=calibrate.md&var.vScenarioURL='scenarios/powerwall/seattle-05.json')", \
-        '', \
-        "[Seattle, June](#url=calibrate.md&var.vScenarioURL='scenarios/powerwall/seattle-06.json')", \
-        '', \
-        "[Seattle, September](#url=calibrate.md&var.vScenarioURL='scenarios/powerwall/seattle-09.json')", \
-        '', \
-        "[Seattle, December](#url=calibrate.md&var.vScenarioURL='scenarios/powerwall/seattle-12.json')", \
-        '' \
+        "[Scenario Calibration](#url=calibrate.md)" \
     )
 endfunction
 
