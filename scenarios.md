@@ -80,11 +80,11 @@ foreach powerwallScenarioURL in fetch('scenarios/powerwallScenarioURLs.json') do
         noTespoToGrid = objectGet(aggRowNoTespo, 'To Grid (kW)')
         tespoToGrid = objectGet(aggRowTespo, 'To Grid (kW)')
         scenarioRow = objectNew( \
-            'Powerwall Scenario', '[' + markdownEscape(powerwallScenarioName) + '](#url=compare.md&' + \
+            'Powerwall Scenario', '[' + markdownEscape(powerwallScenarioName) + ', ' + markdownEscape(vehicleScenarioName) + \
+                '](#url=compare.md&' + \
                 "var.vPowerwallScenario='" + encodeURIComponent(powerwallScenarioURL) + "'&" + \
                 "var.vVehicleScenario='" + encodeURIComponent(vehicleScenarioURL) + "'" + \
                 ')', \
-            'Vehicle Scenario', vehicleScenarioName, \
             'Self-Powered Difference (%)', 100 * (tespoSelfPowered - noTespoSelfPowered) / noTespoSelfPowered, \
             'From Grid Difference (%)', if(noTespoFromGrid != 0, 100 * (tespoFromGrid - noTespoFromGrid) / noTespoFromGrid, 0), \
             'To Grid Difference (%)', if(noTespoToGrid != 0, 100 * (tespoToGrid - noTespoToGrid) / noTespoToGrid, 0) \

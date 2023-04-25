@@ -32,7 +32,7 @@ async function calibrateIndex()
     foreach scenarioJSON, ixScenario in powerwallScenarioJSONs do
         scenarioName = objectGet(scenarioJSON, 'name')
         arrayPush(scenarioTable, objectNew( \
-            'Scenario', '[' + markdownEscape(scenarioName) + "](#var.vScenarioURL='" + arrayGet(scenarioURLs, ixScenario) + "')", \
+            'Scenario', '[' + markdownEscape(scenarioName) + "](#var.vScenarioURL='" + arrayGet(powerwallScenarioURLs, ixScenario) + "')", \
             'Battery Capacity (kWh)', objectGet(scenarioJSON, 'batteryCapacity'), \
             'Backup (%)', objectGet(scenarioJSON, 'backupPercent'), \
             'Charge Ratio', objectGet(scenarioJSON, 'chargeRatio'), \
