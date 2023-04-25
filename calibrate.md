@@ -287,7 +287,6 @@ endfunction
 
 function calibrateAuto(powerwallScenario)
     batteryCapacity = objectGet(powerwallScenario, 'batteryCapacity')
-    backupPercent = objectGet(powerwallScenario, 'backupPercent')
     chargeRatio = objectGet(powerwallScenario, 'chargeRatio')
     dischargeRatio = objectGet(powerwallScenario, 'dischargeRatio')
 
