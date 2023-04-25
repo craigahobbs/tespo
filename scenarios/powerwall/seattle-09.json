@@ -1,9 +1,9 @@
 {
     "name": "Seattle, Week #9",
-    "batteryCapacity": 24.5,
+    "batteryCapacity": 25.9,
     "backupPercent": 20,
-    "chargeRatio": 0.95,
-    "dischargeRatio": 0.95,
+    "chargeRatio": 0.94,
+    "dischargeRatio": 0.91,
     "dataURLs": [
         "seattle/2023-02-28.csv",
         "seattle/2023-03-01.csv",
