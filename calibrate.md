@@ -293,13 +293,14 @@ function calibrateAuto(powerwallScenario)
     # Compute the initial difference
     minDiff = getSimulatedDiff(powerwallScenario)
 
+    iter = 0
     changed = true
-    while changed do
+    while changed && iter < 100 do
         changed = false
 
         # Adjust the battery capacity until we hit a local minimum
         batteryCapacityDelta = 0.1
-        while true do
+        while batteryCapacity < 1000 do
             batteryCapacity = batteryCapacity + batteryCapacityDelta
             objectSet(powerwallScenario, 'batteryCapacity', batteryCapacity)
             diff = getSimulatedDiff(powerwallScenario)
@@ -311,7 +312,7 @@ function calibrateAuto(powerwallScenario)
             minDiff = diff
             changed = true
         endwhile
-        while true do
+        while batteryCapacity > 1 do
             batteryCapacity = batteryCapacity - batteryCapacityDelta
             objectSet(powerwallScenario, 'batteryCapacity', batteryCapacity)
             diff = getSimulatedDiff(powerwallScenario)
@@ -326,7 +327,7 @@ function calibrateAuto(powerwallScenario)
 
         # Adjust the charge ratio until we hit a local minimum
         chargeRatioDelta = 0.01
-        while true do
+        while chargeRatio < 1 do
             chargeRatio = chargeRatio + chargeRatioDelta
             objectSet(powerwallScenario, 'chargeRatio', chargeRatio)
             diff = getSimulatedDiff(powerwallScenario)
@@ -338,7 +339,7 @@ function calibrateAuto(powerwallScenario)
             minDiff = diff
             changed = true
         endwhile
-        while true do
+        while chargeRatio > 0.85 do
             chargeRatio = chargeRatio - chargeRatioDelta
             objectSet(powerwallScenario, 'chargeRatio', chargeRatio)
             diff = getSimulatedDiff(powerwallScenario)
@@ -353,7 +354,7 @@ function calibrateAuto(powerwallScenario)
 
         # Adjust the charge ratio until we hit a local minimum
         dischargeRatioDelta = 0.01
-        while true do
+        while dischargeRatio < 1 do
             dischargeRatio = dischargeRatio + dischargeRatioDelta
             objectSet(powerwallScenario, 'dischargeRatio', dischargeRatio)
             diff = getSimulatedDiff(powerwallScenario)
@@ -365,7 +366,7 @@ function calibrateAuto(powerwallScenario)
             minDiff = diff
             changed = true
         endwhile
-        while true do
+        while dischargeRatio > 0.85 do
             dischargeRatio = dischargeRatio - dischargeRatioDelta
             objectSet(powerwallScenario, 'dischargeRatio', dischargeRatio)
             diff = getSimulatedDiff(powerwallScenario)
@@ -377,6 +378,8 @@ function calibrateAuto(powerwallScenario)
             minDiff = diff
             changed = true
         endwhile
+
+    iter = iter + 1
     endwhile
 endfunction
 
