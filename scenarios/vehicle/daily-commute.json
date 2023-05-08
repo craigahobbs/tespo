@@ -20,27 +20,27 @@
         },
         {
             "departures": [
-                {"id": "ID-1", "departure": 8, "arrival": 18, "batteryChange": -8}
+                {"id": "ID-1", "departure": 8, "arrival": 17, "batteryChange": -8}
             ]
         },
         {
             "departures": [
-                {"id": "ID-1", "departure": 8, "arrival": 18, "batteryChange": -8}
+                {"id": "ID-1", "departure": 9, "arrival": 18, "batteryChange": -8}
             ]
         },
         {
             "departures": [
-                {"id": "ID-1", "departure": 8, "arrival": 18, "batteryChange": -8}
+                {"id": "ID-1", "departure": 8, "arrival": 17, "batteryChange": -8}
             ]
         },
         {
             "departures": [
-                {"id": "ID-1", "departure": 8, "arrival": 18, "batteryChange": -8}
+                {"id": "ID-1", "departure": 9, "arrival": 18, "batteryChange": -8}
             ]
         },
         {
             "departures": [
-                {"id": "ID-1", "departure": 8, "arrival": 18, "batteryChange": -8}
+                {"id": "ID-1", "departure": 8, "arrival": 17, "batteryChange": -8}
             ]
         },
         {

@@ -37,7 +37,7 @@ function tespo(input)
             # P = V * I
             vehicleChargingRate = objectGet(vehicle, 'chargingRate')
             vehicleChargingVoltage = objectGet(vehicle, 'chargingVoltage')
-            availableSolar = availableSolar + vehicleChargingVoltage * vehicleChargingRate / 1000
+            availableSolar = mathMin(solarPower, availableSolar + vehicleChargingVoltage * vehicleChargingRate / 1000)
         endif
     endforeach
     availableSolar = mathMax(availableSolar, 0)
