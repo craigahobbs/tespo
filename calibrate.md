@@ -65,6 +65,17 @@ async function calibrateDetail()
     data = objectGet(powerwallScenario, 'data')
     scenarioName = objectGet(powerwallScenario, 'name')
 
+    # Compute the prev/next scenario URLs
+    baseScenarioURL = powerwallGetBaseURL(vScenarioURL)
+    prevScenarioURL = objectGet(powerwallScenario, 'prevScenarioURL')
+    if prevScenarioURL != null && powerwallIsRelativeURL(prevScenarioURL) then
+        prevScenarioURL = baseScenarioURL + prevScenarioURL
+    endif
+    nextScenarioURL = objectGet(powerwallScenario, 'nextScenarioURL')
+    if nextScenarioURL != null && powerwallIsRelativeURL(nextScenarioURL) then
+        nextScenarioURL = baseScenarioURL + nextScenarioURL
+    endif
+
     # Variable scenario overrides
     batteryCapacity = if(vBatteryCapacity, mathMax(1, vBatteryCapacity), objectGet(powerwallScenario, 'batteryCapacity'))
     backupPercent = if(vBackupPercent, mathMax(0, vBackupPercent), objectGet(powerwallScenario, 'backupPercent'))
@@ -155,7 +166,12 @@ async function calibrateDetail()
         '', \
         '# ' + title, \
         '', \
-        '**Scenario:** ' + markdownEscape(scenarioName), \
+        '**Scenario:** ' + markdownEscape(scenarioName) + if(prevScenarioURL == null && nextScenarioURL == null, '', '&nbsp;&nbsp;(' + \
+            if(prevScenarioURL != null, '[Previous](' + calibrateURL(objectNew('scenarioURL', prevScenarioURL)) + ')', 'Previous') + \
+            '&nbsp;|&nbsp;' + \
+            if(nextScenarioURL != null, '[Next](' + calibrateURL(objectNew('scenarioURL', nextScenarioURL)) + ')', 'Next') + \
+            ')' \
+        ), \
         '', \
         '**Battery Capacity:** ' + numberToFixed(batteryCapacity, 1) + '&nbsp;&nbsp;', \
         '[Up](' + calibrateURL(objectNew('batteryCapacity', mathMin(batteryCapacity + 0.1, 100)), powerwallScenario) + ')', \
@@ -400,14 +416,17 @@ endfunction
 
 # Helper to create calibrate application URLs
 function calibrateURL(args, powerwallScenario)
+    # URL arguments
+    scenarioURL = if(objectHas(args, 'scenarioURL'), objectGet(args, 'scenarioURL'), vScenarioURL)
+
+    # Powerwall scenario URL arguments
     if powerwallScenario != null then
-        # URL arguments
-        batteryCapacity = if(!reset && objectHas(args, 'batteryCapacity'), objectGet(args, 'batteryCapacity'), vBatteryCapacity)
-        backupPercent = if(!reset && objectHas(args, 'backupPercent'), objectGet(args, 'backupPercent'), vBackupPercent)
-        chargeRatio = if(!reset && objectHas(args, 'chargeRatio'), objectGet(args, 'chargeRatio'), vChargeRatio)
-        dischargeRatio = if(!reset && objectHas(args, 'dischargeRatio'), objectGet(args, 'dischargeRatio'), vDischargeRatio)
-        precision = if(!reset && objectHas(args, 'precision'), objectGet(args, 'precision'), vPrecision)
-        auto = if(!reset && objectHas(args, 'auto'), objectGet(args, 'auto'), vAuto)
+        batteryCapacity = if(objectHas(args, 'batteryCapacity'), objectGet(args, 'batteryCapacity'), vBatteryCapacity)
+        backupPercent = if(objectHas(args, 'backupPercent'), objectGet(args, 'backupPercent'), vBackupPercent)
+        chargeRatio = if(objectHas(args, 'chargeRatio'), objectGet(args, 'chargeRatio'), vChargeRatio)
+        dischargeRatio = if(objectHas(args, 'dischargeRatio'), objectGet(args, 'dischargeRatio'), vDischargeRatio)
+        precision = if(objectHas(args, 'precision'), objectGet(args, 'precision'), vPrecision)
+        auto = if(objectHas(args, 'auto'), objectGet(args, 'auto'), vAuto)
 
         # Set defaults from the scenario
         batteryCapacity = if(batteryCapacity != null, batteryCapacity, objectGet(powerwallScenario, 'batteryCapacity'))
@@ -418,12 +437,12 @@ function calibrateURL(args, powerwallScenario)
 
     # Create the URL
     parts = arrayNew()
-    ratioPrecicion = if(vPrecision != null, vPrecision, calibrateDefaultPrecision)
-    arrayPush(parts, "var.vScenarioURL='" + encodeURIComponent(vScenarioURL) + "'")
+    ratioPrecision = if(vPrecision != null, vPrecision, calibrateDefaultPrecision)
+    arrayPush(parts, "var.vScenarioURL='" + encodeURIComponent(scenarioURL) + "'")
     if(batteryCapacity != null, arrayPush(parts, 'var.vBatteryCapacity=' + mathRound(batteryCapacity, 1)))
     if(backupPercent != null, arrayPush(parts, 'var.vBackupPercent=' + mathRound(backupPercent, 1)))
-    if(chargeRatio != null, arrayPush(parts, 'var.vChargeRatio=' + mathRound(chargeRatio, ratioPrecicion)))
-    if(dischargeRatio != null, arrayPush(parts, 'var.vDischargeRatio=' + mathRound(dischargeRatio, ratioPrecicion)))
+    if(chargeRatio != null, arrayPush(parts, 'var.vChargeRatio=' + mathRound(chargeRatio, ratioPrecision)))
+    if(dischargeRatio != null, arrayPush(parts, 'var.vDischargeRatio=' + mathRound(dischargeRatio, ratioPrecision)))
     if(precision != null, arrayPush(parts, 'var.vPrecision=' + precision))
     if(auto != null, arrayPush(parts, 'var.vAuto=' + auto))
     return if(arrayLength(parts), '#' + arrayJoin(parts, '&'), '#var=')

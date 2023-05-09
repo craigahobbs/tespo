@@ -369,7 +369,13 @@ powerwallTypes = schemaParseEx( \
         'struct PowerwallScenario', \
         '', \
         '    # The scenario name', \
-        '    string(len > 0) name', \
+        '    string name', \
+        '', \
+        '    # Optional previous Powerwall scenario URL', \
+        '    optional string prevScenarioURL', \
+        '', \
+        '    # Optional next Powerwall scenario URL', \
+        '    optional string nextScenarioURL', \
         '', \
         '    # The Powerwall battery capacity in kWh', \
         '    float(> 0) batteryCapacity', \
@@ -384,14 +390,14 @@ powerwallTypes = schemaParseEx( \
         '    float(> 0, < 1) dischargeRatio', \
         '', \
         '    # The list of Tesla app daily energy data URLs', \
-        '    string(len > 0)[len > 0] dataURLs', \
+        '    string[len > 0] dataURLs', \
         '', \
         '', \
         '# A vehicle charging scenario', \
         'struct VehicleScenario', \
         '', \
         '    # The scenario name', \
-        '    string(len > 0) name', \
+        '    string name', \
         '', \
         '    # The scenario vehicles', \
         '    Vehicle[len > 0] vehicles', \
@@ -411,7 +417,7 @@ powerwallTypes = schemaParseEx( \
         'struct VehicleDeparture', \
         '', \
         '    # The vehicle ID', \
-        '    string(len > 0) id', \
+        '    string id', \
         '', \
         '    # The vehicle departure hour', \
         '    float(>= 0, <=24) departure', \

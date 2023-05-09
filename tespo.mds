@@ -167,7 +167,7 @@ tespoTypes = schemaParse( \
     'struct Vehicle', \
     '', \
     '    # The vehicle ID', \
-    '    string(len > 0) id', \
+    '    string id', \
     '', \
     "    # The vehicle's battery charge as a percentage", \
     '    float(>= 0, <= 100) battery', \
@@ -208,7 +208,7 @@ tespoTypes = schemaParse( \
     'struct VehicleCharging', \
     '', \
     '    # The vehicle ID', \
-    '    string(len > 0) id', \
+    '    string id', \
     '', \
     '    # The charging rate in amps', \
     '    int(> 0) chargingRate', \

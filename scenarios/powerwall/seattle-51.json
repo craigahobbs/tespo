@@ -1,5 +1,6 @@
 {
     "name": "Seattle, Week #51",
+    "prevScenarioURL": "seattle-50.json",
     "batteryCapacity": 25.1,
     "backupPercent": 50,
     "chargeRatio": 0.95,
