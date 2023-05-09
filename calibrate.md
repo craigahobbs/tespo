@@ -27,12 +27,13 @@ async function calibrateIndex()
     powerwallScenarioURLs = fetch('scenarios/powerwallScenarioURLs.json')
     powerwallScenarioJSONs = fetch(powerwallScenarioURLs)
 
-    # Create the scenario data table
+    # Create the scenario table's data
     scenarioTable = arrayNew()
     foreach scenarioJSON, ixScenario in powerwallScenarioJSONs do
+        scenarioURL = arrayGet(powerwallScenarioURLs, ixScenario)
         scenarioName = objectGet(scenarioJSON, 'name')
         arrayPush(scenarioTable, objectNew( \
-            'Scenario', '[' + markdownEscape(scenarioName) + "](#var.vScenarioURL='" + arrayGet(powerwallScenarioURLs, ixScenario) + "')", \
+            'Scenario', '[' + markdownEscape(scenarioName) + '](' + calibrateURL(objectNew('scenarioURL', scenarioURL)) + ')', \
             'Battery Capacity (kWh)', objectGet(scenarioJSON, 'batteryCapacity'), \
             'Backup (%)', objectGet(scenarioJSON, 'backupPercent'), \
             'Charge Ratio', objectGet(scenarioJSON, 'chargeRatio'), \
@@ -55,11 +56,7 @@ async function calibrateDetail()
     # Load the scenario
     powerwallScenario = if(vScenarioURL != null, powerwallLoadScenario(vScenarioURL))
     if powerwallScenario == null then
-        markdownPrint( \
-            'Failed to load scenario URL "' + vScenarioURL + '".', \
-            '', \
-            "Check the `var.vScenarioURL='scenario.json'` hash parameter." \
-        )
+        markdownPrint('Failed to load scenario URL "' + vScenarioURL + '"')
         return
     endif
     data = objectGet(powerwallScenario, 'data')
@@ -309,9 +306,10 @@ function calibrateAuto(powerwallScenario)
     # Compute the initial difference
     minDiff = getSimulatedDiff(powerwallScenario)
 
+    # Iteratively make adjustments to battery capacity, charge ratio, and discharge ratio
     iter = 0
     changed = true
-    while changed && iter < 100 do
+    while changed && iter < 10 do
         changed = false
 
         # Adjust the battery capacity until we hit a local minimum
@@ -395,7 +393,7 @@ function calibrateAuto(powerwallScenario)
             changed = true
         endwhile
 
-    iter = iter + 1
+        iter = iter + 1
     endwhile
 endfunction
 
