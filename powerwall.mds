@@ -47,7 +47,14 @@ powerwallSimulationPrecision = 3
 
 
 # Simulate a Tesla Powerwall scenario
-function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, tespoEnabled)
+#
+# Arguments:
+#   powerwallScenario: the Powerwall scenario model
+#   batteryPercent: Optional - the initial battery percent
+#   vehicleScenario: Optional - the vehicle scenario model
+#   tespoRows: Optional - if non-zero, the number of rows to compute the TESPO average home and solar power
+#
+function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, tespoRows)
     # Powerwall specifications
     batteryCapacityKwh = objectGet(powerwallScenario, 'batteryCapacity')
     backupPercent = objectGet(powerwallScenario, 'backupPercent')
@@ -107,12 +114,22 @@ function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, t
             endforeach
 
             # Adjust vehicle charging with TESPO?
-            if tespoEnabled then
+            if tespoRows then
+                # Compute the average solar and home energy usage
+                ixTespoRow = ixRow - tespoRows
+                tespoHomeSum = 0
+                tespoSolarSum = 0
+                while ixTespoRow < ixRow do
+                    tespoRow = if(ixTespoRow >= 0, arrayGet(data, ixTespoRow), row)
+                    tespoHomeSum = tespoHomeSum + objectGet(tespoRow, powerwallFieldHome)
+                    tespoSolarSum = tespoSolarSum + objectGet(tespoRow, powerwallFieldSolar)
+                    ixTespoRow = ixTespoRow + 1
+                endwhile
+
                 # Call TESPO
-                prevRow = if(ixRow == 0, row, arrayGet(data, ixRow - 1))
                 tespoInput = objectNew( \
-                  'solarPower', objectGet(prevRow, powerwallFieldSolar), \
-                  'homePower', objectGet(prevRow, powerwallFieldHome), \
+                  'solarPower', tespoSolarSum / tespoRows, \
+                  'homePower', tespoHomeSum / tespoRows, \
                   'homeBattery', batteryPercent, \
                   'vehicles', tespoInputVehicles \
                 )

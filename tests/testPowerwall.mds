@@ -608,7 +608,7 @@ function testPowerwallSimulate_vehicleScenario_tespo()
                 ) \
             ) \
         )), \
-        true \
+        1 \
     )
     unittestDeepEquals( \
         data, \

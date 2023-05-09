@@ -15,11 +15,11 @@ foreach powerwallScenarioURL in fetch('scenarios/powerwallScenarioURLs.json') do
 
         # Run the scenario simulation without TESPO
         vehicleScenarioCopy = jsonParse(jsonStringify(vehicleScenario))
-        dataNoTespo = powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenarioCopy, false)
+        dataNoTespo = powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenarioCopy, 0)
 
         # Run the scenario simulation with TESPO
         vehicleScenarioCopy = jsonParse(jsonStringify(vehicleScenario))
-        dataTespo = powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenarioCopy, true)
+        dataTespo = powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenarioCopy, 2)
 
         # Add the powerwall and grid to/from fields
         aggDatum = arrayNew()

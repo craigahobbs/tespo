@@ -12,7 +12,7 @@ dataTespoDisabled = powerwallSimulate( \
     powerwallScenario, \
     initialBatteryPercent, \
     vehicleScenarioCopy, \
-    false \
+    0 \
 )
 
 vehicleScenarioCopy = jsonParse(jsonStringify(vehicleScenario))
@@ -20,7 +20,7 @@ dataTespoEnabled = powerwallSimulate( \
     powerwallScenario, \
     initialBatteryPercent, \
     vehicleScenarioCopy, \
-    true \
+    2 \
 )
 
 chartWidth = 1200
