@@ -16,7 +16,11 @@ async function simulateIndex()
     # Set the title
     title = 'TESPO Simulations'
     setDocumentTitle(title)
-    markdownPrint('# ' + markdownEscape(title))
+    markdownPrint( \
+        '[Home](#url=&var=)', \
+        '', \
+        '# ' + markdownEscape(title) \
+    )
 
     # Fetch the scenarios
     vehicleScenarioURLs = fetch('scenarios/vehicleScenarios.json')
@@ -62,7 +66,7 @@ async function simulateIndex()
 
             # If loading, render the loading message and set a timer to immediately continue
             if isLoading then
-                markdownPrint('', 'Running simulation ' + arrayLength(scenarioData) + ' ...')
+                markdownPrint('', 'Running simulations ' + arrayLength(scenarioData) + ' ...')
                 setWindowTimeout(simulateIndex, 0)
                 return
             endif
@@ -151,35 +155,24 @@ endfunction
 
 async function simulateDetails()
     powerwallScenario = powerwallLoadScenario(vPowerwallScenario)
+    vehicleScenario = if(vVehicleScenario != null, powerwallValidateVehicleScenario(fetch(vVehicleScenario)), null)
+    tespoRows = if(vTespoRows != null, vTespoRows, 0)
+
     initialBatteryPercent = powerwallBatteryPercent(powerwallScenario)
-    vehicleScenario = powerwallValidateVehicleScenario(fetch(vVehicleScenario))
-
-    vehicleScenarioCopy = jsonParse(jsonStringify(vehicleScenario))
-    dataTespoDisabled = powerwallSimulate( \
-        powerwallScenario, \
-        initialBatteryPercent, \
-        vehicleScenarioCopy, \
-        0 \
-    )
-
-    vehicleScenarioCopy = jsonParse(jsonStringify(vehicleScenario))
-    dataTespoEnabled = powerwallSimulate( \
-        powerwallScenario, \
-        initialBatteryPercent, \
-        vehicleScenarioCopy, \
-        2 \
-    )
+    data = powerwallSimulate(powerwallScenario, initialBatteryPercent, vehicleScenario, tespoRows)
 
     chartWidth = 1200
     chartHeight = 300
 
     markdownPrint( \
+        '[Back](#var=)', \
+        '', \
         '**Powerwall Scenario:** ' + markdownEscape(objectGet(powerwallScenario, 'name')) + ' \\', \
-        '**Vehicle Scenario:** ' + markdownEscape(objectGet(vehicleScenario, 'name')) \
+        '**Vehicle Scenario:** ' + markdownEscape(objectGet(vehicleScenario, 'name')) + ' \\', \
+        '**TESPO Rows:** ' + tespoRows \
     )
 
-    dataLineChart(dataTespoDisabled, objectNew( \
-        'title', 'Simulation without TESPO', \
+    dataLineChart(data, objectNew( \
         'width', chartWidth, \
         'height', chartHeight, \
         'x', powerwallFieldDate, \
@@ -187,16 +180,7 @@ async function simulateDetails()
         'yTicks', objectNew('start', 0, 'end', 100) \
     ))
 
-    dataLineChart(dataTespoEnabled, objectNew( \
-        'title', 'Simulation with TESPO', \
-        'width', chartWidth, \
-        'height', chartHeight, \
-        'x', powerwallFieldDate, \
-        'y', arrayNew(powerwallFieldBatteryPercent, powerwallFieldBackupPercent, 'Vehicle ID-1 Battery (%)', 'Vehicle ID-1 Charging Limit (%)'), \
-        'yTicks', objectNew('start', 0, 'end', 100) \
-    ))
-
-    dataTable(dataTespoEnabled, objectNew( \
+    dataTable(data, objectNew( \
         'fields', arrayNew( \
             powerwallFieldDate, \
             powerwallFieldHome, \
