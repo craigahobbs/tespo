@@ -27,6 +27,7 @@ async function simulateIndex()
     scenarioData = arrayNew()
     foreach vehicleScenarioURL in vehicleScenarioURLs do
         foreach powerwallScenarioURL in powerwallScenarioURLs do
+            isLoading = false
             foreach tespoRows in tespoRowsArray do
                 # Get the cached scenario stats
                 scenarioStats = simulateGetScenarioStats(vehicleScenarioURL, powerwallScenarioURL, tespoRows)
@@ -52,11 +53,19 @@ async function simulateIndex()
 
                     # Update the scenario cache
                     simulateSetScenarioStats(vehicleScenarioURL, powerwallScenarioURL, tespoRows, scenarioStats)
+                    isLoading = true
                 endif
 
                 # Add the scenario table row
                 arrayPush(scenarioData, scenarioStats)
             endforeach
+
+            # If loading, render the loading message and set a timer to immediately continue
+            if isLoading then
+                markdownPrint('', 'Running simulation ' + arrayLength(scenarioData) + ' ...')
+                setWindowTimeout(simulateIndex, 0)
+                return
+            endif
         endforeach
     endforeach
 
