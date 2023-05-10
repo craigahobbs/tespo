@@ -13,102 +13,130 @@ endfunction
 
 
 async function simulateIndex()
+    # Set the title
     title = 'TESPO Simulations'
     setDocumentTitle(title)
+    markdownPrint('# ' + markdownEscape(title))
+
+    # Fetch the scenarios
+    vehicleScenarioURLs = fetch('scenarios/vehicleScenarios.json')
+    powerwallScenarioURLs = fetch('scenarios/powerwallScenarioURLs.json')
+    tespoRowsArray = arrayNew(0, 1, 2, 3, 6, 9, 12)
 
     # Run each powerwall scenario with each vehicle scenario
     scenarioData = arrayNew()
-    foreach powerwallScenarioURL in fetch('scenarios/powerwallScenarioURLs.json') do
-        foreach vehicleScenarioURL in fetch('scenarios/vehicleScenarios.json') do
-            # Load each scenario
-            powerwallScenario = powerwallLoadScenario(powerwallScenarioURL)
-            batteryPercent = powerwallBatteryPercent(powerwallScenario)
-            vehicleScenario = powerwallValidateVehicleScenario(fetch(vehicleScenarioURL))
+    foreach vehicleScenarioURL in vehicleScenarioURLs do
+        foreach powerwallScenarioURL in powerwallScenarioURLs do
+            foreach tespoRows in tespoRowsArray do
+                # Get the cached scenario stats
+                scenarioStats = simulateGetScenarioStats(vehicleScenarioURL, powerwallScenarioURL, tespoRows)
+                if scenarioStats == null then
+                    # Load each scenario
+                    vehicleScenario = powerwallValidateVehicleScenario(fetch(vehicleScenarioURL))
+                    powerwallScenario = powerwallLoadScenario(powerwallScenarioURL)
 
-            # Run the scenario simulation without TESPO
-            vehicleScenarioCopy = jsonParse(jsonStringify(vehicleScenario))
-            dataNoTespo = powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenarioCopy, 0)
+                    # Run the simulation
+                    batteryPercent = powerwallBatteryPercent(powerwallScenario)
+                    data = powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, tespoRows)
 
-            # Run the scenario simulation with TESPO
-            vehicleScenarioCopy = jsonParse(jsonStringify(vehicleScenario))
-            dataTespo = powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenarioCopy, 2)
+                    # Compute the scenario URL
+                    scenarioURL = "#var.vPowerwallScenario='" + encodeURIComponent(powerwallScenarioURL) + "'" + \
+                        "&var.vVehicleScenario='" + encodeURIComponent(vehicleScenarioURL) + "'" + \
+                        '&var.vTespoRows=' + tespoRows
 
-            # Add the powerwall and grid to/from fields
-            aggDatum = arrayNew()
-            foreach data in arrayNew(dataNoTespo, dataTespo) do
-                dataCalculatedField( \
-                    data, \
-                    'To Powerwall (kW)', \
-                    'if([' + powerwallFieldPowerwall + '] < 0, [' + powerwallFieldPowerwall + '], 0)'  \
-                )
-                dataCalculatedField( \
-                    data, \
-                    'From Powerwall (kW)', \
-                    'if([' + powerwallFieldPowerwall + '] > 0, [' + powerwallFieldPowerwall + '], 0)' \
-                )
-                dataCalculatedField( \
-                    data, \
-                    'To Grid (kW)', \
-                    'if([' + powerwallFieldGrid + '] < 0, [' + powerwallFieldGrid + '], 0)' \
-                )
-                dataCalculatedField( \
-                    data, \
-                    'From Grid (kW)', \
-                    'if([' + powerwallFieldGrid + '] > 0, [' + powerwallFieldGrid + '], 0)' \
-                )
+                    # Compute the simulation statistics
+                    scenarioStats = simulateStatistics(data)
+                    objectSet(scenarioStats, 'Vehicle Scenario', objectGet(vehicleScenario, 'name'))
+                    objectSet(scenarioStats, 'Powerwall Scenario', objectGet(powerwallScenario, 'name'))
+                    objectSet(scenarioStats, 'Tespo Rows', '[' + tespoRows + '](' + scenarioURL + ')')
 
-                # Aggregate the data
-                aggData = dataAggregate(data, objectNew( \
-                    'measures', arrayNew( \
-                        objectNew('field', 'Home (kW)', 'function', 'sum'), \
-                        objectNew('field', 'Solar Energy (kW)', 'function', 'sum'), \
-                        objectNew('field', 'To Powerwall (kW)', 'function', 'sum'), \
-                        objectNew('field', 'From Powerwall (kW)', 'function', 'sum'), \
-                        objectNew('field', 'From Grid (kW)', 'function', 'sum'), \
-                        objectNew('field', 'To Grid (kW)', 'function', 'sum') \
-                    ) \
-                ))
-                arrayPush(aggDatum, aggData)
+                    # Update the scenario cache
+                    simulateSetScenarioStats(vehicleScenarioURL, powerwallScenarioURL, tespoRows, scenarioStats)
+                endif
 
-                # Compute self-powered percentage
-                dataCalculatedField( \
-                    aggData, \
-                    'Self-Powered (%)', \
-                    '100 * ([' + powerwallFieldHome + '] - [From Grid (kW)]) / [' + powerwallFieldHome + ']' \
-                )
+                # Add the scenario table row
+                arrayPush(scenarioData, scenarioStats)
             endforeach
-            aggDataNoTespo = arrayGet(aggDatum, 0)
-            aggDataTespo = arrayGet(aggDatum, 1)
-            aggRowNoTespo = arrayGet(aggDataNoTespo, 0)
-            aggRowTespo = arrayGet(aggDataTespo, 0)
-
-            # Add the scenario table row
-            powerwallScenarioName = objectGet(powerwallScenario, 'name')
-            vehicleScenarioName = objectGet(vehicleScenario, 'name')
-            noTespoSelfPowered = objectGet(aggRowNoTespo, 'Self-Powered (%)')
-            tespoSelfPowered = objectGet(aggRowTespo, 'Self-Powered (%)')
-            noTespoFromGrid = objectGet(aggRowNoTespo, 'From Grid (kW)')
-            tespoFromGrid = objectGet(aggRowTespo, 'From Grid (kW)')
-            noTespoToGrid = objectGet(aggRowNoTespo, 'To Grid (kW)')
-            tespoToGrid = objectGet(aggRowTespo, 'To Grid (kW)')
-            scenarioRow = objectNew( \
-                'Powerwall Scenario', '[' + markdownEscape(powerwallScenarioName) + ', ' + markdownEscape(vehicleScenarioName) + \
-                    '](#url=compare.md&' + \
-                    "var.vPowerwallScenario='" + encodeURIComponent(powerwallScenarioURL) + "'&" + \
-                    "var.vVehicleScenario='" + encodeURIComponent(vehicleScenarioURL) + "'" + \
-                    ')', \
-                'Self-Powered Difference (%)', 100 * (tespoSelfPowered - noTespoSelfPowered) / noTespoSelfPowered, \
-                'From Grid Difference (%)', if(noTespoFromGrid != 0, 100 * (tespoFromGrid - noTespoFromGrid) / noTespoFromGrid, 0), \
-                'To Grid Difference (%)', if(noTespoToGrid != 0, 100 * (tespoToGrid - noTespoToGrid) / noTespoToGrid, 0) \
-            )
-            arrayPush(scenarioData, scenarioRow)
         endforeach
     endforeach
 
     # Render the scenario table
     dataTable(scenarioData, objectNew( \
-        'markdown', arrayNew('Powerwall Scenario') \
+        'categories', arrayNew('Vehicle Scenario', 'Powerwall Scenario', 'Tespo Rows'), \
+        'fields', arrayNew('To Powerwall (kW)', 'From Powerwall (kW)', 'From Grid (kW)', 'To Grid (kW)'), \
+        'markdown', arrayNew('Tespo Rows') \
     ))
+endfunction
+
+
+function simulateGetScenarioStats(vehicleScenarioURL, powerwallScenarioURL, tespoRows)
+    scenarioDataStr = localStorageGet('ScenarioData')
+    if scenarioDataStr != null then
+        scenarioData = jsonParse(scenarioDataStr)
+        scenarioKey = vehicleScenarioURL + ', ' + powerwallScenarioURL + ', ' + tespoRows
+        return objectGet(scenarioData, scenarioKey)
+    endif
+    return null
+endfunction
+
+
+function simulateSetScenarioStats(vehicleScenarioURL, powerwallScenarioURL, tespoRows, scenarioStats)
+    scenarioDataStr = localStorageGet('ScenarioData')
+    if scenarioDataStr != null then
+        scenarioData = jsonParse(scenarioDataStr)
+    endif
+    if scenarioData == null then
+        scenarioData = objectNew()
+    endif
+    scenarioKey = vehicleScenarioURL + ', ' + powerwallScenarioURL + ', ' + tespoRows
+    objectSet(scenarioData, scenarioKey, scenarioStats)
+    localStorageSet('ScenarioData', jsonStringify(scenarioData))
+endfunction
+
+
+function simulateStatistics(data)
+    # Add to/from powerwall/grid calculated fields
+    dataCalculatedField( \
+        data, \
+        'To Powerwall (kW)', \
+        'if([' + powerwallFieldPowerwall + '] < 0, [' + powerwallFieldPowerwall + '], 0)'  \
+    )
+    dataCalculatedField( \
+        data, \
+        'From Powerwall (kW)', \
+        'if([' + powerwallFieldPowerwall + '] > 0, [' + powerwallFieldPowerwall + '], 0)' \
+    )
+    dataCalculatedField( \
+        data, \
+        'To Grid (kW)', \
+        'if([' + powerwallFieldGrid + '] < 0, [' + powerwallFieldGrid + '], 0)' \
+    )
+    dataCalculatedField( \
+        data, \
+        'From Grid (kW)', \
+        'if([' + powerwallFieldGrid + '] > 0, [' + powerwallFieldGrid + '], 0)' \
+    )
+
+    # Aggregate the data
+    aggData = dataAggregate(data, objectNew( \
+        'measures', arrayNew( \
+            objectNew('field', powerwallFieldHome, 'function', 'sum'), \
+            objectNew('field', powerwallFieldSolar, 'function', 'sum'), \
+            objectNew('field', 'To Powerwall (kW)', 'function', 'sum'), \
+            objectNew('field', 'From Powerwall (kW)', 'function', 'sum'), \
+            objectNew('field', 'From Grid (kW)', 'function', 'sum'), \
+            objectNew('field', 'To Grid (kW)', 'function', 'sum') \
+        ) \
+    ))
+
+    # Compute self-powered percentage
+    dataCalculatedField( \
+        aggData, \
+        'Self-Powered (%)', \
+        '100 * ([' + powerwallFieldHome + '] - [From Grid (kW)]) / [' + powerwallFieldHome + ']' \
+    )
+
+    return arrayGet(aggData, 0)
 endfunction
 
 
