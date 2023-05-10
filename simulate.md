@@ -3,7 +3,7 @@ include 'powerwall.mds'
 
 
 async function simulateMain()
-    if vPowerwallScenario != null && vVehicleScenario != null then
+    if vPowerwallScenario != null then
         simulateDetails()
         return
     endif
