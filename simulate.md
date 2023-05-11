@@ -1,5 +1,6 @@
 ~~~ markdown-script
 include 'powerwall.mds'
+include 'https://craigahobbs.github.io/markdown-up/include/forms.mds'
 
 
 async function simulateMain()
@@ -73,12 +74,21 @@ async function simulateIndex()
         endforeach
     endforeach
 
+    # Render the reset link
+    elementModelRender(objectNew('html', 'p', 'elem', formsLinkButtonElements('Reset', simulateOnReset)))
+
     # Render the scenario table
     dataTable(scenarioData, objectNew( \
         'categories', arrayNew('Vehicle Scenario', 'Powerwall Scenario', 'Tespo Rows'), \
         'fields', arrayNew('To Powerwall (kW)', 'From Powerwall (kW)', 'From Grid (kW)', 'To Grid (kW)'), \
         'markdown', arrayNew('Tespo Rows') \
     ))
+endfunction
+
+
+async function simulateOnReset()
+    localStorageRemove('ScenarioData')
+    simulateIndex()
 endfunction
 
 
