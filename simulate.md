@@ -65,7 +65,7 @@ async function simulateIndex()
                 arrayPush(scenarioData, scenarioStats)
             endforeach
 
-            # If loading, render the loading message and set a timer to immediately continue
+            # If loading, render the loading message (and immediately continue)
             if isLoading then
                 markdownPrint('', 'Running simulations ' + arrayLength(scenarioData) + ' ...')
                 setWindowTimeout(simulateIndex, 0)
