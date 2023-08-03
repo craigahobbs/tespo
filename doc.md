@@ -6,17 +6,17 @@ include 'powerwall.mds'
 
 
 async function tespoDocMain()
-    if vDoc == 'powerwall' then
+    if vDoc == 'powerwall':
         typeName = 'PowerwallScenario'
-    else if vDoc == 'vehicle' then
+    elif vDoc == 'vehicle':
         typeName = 'VehicleScenario'
-    else if vDoc == 'output' then
+    elif vDoc == 'output':
         typeName = 'TespoOutput'
-    else then
+    else:
         typeName = 'TespoInput'
     endif
 
-    setDocumentTitle(typeName)
+    documentSetTitle(typeName)
     markdownPrint('[Home](#url=&var=)')
     elementModelRender(schemaElements(powerwallTypes, typeName))
 endfunction

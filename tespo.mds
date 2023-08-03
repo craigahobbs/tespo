@@ -3,7 +3,7 @@
 
 
 # Include sentinel
-if getGlobal('tespo') then
+if runtimeGetGlobal('tespo'):
     return
 endif
 
@@ -28,23 +28,23 @@ function tespo(input)
 
     # Compute the available solar power
     availableSolar = solarPower - homePower
-    foreach vehicle in vehicles do
+    for vehicle in vehicles:
         # If vehicle is charging, add its charging power back to the available power for
         # re-computing the optimal charging rate below
         vehicleBattery = objectGet(vehicle, 'battery')
         vehicleChargingLimit = objectGet(vehicle, 'chargingLimit')
-        if vehicleBattery < vehicleChargingLimit then
+        if vehicleBattery < vehicleChargingLimit:
             # P = V * I
             vehicleChargingRate = objectGet(vehicle, 'chargingRate')
             vehicleChargingVoltage = objectGet(vehicle, 'chargingVoltage')
             availableSolar = mathMin(solarPower, availableSolar + vehicleChargingVoltage * vehicleChargingRate / 1000)
         endif
-    endforeach
+    endfor
     availableSolar = mathMax(availableSolar, 0)
 
     # Determine each vehicle's charging state
     chargingSolar = availableSolar
-    foreach vehicle in vehicles do
+    for vehicle in vehicles:
         vehicleID = objectGet(vehicle, 'id')
         vehicleBattery = objectGet(vehicle, 'battery')
         vehicleMinChargingRate = objectGet(vehicle, 'minChargingRate')
@@ -65,19 +65,19 @@ function tespo(input)
         vehicleMinChargingPower = vehicleChargingVoltage * vehicleMinChargingRate / 1000
         if isHomeBatteryCharged \
                 && vehicleBattery < maxVehicleChargingLimit \
-                && vehicleMinChargingPower < chargingSolar then
+                && vehicleMinChargingPower < chargingSolar:
             # Set the maximum charging limit
             objectSet(outputVehicle, 'chargingLimit', maxVehicleChargingLimit)
 
             # Deduct the minimum charging power
             chargingSolar = chargingSolar - vehicleMinChargingPower
         endif
-    endforeach
+    endfor
 
     # Compute each vehicle's charging settings
     chargingLoop:
         chargingChanged = false
-        foreach vehicle, ixVehicle in vehicles do
+        for vehicle, ixVehicle in vehicles:
             vehicleMaxChargingRate = objectGet(vehicle, 'maxChargingRate')
             vehicleChargingVoltage = objectGet(vehicle, 'chargingVoltage')
 
@@ -93,7 +93,7 @@ function tespo(input)
             chargingPowerIncrement = vehicleChargingVoltage * chargingRateIncrement / 1000
             if vehicleChargingLimit == maxVehicleChargingLimit \
                     && chargingRateIncrement <= vehicleMaxChargingRate - vehicleChargingRate \
-                    && chargingPowerIncrement <= chargingSolar then
+                    && chargingPowerIncrement <= chargingSolar:
                 # Note that charging has changed
                 chargingChanged = true
 
@@ -101,7 +101,7 @@ function tespo(input)
                 objectSet(outputVehicle, 'chargingRate', vehicleChargingRate + chargingRateIncrement)
                 chargingSolar = chargingSolar - chargingPowerIncrement
             endif
-        endforeach
+        endfor
     jumpif (chargingChanged) chargingLoop
 
     # Set available solar power and the spilling state

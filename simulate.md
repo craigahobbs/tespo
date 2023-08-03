@@ -1,10 +1,10 @@
 ~~~ markdown-script
 include 'powerwall.mds'
-include 'https://craigahobbs.github.io/markdown-up/include/forms.mds'
+include <forms.mds>
 
 
 async function simulateMain()
-    if vPowerwallScenario != null then
+    if vPowerwallScenario != null:
         simulateDetails()
         return
     endif
@@ -16,7 +16,7 @@ endfunction
 async function simulateIndex()
     # Set the title
     title = 'TESPO Simulations'
-    setDocumentTitle(title)
+    documentSetTitle(title)
     markdownPrint( \
         '[Home](#url=&var=)', \
         '', \
@@ -24,21 +24,21 @@ async function simulateIndex()
     )
 
     # Fetch the scenarios
-    vehicleScenarioURLs = fetch('scenarios/vehicleScenarios.json')
-    powerwallScenarioURLs = fetch('scenarios/powerwallScenarioURLs.json')
+    vehicleScenarioURLs = httpFetch('scenarios/vehicleScenarios.json')
+    powerwallScenarioURLs = httpFetch('scenarios/powerwallScenarioURLs.json')
     tespoRowsArray = arrayNew(0, 1, 2, 3, 6, 9, 12)
 
     # Run each powerwall scenario with each vehicle scenario
     scenarioData = arrayNew()
-    foreach vehicleScenarioURL in vehicleScenarioURLs do
-        foreach powerwallScenarioURL in powerwallScenarioURLs do
+    for vehicleScenarioURL in vehicleScenarioURLs:
+        for powerwallScenarioURL in powerwallScenarioURLs:
             isLoading = false
-            foreach tespoRows in tespoRowsArray do
+            for tespoRows in tespoRowsArray:
                 # Get the cached scenario stats
                 scenarioStats = simulateGetScenarioStats(vehicleScenarioURL, powerwallScenarioURL, tespoRows)
-                if scenarioStats == null then
+                if scenarioStats == null:
                     # Load each scenario
-                    vehicleScenario = powerwallValidateVehicleScenario(fetch(vehicleScenarioURL))
+                    vehicleScenario = powerwallValidateVehicleScenario(httpFetch(vehicleScenarioURL))
                     powerwallScenario = powerwallLoadScenario(powerwallScenarioURL)
 
                     # Run the simulation
@@ -46,8 +46,8 @@ async function simulateIndex()
                     data = powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, tespoRows)
 
                     # Compute the scenario URL
-                    scenarioURL = "#var.vPowerwallScenario='" + encodeURIComponent(powerwallScenarioURL) + "'" + \
-                        "&var.vVehicleScenario='" + encodeURIComponent(vehicleScenarioURL) + "'" + \
+                    scenarioURL = "#var.vPowerwallScenario='" + urlEncodeComponent(powerwallScenarioURL) + "'" + \
+                        "&var.vVehicleScenario='" + urlEncodeComponent(vehicleScenarioURL) + "'" + \
                         '&var.vTespoRows=' + tespoRows
 
                     # Compute the simulation statistics
@@ -63,16 +63,16 @@ async function simulateIndex()
 
                 # Add the scenario table row
                 arrayPush(scenarioData, scenarioStats)
-            endforeach
+            endfor
 
             # If loading, render the loading message (and immediately continue)
-            if isLoading then
+            if isLoading:
                 markdownPrint('', 'Running simulations ' + arrayLength(scenarioData) + ' ...')
-                setWindowTimeout(simulateIndex, 0)
+                windowSetTimeout(simulateIndex, 0)
                 return
             endif
-        endforeach
-    endforeach
+        endfor
+    endfor
 
     # Render the reset link
     elementModelRender(objectNew('html', 'p', 'elem', formsLinkButtonElements('Reset', simulateOnReset)))
@@ -94,7 +94,7 @@ endfunction
 
 function simulateGetScenarioStats(vehicleScenarioURL, powerwallScenarioURL, tespoRows)
     scenarioDataStr = localStorageGet('ScenarioData')
-    if scenarioDataStr != null then
+    if scenarioDataStr != null:
         scenarioData = jsonParse(scenarioDataStr)
         scenarioKey = vehicleScenarioURL + ', ' + powerwallScenarioURL + ', ' + tespoRows
         return objectGet(scenarioData, scenarioKey)
@@ -105,10 +105,10 @@ endfunction
 
 function simulateSetScenarioStats(vehicleScenarioURL, powerwallScenarioURL, tespoRows, scenarioStats)
     scenarioDataStr = localStorageGet('ScenarioData')
-    if scenarioDataStr != null then
+    if scenarioDataStr != null:
         scenarioData = jsonParse(scenarioDataStr)
     endif
-    if scenarioData == null then
+    if scenarioData == null:
         scenarioData = objectNew()
     endif
     scenarioKey = vehicleScenarioURL + ', ' + powerwallScenarioURL + ', ' + tespoRows
@@ -165,7 +165,7 @@ endfunction
 
 async function simulateDetails()
     powerwallScenario = powerwallLoadScenario(vPowerwallScenario)
-    vehicleScenario = if(vVehicleScenario != null, powerwallValidateVehicleScenario(fetch(vVehicleScenario)), null)
+    vehicleScenario = if(vVehicleScenario != null, powerwallValidateVehicleScenario(httpFetch(vVehicleScenario)), null)
     tespoRows = if(vTespoRows != null, vTespoRows, 0)
 
     initialBatteryPercent = powerwallBatteryPercent(powerwallScenario)

@@ -3,7 +3,7 @@
 
 
 # Include sentinel
-if getGlobal('powerwallSimulate') then
+if runtimeGetGlobal('powerwallSimulate'):
     return
 endif
 
@@ -71,7 +71,7 @@ function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, t
 
     # Simulate each data row
     simulated = arrayNew()
-    foreach row, ixRow in data do
+    for row, ixRow in data:
         simulatedRow = objectNew(powerwallFieldDate, objectGet(row, powerwallFieldDate))
 
         # Get the home and solar energy
@@ -82,7 +82,7 @@ function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, t
         batteryKwh = batteryPercent * batteryCapacityKwh / 100
 
         # Add simulated vehicle charging home power usage
-        if vehicleScenario then
+        if vehicleScenario:
             days = objectGet(vehicleScenario, 'days')
             vehicles = objectGet(vehicleScenario, 'vehicles')
 
@@ -93,33 +93,33 @@ function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, t
 
             # Did any vehicles arrive this period? If so, update their battery energy.
             tespoInputVehicles = arrayNew()
-            foreach vehicle, ixVehicle in vehicles do
+            for vehicle, ixVehicle in vehicles:
                 vehicleID = objectGet(vehicle, 'id')
                 vehicleBatteryPercent = objectGet(vehicle, 'battery')
 
                 # Is the vehicle connnected?
-                if !powerwallVehicleDeparted(vehicleDay, vehicleID, hourOfDay) then
+                if !powerwallVehicleDeparted(vehicleDay, vehicleID, hourOfDay):
                     # Include in TESPO
                     arrayPush(tespoInputVehicles, vehicle)
 
                     # Did the vehicle just arrive?
                     vehicleDeparture = if(hourOfDay > 0, powerwallVehicleDeparted(vehicleDay, vehicleID, hourOfDay - durationHours))
-                    if vehicleDeparture then
+                    if vehicleDeparture:
                         # Yes, update the vehicle's battery percentage
                         vehicleBatteryPercentChange = objectGet(vehicleDeparture, 'batteryChange')
                         vehicleBatteryPercent = vehicleBatteryPercent + vehicleBatteryPercentChange
                         objectSet(vehicle, 'battery', vehicleBatteryPercent)
                     endif
                 endif
-            endforeach
+            endfor
 
             # Adjust vehicle charging with TESPO?
-            if tespoRows then
+            if tespoRows:
                 # Compute the average solar and home energy usage
                 ixTespoRow = ixRow - tespoRows
                 tespoHomeSum = 0
                 tespoSolarSum = 0
-                while ixTespoRow < ixRow do
+                while ixTespoRow < ixRow:
                     tespoRow = if(ixTespoRow >= 0, arrayGet(data, ixTespoRow), row)
                     tespoHomeSum = tespoHomeSum + objectGet(tespoRow, powerwallFieldHome)
                     tespoSolarSum = tespoSolarSum + objectGet(tespoRow, powerwallFieldSolar)
@@ -137,23 +137,23 @@ function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, t
                 tespoOutputVehicles = objectGet(tespoOutput, 'vehicles')
 
                 # Update each vehicle's charging
-                foreach tespoOutputVehicle in tespoOutputVehicles do
+                for tespoOutputVehicle in tespoOutputVehicles:
                     tespoOutputVehicleID = objectGet(tespoOutputVehicle, 'id')
                     tespoChargingLimit = objectGet(tespoOutputVehicle, 'chargingLimit')
                     tespoChargingRate = objectGet(tespoOutputVehicle, 'chargingRate')
-                    foreach vehicle in vehicles do
+                    for vehicle in vehicles:
                         vehicleID = objectGet(vehicle, 'id')
-                        if vehicleID == tespoOutputVehicleID then
+                        if vehicleID == tespoOutputVehicleID:
                             objectSet(vehicle, 'chargingLimit', tespoChargingLimit)
                             objectSet(vehicle, 'chargingRate', tespoChargingRate)
                             break
                         endif
-                    endforeach
-                endforeach
+                    endfor
+                endfor
             endif
 
             # Simulate each connected vehicle
-            foreach vehicle, ixVehicle in vehicles do
+            for vehicle, ixVehicle in vehicles:
                 vehicleID = objectGet(vehicle, 'id')
                 vehicleBatteryPercent = objectGet(vehicle, 'battery')
                 vehicleBatteryCapacity = objectGet(vehicle, 'batteryCapacity')
@@ -166,16 +166,16 @@ function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, t
                 # Is the vehicle connnected?
                 vehicleConnected = 0
                 vehicleChargeKw = 0
-                if !powerwallVehicleDeparted(vehicleDay, vehicleID, hourOfDay) then
+                if !powerwallVehicleDeparted(vehicleDay, vehicleID, hourOfDay):
                     vehicleConnected = ixVehicle + 1
 
                     # Is the vehicle charging?
-                    if vehicleBatteryPercent < vehicleChargingLimit then
+                    if vehicleBatteryPercent < vehicleChargingLimit:
                         # Add the vehicle charge energy to the home power usage
                         vehicleChargeKw = vehicleChargingRate * vehicleChargingVoltage / 1000
                         vehicleChargeKwh = vehicleChargeKw * durationHours
                         vehicleChargeMaxKwh = vehicleChargingLimitKwh - vehicleBatteryKwh
-                        if vehicleChargeKwh > vehicleChargeMaxKwh then
+                        if vehicleChargeKwh > vehicleChargeMaxKwh:
                             vehicleChargeKw = vehicleChargeMaxKwh / durationHours
                             vehicleChargeKwh = vehicleChargeMaxKwh
                         endif
@@ -194,47 +194,47 @@ function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, t
                 objectSet(simulatedRow, 'Vehicle ' + vehicleID + ' Battery (%)', mathRound(vehicleBatteryPercent, powerwallSimulationPrecision))
                 objectSet(simulatedRow, 'Vehicle ' + vehicleID + ' Charging Rate (amps)', mathRound(vehicleChargingRate, powerwallSimulationPrecision))
                 objectSet(simulatedRow, 'Vehicle ' + vehicleID + ' Charging Limit (%)', mathRound(vehicleChargingLimit, powerwallSimulationPrecision))
-            endforeach
+            endfor
         endif
 
         # Are we generating more solar energy than we're currently using?
         powerwallKw = homeKw - solarKw
-        if solarKw > homeKw then
+        if solarKw > homeKw:
             # Is the battery fully charged? If so, "spill" to the grid.
-            if batteryPercent >= 100 then
+            if batteryPercent >= 100:
                 gridKw = powerwallKw
                 powerwallKw = 0
                 batteryNewKwh = batteryKwh
-            else then
+            else:
                 # Charge the battery - did we exceed the battery's capacity?
                 batteryNewKwh = batteryKwh - powerwallKw * chargeRatio * durationHours
-                if batteryNewKwh > batteryCapacityKwh then
+                if batteryNewKwh > batteryCapacityKwh:
                     # Battery is full - output excess energy to the grid
                     batteryNewKwh = batteryCapacityKwh
                     powerwallKw = ((batteryKwh - batteryCapacityKwh) / chargeRatio) / durationHours
                     gridKw = homeKw - solarKw - powerwallKw
-                else then
+                else:
                     # Battery is charging
                     gridKw = 0
                 endif
             endif
 
         # No, we are using more energy than we are generating
-        else then
+        else:
             # Is the battery at or below the backup limit? If so, pull from the grid.
-            if batteryPercent <= backupPercent then
+            if batteryPercent <= backupPercent:
                 gridKw = powerwallKw
                 powerwallKw = 0
                 batteryNewKwh = batteryPercent * batteryCapacityKwh / 100
-            else then
+            else:
                 # Discharge the battery - did we run out of battery power?
                 batteryNewKwh = batteryKwh - ((homeKw - solarKw) / dischargeRatio) * durationHours
-                if batteryNewKwh < backupKwh then
+                if batteryNewKwh < backupKwh:
                     # Battery is empty - pull from the grid
                     batteryNewKwh = backupKwh
                     powerwallKw = ((batteryKwh - backupKwh) * dischargeRatio) / durationHours
                     gridKw = homeKw - solarKw - powerwallKw
-                else then
+                else:
                     # Battery is discharging
                     gridKw = 0
                 endif
@@ -252,7 +252,7 @@ function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, t
         objectSet(simulatedRow, powerwallFieldBatteryPercent, mathRound(batteryPercent, powerwallSimulationPrecision))
         objectSet(simulatedRow, powerwallFieldBackupPercent, backupPercent)
         arrayPush(simulated, simulatedRow)
-    endforeach
+    endfor
 
     return simulated
 endfunction
@@ -261,14 +261,14 @@ endfunction
 # Determine if a vehicle is away from the home
 function powerwallVehicleDeparted(vehicleDay, vehicleID, hourOfDay)
     departures = objectGet(vehicleDay, 'departures')
-    foreach departure in departures do
+    for departure in departures:
         departureID = objectGet(departure, 'id')
         departureHour = objectGet(departure, 'departure')
         arrivalHour = objectGet(departure, 'arrival')
-        if vehicleID == departureID && hourOfDay >= departureHour && hourOfDay <= arrivalHour then
+        if vehicleID == departureID && hourOfDay >= departureHour && hourOfDay <= arrivalHour:
             return departure
         endif
-    endforeach
+    endfor
     return null
 endfunction
 
@@ -282,31 +282,31 @@ endfunction
 # Load a Powerwall simulation scenario
 async function powerwallLoadScenario(scenarioURL)
     # Load the scenario file
-    powerwallScenario = fetch(scenarioURL)
+    powerwallScenario = httpFetch(scenarioURL)
     powerwallScenario = if(powerwallScenario != null, schemaValidate(powerwallTypes, 'PowerwallScenario', powerwallScenario))
-    if powerwallScenario == null then
+    if powerwallScenario == null:
         return null
     endif
 
     # Fixup relative data URLs
     dataURLs = objectGet(powerwallScenario, 'dataURLs')
     scenarioBaseURL = powerwallGetBaseURL(scenarioURL)
-    foreach dataURL, ixDataURL in dataURLs do
-        if powerwallIsRelativeURL(dataURL) then
+    for dataURL, ixDataURL in dataURLs:
+        if powerwallIsRelativeURL(dataURL):
             arraySet(dataURLs, ixDataURL, scenarioBaseURL + dataURL)
         endif
-    endforeach
+    endfor
 
     # Load the scenario data files
-    dataCSVs = fetch(dataURLs, null, true)
+    dataCSVs = httpFetch(dataURLs, null, true)
     data = arrayNew()
-    foreach dataCSV in dataCSVs do
+    for dataCSV in dataCSVs:
         dataPart = if(dataCSV != null, dataParseCSV(dataCSV))
-        if dataPart == null then
+        if dataPart == null:
             return null
         endif
         arrayExtend(data, dataPart)
-    endforeach
+    endfor
     dataSort(data, arrayNew(arrayNew(powerwallFieldDate)))
     objectSet(powerwallScenario, 'data', data)
 
@@ -314,13 +314,13 @@ async function powerwallLoadScenario(scenarioURL)
     ixPrev = null
     batteryPercentPrev = null
     batteryDeltaPrev = 0
-    foreach row, ixRow in data do
+    for row, ixRow in data:
         batteryPercent = objectGet(row, powerwallFieldBatteryPercent)
-        if batteryPercent then
-            if ixPrev != null then
+        if batteryPercent:
+            if ixPrev != null:
                 # Set interpolated battery percent values between non-null values
                 ixHole = ixPrev + 1
-                while ixHole < ixRow do
+                while ixHole < ixRow:
                     holePercent = batteryPercentPrev + ((ixHole - ixPrev) / (ixRow - ixPrev)) * (batteryPercent - batteryPercentPrev)
                     objectSet(arrayGet(data, ixHole), powerwallFieldBatteryPercent, holePercent)
                     ixHole = ixHole + 1
@@ -330,14 +330,14 @@ async function powerwallLoadScenario(scenarioURL)
             ixPrev = ixRow
             batteryPercentPrev = batteryPercent
         endif
-    endforeach
+    endfor
 
     # Any trailing holes? If so, set to the previous value
-    if batteryPercentPrev != null then
+    if batteryPercentPrev != null:
         dataLength = arrayLength(data)
         ixHole = ixPrev + 1
         holePercent = batteryPercentPrev
-        while ixHole < dataLength do
+        while ixHole < dataLength:
             holePercent = holePercent + batteryDeltaPrev
             objectSet(arrayGet(data, ixHole), powerwallFieldBatteryPercent, holePercent)
             ixHole = ixHole + 1

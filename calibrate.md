@@ -7,7 +7,7 @@ include 'powerwall.mds'
 
 async function calibrateMain()
     # Render the selected scenario, if requested
-    if vScenarioURL != null then
+    if vScenarioURL != null:
         calibrateDetail()
         return
     endif
@@ -20,16 +20,16 @@ endfunction
 async function calibrateIndex()
     # Set the title
     title = 'TESPO Powerwall Scenario Calibration'
-    setDocumentTitle(title)
+    documentSetTitle(title)
     markdownPrint('[Home](#url=&var=)', '', '# ' + markdownEscape(title))
 
     # Fetch the scenario files
-    powerwallScenarioURLs = fetch('scenarios/powerwallScenarioURLs.json')
-    powerwallScenarioJSONs = fetch(powerwallScenarioURLs)
+    powerwallScenarioURLs = httpFetch('scenarios/powerwallScenarioURLs.json')
+    powerwallScenarioJSONs = httpFetch(powerwallScenarioURLs)
 
     # Create the scenario table's data
     scenarioTable = arrayNew()
-    foreach scenarioJSON, ixScenario in powerwallScenarioJSONs do
+    for scenarioJSON, ixScenario in powerwallScenarioJSONs:
         scenarioURL = arrayGet(powerwallScenarioURLs, ixScenario)
         scenarioName = objectGet(scenarioJSON, 'name')
         arrayPush(scenarioTable, objectNew( \
@@ -39,7 +39,7 @@ async function calibrateIndex()
             'Charge Ratio', objectGet(scenarioJSON, 'chargeRatio'), \
             'Discharge Ratio', objectGet(scenarioJSON, 'dischargeRatio') \
         ))
-    endforeach
+    endfor
 
     # Render the scenario table
     dataTable(scenarioTable, objectNew( \
@@ -51,11 +51,11 @@ endfunction
 async function calibrateDetail()
     # Set the default title
     title = 'TESPO Simulation Scenario Calibration'
-    setDocumentTitle(title)
+    documentSetTitle(title)
 
     # Load the scenario
     powerwallScenario = if(vScenarioURL != null, powerwallLoadScenario(vScenarioURL))
-    if powerwallScenario == null then
+    if powerwallScenario == null:
         markdownPrint('Failed to load scenario URL "' + vScenarioURL + '"')
         return
     endif
@@ -65,11 +65,11 @@ async function calibrateDetail()
     # Compute the prev/next scenario URLs
     baseScenarioURL = powerwallGetBaseURL(vScenarioURL)
     prevScenarioURL = objectGet(powerwallScenario, 'prevScenarioURL')
-    if prevScenarioURL != null && powerwallIsRelativeURL(prevScenarioURL) then
+    if prevScenarioURL != null && powerwallIsRelativeURL(prevScenarioURL):
         prevScenarioURL = baseScenarioURL + prevScenarioURL
     endif
     nextScenarioURL = objectGet(powerwallScenario, 'nextScenarioURL')
-    if nextScenarioURL != null && powerwallIsRelativeURL(nextScenarioURL) then
+    if nextScenarioURL != null && powerwallIsRelativeURL(nextScenarioURL):
         nextScenarioURL = baseScenarioURL + nextScenarioURL
     endif
 
@@ -88,9 +88,9 @@ async function calibrateDetail()
     objectSet(powerwallScenario, 'dischargeRatio', dischargeRatio)
 
     # Auto-calibrate?
-    if vAuto then
+    if vAuto:
         calibrateAuto(powerwallScenario)
-        setWindowLocation(calibrateURL( \
+        windowSetLocation(calibrateURL( \
             objectNew( \
                 'batteryCapacity', objectGet(powerwallScenario, 'batteryCapacity'), \
                 'backupPercent', objectGet(powerwallScenario, 'backupPercent'), \
@@ -114,7 +114,7 @@ async function calibrateDetail()
     powerwallEuclidianSum = 0
     gridEuclidianSum = 0
     batteryEuclidianSum = 0
-    foreach row, ixRow in data do
+    for row, ixRow in data:
         rowSimulated = arrayGet(simulated, ixRow)
 
         # Compute the diffs
@@ -139,7 +139,7 @@ async function calibrateDetail()
             powerwallFieldGrid, gridDiff, \
             powerwallFieldBatteryPercent, batteryDiff \
         ))
-    endforeach
+    endfor
 
     # Compute the Manhattan distances
     powerwallManhattanDistance = powerwallManhattanSum / arrayLength(data)
@@ -154,10 +154,10 @@ async function calibrateDetail()
     # Chart constants
     chartWidth = 1250
     chartHeight = 250
-    fontSize = getDocumentFontSize()
+    fontSize = documentFontSize()
 
     # Controls
-    setDocumentTitle(scenarioName)
+    documentSetTitle(scenarioName)
     markdownPrint( \
         '[Back](#var=)', \
         '', \
@@ -275,12 +275,12 @@ async function calibrateDetail()
     ))
 
     # Simulated data table
-    foreach row, ixRow in data do
+    for row, ixRow in data:
         rowSimulated = arrayGet(simulated, ixRow)
         objectSet(row, 'Simulated ' + powerwallFieldPowerwall, objectGet(rowSimulated, powerwallFieldPowerwall))
         objectSet(row, 'Simulated ' + powerwallFieldGrid, objectGet(rowSimulated, powerwallFieldGrid))
         objectSet(row, 'Simulated ' + powerwallFieldBatteryPercent, objectGet(rowSimulated, powerwallFieldBatteryPercent))
-    endforeach
+    endfor
     markdownPrint('', '---')
     dataTable(data, objectNew( \
         'fields', arrayNew( \
@@ -309,16 +309,16 @@ function calibrateAuto(powerwallScenario)
     # Iteratively make adjustments to battery capacity, charge ratio, and discharge ratio
     iter = 0
     changed = true
-    while changed && iter < 10 do
+    while changed && iter < 10:
         changed = false
 
         # Adjust the battery capacity until we hit a local minimum
         batteryCapacityDelta = 0.1
-        while batteryCapacity < 1000 do
+        while batteryCapacity < 1000:
             batteryCapacity = batteryCapacity + batteryCapacityDelta
             objectSet(powerwallScenario, 'batteryCapacity', batteryCapacity)
             diff = getSimulatedDiff(powerwallScenario)
-            if diff > minDiff then
+            if diff > minDiff:
                 batteryCapacity = batteryCapacity - batteryCapacityDelta
                 objectSet(powerwallScenario, 'batteryCapacity', batteryCapacity)
                 break
@@ -326,11 +326,11 @@ function calibrateAuto(powerwallScenario)
             minDiff = diff
             changed = true
         endwhile
-        while batteryCapacity > 1 do
+        while batteryCapacity > 1:
             batteryCapacity = batteryCapacity - batteryCapacityDelta
             objectSet(powerwallScenario, 'batteryCapacity', batteryCapacity)
             diff = getSimulatedDiff(powerwallScenario)
-            if diff > minDiff then
+            if diff > minDiff:
                 batteryCapacity = batteryCapacity + batteryCapacityDelta
                 objectSet(powerwallScenario, 'batteryCapacity', batteryCapacity)
                 break
@@ -341,11 +341,11 @@ function calibrateAuto(powerwallScenario)
 
         # Adjust the charge ratio until we hit a local minimum
         chargeRatioDelta = 0.01
-        while chargeRatio < 1 do
+        while chargeRatio < 1:
             chargeRatio = chargeRatio + chargeRatioDelta
             objectSet(powerwallScenario, 'chargeRatio', chargeRatio)
             diff = getSimulatedDiff(powerwallScenario)
-            if diff > minDiff then
+            if diff > minDiff:
                 chargeRatio = chargeRatio - chargeRatioDelta
                 objectSet(powerwallScenario, 'chargeRatio', chargeRatio)
                 break
@@ -353,11 +353,11 @@ function calibrateAuto(powerwallScenario)
             minDiff = diff
             changed = true
         endwhile
-        while chargeRatio > 0.85 do
+        while chargeRatio > 0.85:
             chargeRatio = chargeRatio - chargeRatioDelta
             objectSet(powerwallScenario, 'chargeRatio', chargeRatio)
             diff = getSimulatedDiff(powerwallScenario)
-            if diff > minDiff then
+            if diff > minDiff:
                 chargeRatio = chargeRatio + chargeRatioDelta
                 objectSet(powerwallScenario, 'chargeRatio', chargeRatio)
                 break
@@ -368,11 +368,11 @@ function calibrateAuto(powerwallScenario)
 
         # Adjust the charge ratio until we hit a local minimum
         dischargeRatioDelta = 0.01
-        while dischargeRatio < 1 do
+        while dischargeRatio < 1:
             dischargeRatio = dischargeRatio + dischargeRatioDelta
             objectSet(powerwallScenario, 'dischargeRatio', dischargeRatio)
             diff = getSimulatedDiff(powerwallScenario)
-            if diff > minDiff then
+            if diff > minDiff:
                 dischargeRatio = dischargeRatio - dischargeRatioDelta
                 objectSet(powerwallScenario, 'dischargeRatio', dischargeRatio)
                 break
@@ -380,11 +380,11 @@ function calibrateAuto(powerwallScenario)
             minDiff = diff
             changed = true
         endwhile
-        while dischargeRatio > 0.85 do
+        while dischargeRatio > 0.85:
             dischargeRatio = dischargeRatio - dischargeRatioDelta
             objectSet(powerwallScenario, 'dischargeRatio', dischargeRatio)
             diff = getSimulatedDiff(powerwallScenario)
-            if diff > minDiff then
+            if diff > minDiff:
                 dischargeRatio = dischargeRatio + dischargeRatioDelta
                 objectSet(powerwallScenario, 'dischargeRatio', dischargeRatio)
                 break
@@ -403,11 +403,11 @@ function getSimulatedDiff(powerwallScenario)
     data = objectGet(powerwallScenario, 'data')
     simulated = powerwallSimulate(powerwallScenario, powerwallBatteryPercent(powerwallScenario))
     batteryPercentManhattanSum = 0
-    foreach row, ixRow in data do
+    for row, ixRow in data:
         rowSimulated = arrayGet(simulated, ixRow)
         batteryPercentDiff = objectGet(rowSimulated, powerwallFieldBatteryPercent) - objectGet(row, powerwallFieldBatteryPercent)
         batteryPercentManhattanSum = batteryPercentManhattanSum + mathAbs(batteryPercentDiff)
-    endforeach
+    endfor
     return batteryPercentManhattanSum / arrayLength(data)
 endfunction
 
@@ -418,7 +418,7 @@ function calibrateURL(args, powerwallScenario)
     scenarioURL = if(objectHas(args, 'scenarioURL'), objectGet(args, 'scenarioURL'), vScenarioURL)
 
     # Powerwall scenario URL arguments
-    if powerwallScenario != null then
+    if powerwallScenario != null:
         batteryCapacity = if(objectHas(args, 'batteryCapacity'), objectGet(args, 'batteryCapacity'), vBatteryCapacity)
         backupPercent = if(objectHas(args, 'backupPercent'), objectGet(args, 'backupPercent'), vBackupPercent)
         chargeRatio = if(objectHas(args, 'chargeRatio'), objectGet(args, 'chargeRatio'), vChargeRatio)
@@ -436,7 +436,7 @@ function calibrateURL(args, powerwallScenario)
     # Create the URL
     parts = arrayNew()
     ratioPrecision = if(vPrecision != null, vPrecision, calibrateDefaultPrecision)
-    arrayPush(parts, "var.vScenarioURL='" + encodeURIComponent(scenarioURL) + "'")
+    arrayPush(parts, "var.vScenarioURL='" + urlEncodeComponent(scenarioURL) + "'")
     if(batteryCapacity != null, arrayPush(parts, 'var.vBatteryCapacity=' + mathRound(batteryCapacity, 1)))
     if(backupPercent != null, arrayPush(parts, 'var.vBackupPercent=' + mathRound(backupPercent, 1)))
     if(chargeRatio != null, arrayPush(parts, 'var.vChargeRatio=' + mathRound(chargeRatio, ratioPrecision)))

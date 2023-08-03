@@ -723,7 +723,7 @@ unittestRunTest('testPowerwallSimulate_vehicleScenario_tespo')
 # Mock fetch for powerwallLoadScenario tests
 function testPowerwallLoadScenario_fetch(url, options, text)
     unittestEquals(options, null)
-    if url == 'scenario.json' then
+    if url == 'scenario.json':
         unittestEquals(text, null)
         return objectNew( \
             'name', 'Powerwall Scenario', \
@@ -733,7 +733,7 @@ function testPowerwallLoadScenario_fetch(url, options, text)
             'dischargeRatio', 0.95, \
             'dataURLs', arrayNew('data1.json', 'data2.json') \
         )
-    else if url == 'scenario2.json' then
+    elif url == 'scenario2.json':
         unittestEquals(text, null)
         return objectNew( \
             'name', 'Powerwall Scenario 2', \
@@ -743,7 +743,7 @@ function testPowerwallLoadScenario_fetch(url, options, text)
             'dischargeRatio', 0.95, \
             'dataURLs', arrayNew('data1.json', 'dataUnknown.json', 'data2.json') \
         )
-    else if url == 'data/scenario3.json' then
+    elif url == 'data/scenario3.json':
         unittestEquals(text, null)
         return objectNew( \
             'name', 'Powerwall Scenario 3', \
@@ -753,7 +753,7 @@ function testPowerwallLoadScenario_fetch(url, options, text)
             'dischargeRatio', 0.95, \
             'dataURLs', arrayNew('data2.json') \
         )
-    else if url == 'data/scenario4.json' then
+    elif url == 'data/scenario4.json':
         unittestEquals(text, null)
         return objectNew( \
             'name', 'Powerwall Scenario 4', \
@@ -763,7 +763,7 @@ function testPowerwallLoadScenario_fetch(url, options, text)
             'dischargeRatio', 0.95, \
             'dataURLs', arrayNew('/data2.json') \
         )
-    else if url == 'scenario5.json' then
+    elif url == 'scenario5.json':
         unittestEquals(text, null)
         return objectNew( \
             'name', 'Powerwall Scenario 5', \
@@ -773,31 +773,31 @@ function testPowerwallLoadScenario_fetch(url, options, text)
             'dischargeRatio', 0.95, \
             'dataURLs', arrayNew('data3.json') \
         )
-    else if stringEndsWith(url, 'data1.json') then
+    elif stringEndsWith(url, 'data1.json'):
         return 'Date time,Home (kW),Solar (kW),Powerwall (kW),Grid (kW),Energy Remaining (%)' + stringFromCharCode(10) + \
             '2023-03-25T12:10:00-07:00,1.0,4.2,-3.2,0,' + stringFromCharCode(10) + \
             '2023-03-25T12:15:00-07:00,1.0,5.6,-4.6,0,58'
-    else if stringEndsWith(url, 'data2.json') then
+    elif stringEndsWith(url, 'data2.json'):
         return 'Date time,Home (kW),Solar (kW),Powerwall (kW),Grid (kW),Energy Remaining (%)' + stringFromCharCode(10) + \
             '2023-03-25T12:00:00-07:00,1.0,4.1,-3.1,0,55' + stringFromCharCode(10) + \
             '2023-03-25T12:05:00-07:00,1.0,3.7,-2.7,0,'
-    else if stringEndsWith(url, 'data3.json') then
+    elif stringEndsWith(url, 'data3.json'):
         return 'Date time,Home (kW),Solar (kW),Powerwall (kW),Grid (kW),Energy Remaining (%)' + stringFromCharCode(10) + \
             '2023-03-25T12:00:00-07:00,1.0,4.1,-3.1,0,55' + stringFromCharCode(10) + \
             '2023-03-25T12:05:00-07:00,1.0,3.7,-2.7,0,57' + stringFromCharCode(10) + \
             '2023-03-25T12:10:00-07:00,1.0,3.9,-2.9,0,' + stringFromCharCode(10) + \
             '2023-03-25T12:15:00-07:00,1.0,5.6,-4.6,0,0'
-    else if arrayLength(url) != null then
+    elif arrayLength(url) != null:
         responses = arrayNew()
-        foreach url_ in url do
+        for url_ in url:
             response = testPowerwallLoadScenario_fetch(url_, options, text)
             arrayPush(responses, response)
-        endforeach
+        endfor
         return responses
     endif
     return null
 endfunction
-testPowerwallFetchOrig = getGlobal('fetch')
+testPowerwallFetchOrig = runtimeGetGlobal('fetch')
 fetch = testPowerwallLoadScenario_fetch
 
 
