@@ -797,8 +797,8 @@ function testPowerwallLoadScenario_fetch(url, options, text)
     endif
     return null
 endfunction
-testPowerwallFetchOrig = runtimeGetGlobal('fetch')
-fetch = testPowerwallLoadScenario_fetch
+testPowerwallFetchOrig = runtimeGetGlobal('httpFetch')
+httpFetch = testPowerwallLoadScenario_fetch
 
 
 async function testPowerwallLoadScenario()
@@ -988,7 +988,7 @@ unittestRunTestAsync('testPowerwallLoadScenario_notFoundData')
 
 
 # Un-mock fetch
-fetch = testPowerwallFetchOrig
+httpFetch = testPowerwallFetchOrig
 
 
 #
