@@ -24,8 +24,8 @@ async function calibrateIndex()
     markdownPrint('[Home](#url=&var=)', '', '# ' + markdownEscape(title))
 
     # Fetch the scenario files
-    powerwallScenarioURLs = httpFetch('scenarios/powerwallScenarioURLs.json')
-    powerwallScenarioJSONs = httpFetch(powerwallScenarioURLs)
+    powerwallScenarioURLs = systemFetch('scenarios/powerwallScenarioURLs.json')
+    powerwallScenarioJSONs = systemFetch(powerwallScenarioURLs)
 
     # Create the scenario table's data
     scenarioTable = arrayNew()

@@ -3,7 +3,7 @@
 
 
 # Include sentinel
-if runtimeGetGlobal('tespo'):
+if systemGlobalGet('tespo'):
     return
 endif
 

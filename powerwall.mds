@@ -3,7 +3,7 @@
 
 
 # Include sentinel
-if runtimeGetGlobal('powerwallSimulate'):
+if systemGlobalGet('powerwallSimulate'):
     return
 endif
 
@@ -282,7 +282,7 @@ endfunction
 # Load a Powerwall simulation scenario
 async function powerwallLoadScenario(scenarioURL)
     # Load the scenario file
-    powerwallScenario = httpFetch(scenarioURL)
+    powerwallScenario = systemFetch(scenarioURL)
     powerwallScenario = if(powerwallScenario != null, schemaValidate(powerwallTypes, 'PowerwallScenario', powerwallScenario))
     if powerwallScenario == null:
         return null
@@ -298,7 +298,7 @@ async function powerwallLoadScenario(scenarioURL)
     endfor
 
     # Load the scenario data files
-    dataCSVs = httpFetch(dataURLs, null, true)
+    dataCSVs = systemFetch(dataURLs, null, true)
     data = arrayNew()
     for dataCSV in dataCSVs:
         dataPart = if(dataCSV != null, dataParseCSV(dataCSV))

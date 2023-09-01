@@ -24,8 +24,8 @@ async function simulateIndex()
     )
 
     # Fetch the scenarios
-    vehicleScenarioURLs = httpFetch('scenarios/vehicleScenarios.json')
-    powerwallScenarioURLs = httpFetch('scenarios/powerwallScenarioURLs.json')
+    vehicleScenarioURLs = systemFetch('scenarios/vehicleScenarios.json')
+    powerwallScenarioURLs = systemFetch('scenarios/powerwallScenarioURLs.json')
     tespoRowsArray = arrayNew(0, 1, 2, 3, 6, 9, 12)
 
     # Run each powerwall scenario with each vehicle scenario
@@ -38,7 +38,7 @@ async function simulateIndex()
                 scenarioStats = simulateGetScenarioStats(vehicleScenarioURL, powerwallScenarioURL, tespoRows)
                 if scenarioStats == null:
                     # Load each scenario
-                    vehicleScenario = powerwallValidateVehicleScenario(httpFetch(vehicleScenarioURL))
+                    vehicleScenario = powerwallValidateVehicleScenario(systemFetch(vehicleScenarioURL))
                     powerwallScenario = powerwallLoadScenario(powerwallScenarioURL)
 
                     # Run the simulation
@@ -165,7 +165,7 @@ endfunction
 
 async function simulateDetails()
     powerwallScenario = powerwallLoadScenario(vPowerwallScenario)
-    vehicleScenario = if(vVehicleScenario != null, powerwallValidateVehicleScenario(httpFetch(vVehicleScenario)), null)
+    vehicleScenario = if(vVehicleScenario != null, powerwallValidateVehicleScenario(systemFetch(vVehicleScenario)), null)
     tespoRows = if(vTespoRows != null, vTespoRows, 0)
 
     initialBatteryPercent = powerwallBatteryPercent(powerwallScenario)
