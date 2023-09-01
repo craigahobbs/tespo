@@ -81,7 +81,9 @@ async function simulateIndex()
     dataTable(scenarioData, objectNew( \
         'categories', arrayNew('Vehicle Scenario', 'Powerwall Scenario', 'Tespo Rows'), \
         'fields', arrayNew('To Powerwall (kW)', 'From Powerwall (kW)', 'From Grid (kW)', 'To Grid (kW)'), \
-        'markdown', arrayNew('Tespo Rows') \
+        'formats', objectNew( \
+            'Tespo Rows', objectNew('markdown', true) \
+        ) \
     ))
 endfunction
 

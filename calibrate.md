@@ -43,7 +43,9 @@ async function calibrateIndex()
 
     # Render the scenario table
     dataTable(scenarioTable, objectNew( \
-        'markdown', arrayNew('Scenario') \
+        'formats', objectNew( \
+            'Scenario', objectNew('markdown', true) \
+        ) \
     ))
 endfunction
 
