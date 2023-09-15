@@ -5,7 +5,7 @@
 include 'powerwall.mds'
 
 
-async function tespoDocMain()
+async function tespoDocMain():
     if vDoc == 'powerwall':
         typeName = 'PowerwallScenario'
     elif vDoc == 'vehicle':

@@ -5,7 +5,7 @@
 include 'powerwall.mds'
 
 
-async function calibrateMain()
+async function calibrateMain():
     # Render the selected scenario, if requested
     if vScenarioURL != null:
         calibrateDetail()
@@ -17,7 +17,7 @@ async function calibrateMain()
 endfunction
 
 
-async function calibrateIndex()
+async function calibrateIndex():
     # Set the title
     title = 'TESPO Powerwall Scenario Calibration'
     documentSetTitle(title)
@@ -50,7 +50,7 @@ async function calibrateIndex()
 endfunction
 
 
-async function calibrateDetail()
+async function calibrateDetail():
     # Set the default title
     title = 'TESPO Simulation Scenario Calibration'
     documentSetTitle(title)
@@ -300,7 +300,7 @@ async function calibrateDetail()
 endfunction
 
 
-function calibrateAuto(powerwallScenario)
+function calibrateAuto(powerwallScenario):
     batteryCapacity = objectGet(powerwallScenario, 'batteryCapacity')
     chargeRatio = objectGet(powerwallScenario, 'chargeRatio')
     dischargeRatio = objectGet(powerwallScenario, 'dischargeRatio')
@@ -401,7 +401,7 @@ endfunction
 
 
 # Compute the Manhattan distance between the actual and simulate battery percentage
-function getSimulatedDiff(powerwallScenario)
+function getSimulatedDiff(powerwallScenario):
     data = objectGet(powerwallScenario, 'data')
     simulated = powerwallSimulate(powerwallScenario, powerwallBatteryPercent(powerwallScenario))
     batteryPercentManhattanSum = 0
@@ -415,7 +415,7 @@ endfunction
 
 
 # Helper to create calibrate application URLs
-function calibrateURL(args, powerwallScenario)
+function calibrateURL(args, powerwallScenario):
     # URL arguments
     scenarioURL = if(objectHas(args, 'scenarioURL'), objectGet(args, 'scenarioURL'), vScenarioURL)
 

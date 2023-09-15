@@ -12,7 +12,7 @@ include 'tespo.mds'
 
 
 # Compute the Powerwall scenario's initial battery charge percentage
-function powerwallBatteryPercent(powerwallScenario)
+function powerwallBatteryPercent(powerwallScenario):
     data = objectGet(powerwallScenario, 'data')
     row0 = arrayGet(data, 0)
     row1 = arrayGet(data, 1)
@@ -21,7 +21,7 @@ endfunction
 
 
 # Compute the Powerwall scenario's data row duration
-function powerwallRowDuration(powerwallScenario)
+function powerwallRowDuration(powerwallScenario):
     data = objectGet(powerwallScenario, 'data')
     row0 = arrayGet(data, 0)
     row1 = arrayGet(data, 1)
@@ -54,7 +54,7 @@ powerwallSimulationPrecision = 3
 #   vehicleScenario: Optional - the vehicle scenario model
 #   tespoRows: Optional - if non-zero, the number of rows to compute the TESPO average home and solar power
 #
-function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, tespoRows)
+function powerwallSimulate(powerwallScenario, batteryPercent, vehicleScenario, tespoRows):
     # Powerwall specifications
     batteryCapacityKwh = objectGet(powerwallScenario, 'batteryCapacity')
     backupPercent = objectGet(powerwallScenario, 'backupPercent')
@@ -259,7 +259,7 @@ endfunction
 
 
 # Determine if a vehicle is away from the home
-function powerwallVehicleDeparted(vehicleDay, vehicleID, hourOfDay)
+function powerwallVehicleDeparted(vehicleDay, vehicleID, hourOfDay):
     departures = objectGet(vehicleDay, 'departures')
     for departure in departures:
         departureID = objectGet(departure, 'id')
@@ -274,13 +274,13 @@ endfunction
 
 
 # Validate a vehicle scenario object
-function powerwallValidateVehicleScenario(vehicleScenario)
+function powerwallValidateVehicleScenario(vehicleScenario):
     return schemaValidate(powerwallTypes, 'VehicleScenario', vehicleScenario)
 endfunction
 
 
 # Load a Powerwall simulation scenario
-async function powerwallLoadScenario(scenarioURL)
+async function powerwallLoadScenario(scenarioURL):
     # Load the scenario file
     powerwallScenario = systemFetch(scenarioURL)
     powerwallScenario = if(powerwallScenario != null, schemaValidate(powerwallTypes, 'PowerwallScenario', powerwallScenario))
@@ -349,7 +349,7 @@ endfunction
 
 
 # Is a URL relative?
-function powerwallIsRelativeURL(url)
+function powerwallIsRelativeURL(url):
     return !regexTest(powerwallRegexNotRelativeURL, url)
 endfunction
 
@@ -357,7 +357,7 @@ powerwallRegexNotRelativeURL = regexNew('^(?:[a-z]+:|\\/|\\?|#)')
 
 
 # Compute a URL's base
-function powerwallGetBaseURL(url)
+function powerwallGetBaseURL(url):
     return stringSlice(url, 0, stringLastIndexOf(url, '/') + 1)
 endfunction
 

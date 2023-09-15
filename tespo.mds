@@ -9,7 +9,7 @@ endif
 
 
 # The TESPO algorithm
-function tespo(input)
+function tespo(input):
     solarPower = objectGet(input, 'solarPower')
     homePower = objectGet(input, 'homePower')
     homeBattery = objectGet(input, 'homeBattery')
@@ -113,13 +113,13 @@ endfunction
 
 
 # Validate a TESPO input object
-function tespoValidateInput(input)
+function tespoValidateInput(input):
     return schemaValidate(tespoTypes, 'TespoInput', input)
 endfunction
 
 
 # Validate a TESPO output object
-function tespoValidateOutput(output)
+function tespoValidateOutput(output):
     return schemaValidate(tespoTypes, 'TespoOutput', output)
 endfunction
 

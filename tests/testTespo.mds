@@ -9,7 +9,7 @@ include '../tespo.mds'
 #
 
 
-function testTespo_allCharged()
+function testTespo_allCharged():
     unittestDeepEquals( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 8.2, \
@@ -44,7 +44,7 @@ endfunction
 unittestRunTest('testTespo_allCharged')
 
 
-function testTespo_homeCharged()
+function testTespo_homeCharged():
     unittestDeepEquals( \
         tespo(tespoValidateInput(objectNew( \
             "solarPower", 9.9, \
@@ -79,7 +79,7 @@ endfunction
 unittestRunTest('testTespo_homeCharged')
 
 
-function testTespo_homeCharged_lowSolar()
+function testTespo_homeCharged_lowSolar():
     unittestDeepEquals( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 3.8, \
@@ -114,7 +114,7 @@ endfunction
 unittestRunTest('testTespo_homeCharged_lowSolar')
 
 
-function testTespo_homeCharged_medSolar()
+function testTespo_homeCharged_medSolar():
     unittestDeepEquals( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 5.8, \
@@ -149,7 +149,7 @@ endfunction
 unittestRunTest('testTespo_homeCharged_medSolar')
 
 
-function testTespo_homeCharged_zeroSolar()
+function testTespo_homeCharged_zeroSolar():
     unittestDeepEquals( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 0, \
@@ -184,7 +184,7 @@ endfunction
 unittestRunTest('testTespo_homeCharged_zeroSolar')
 
 
-function testTespo_noneCharged()
+function testTespo_noneCharged():
     unittestDeepEquals( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 9.9, \
@@ -219,7 +219,7 @@ endfunction
 unittestRunTest('testTespo_noneCharged')
 
 
-function testTespo_multipleVehicles()
+function testTespo_multipleVehicles():
     unittestDeepEquals( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 5, \
@@ -269,7 +269,7 @@ endfunction
 unittestRunTest('testTespo_multipleVehicles')
 
 
-function testTespo_multipleVehicles_allCharged()
+function testTespo_multipleVehicles_allCharged():
     unittestDeepEquals( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 5, \
@@ -319,7 +319,7 @@ endfunction
 unittestRunTest('testTespo_multipleVehicles_allCharged')
 
 
-function testTespo_multipleVehicles_oneCharged()
+function testTespo_multipleVehicles_oneCharged():
     unittestDeepEquals( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 5, \
@@ -369,7 +369,7 @@ endfunction
 unittestRunTest('testTespo_multipleVehicles_oneCharged')
 
 
-function testTespo_multipleVehicles_minChargeRate()
+function testTespo_multipleVehicles_minChargeRate():
     unittestDeepEquals( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 3, \
@@ -419,7 +419,7 @@ endfunction
 unittestRunTest('testTespo_multipleVehicles_minChargeRate')
 
 
-function testTespo_multipleVehicles_minChargeRateSingle()
+function testTespo_multipleVehicles_minChargeRateSingle():
     unittestDeepEquals( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 2.8, \
@@ -474,7 +474,7 @@ unittestRunTest('testTespo_multipleVehicles_minChargeRateSingle')
 #
 
 
-function testTespoValidateInput()
+function testTespoValidateInput():
     input = objectNew( \
         'solarPower', 2.8, \
         'homePower', 2.9, \
@@ -497,7 +497,7 @@ endfunction
 unittestRunTest('testTespoValidateInput')
 
 
-function testTespoValidateInput_fail()
+function testTespoValidateInput_fail():
     unittestDeepEquals(tespoValidateInput(objectNew()), null)
 endfunction
 unittestRunTest('testTespoValidateInput_fail')
@@ -508,7 +508,7 @@ unittestRunTest('testTespoValidateInput_fail')
 #
 
 
-function testTespoValidateOutput()
+function testTespoValidateOutput():
     output = objectNew( \
         'availableSolar', 6.8, \
         'spilling', true, \
@@ -525,7 +525,7 @@ endfunction
 unittestRunTest('testTespoValidateOutput')
 
 
-function testTespoValidateOutput_fail()
+function testTespoValidateOutput_fail():
     unittestDeepEquals(tespoValidateOutput(objectNew()), null)
 endfunction
 unittestRunTest('testTespoValidateOutput_fail')

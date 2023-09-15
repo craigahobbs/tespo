@@ -3,7 +3,7 @@ include 'powerwall.mds'
 include <forms.mds>
 
 
-async function simulateMain()
+async function simulateMain():
     if vPowerwallScenario != null:
         simulateDetails()
         return
@@ -13,7 +13,7 @@ async function simulateMain()
 endfunction
 
 
-async function simulateIndex()
+async function simulateIndex():
     # Set the title
     title = 'TESPO Simulations'
     documentSetTitle(title)
@@ -88,13 +88,13 @@ async function simulateIndex()
 endfunction
 
 
-async function simulateOnReset()
+async function simulateOnReset():
     localStorageRemove('ScenarioData')
     simulateIndex()
 endfunction
 
 
-function simulateGetScenarioStats(vehicleScenarioURL, powerwallScenarioURL, tespoRows)
+function simulateGetScenarioStats(vehicleScenarioURL, powerwallScenarioURL, tespoRows):
     scenarioDataStr = localStorageGet('ScenarioData')
     if scenarioDataStr != null:
         scenarioData = jsonParse(scenarioDataStr)
@@ -105,7 +105,7 @@ function simulateGetScenarioStats(vehicleScenarioURL, powerwallScenarioURL, tesp
 endfunction
 
 
-function simulateSetScenarioStats(vehicleScenarioURL, powerwallScenarioURL, tespoRows, scenarioStats)
+function simulateSetScenarioStats(vehicleScenarioURL, powerwallScenarioURL, tespoRows, scenarioStats):
     scenarioDataStr = localStorageGet('ScenarioData')
     if scenarioDataStr != null:
         scenarioData = jsonParse(scenarioDataStr)
@@ -119,7 +119,7 @@ function simulateSetScenarioStats(vehicleScenarioURL, powerwallScenarioURL, tesp
 endfunction
 
 
-function simulateStatistics(data)
+function simulateStatistics(data):
     # Add to/from powerwall/grid calculated fields
     dataCalculatedField( \
         data, \
@@ -165,7 +165,7 @@ function simulateStatistics(data)
 endfunction
 
 
-async function simulateDetails()
+async function simulateDetails():
     powerwallScenario = powerwallLoadScenario(vPowerwallScenario)
     vehicleScenario = if(vVehicleScenario != null, powerwallValidateVehicleScenario(systemFetch(vVehicleScenario)), null)
     tespoRows = if(vTespoRows != null, vTespoRows, 0)

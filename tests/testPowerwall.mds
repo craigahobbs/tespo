@@ -9,7 +9,7 @@ include '../powerwall.mds'
 #
 
 
-function testPowerwallBatteryPercent()
+function testPowerwallBatteryPercent():
     unittestEquals( \
         powerwallBatteryPercent( \
             objectNew( \
@@ -41,7 +41,7 @@ unittestRunTest('testPowerwallBatteryPercent')
 #
 
 
-function testPowerwallSimulate_allZeroes()
+function testPowerwallSimulate_allZeroes():
     data = powerwallSimulate( \
         objectNew( \
             'name', 'Powerwall Scenario', \
@@ -83,7 +83,7 @@ endfunction
 unittestRunTest('testPowerwallSimulate_allZeroes')
 
 
-function testPowerwallSimulate_solarSurplus()
+function testPowerwallSimulate_solarSurplus():
     data = powerwallSimulate( \
         objectNew( \
             'name', 'Powerwall Scenario', \
@@ -135,7 +135,7 @@ endfunction
 unittestRunTest('testPowerwallSimulate_solarSurplus')
 
 
-function testPowerwallSimulate_solarSurplus_nearBackup()
+function testPowerwallSimulate_solarSurplus_nearBackup():
     data = powerwallSimulate( \
         objectNew( \
             'name', 'Powerwall Scenario', \
@@ -187,7 +187,7 @@ endfunction
 unittestRunTest('testPowerwallSimulate_solarSurplus_nearBackup')
 
 
-function testPowerwallSimulate_solarSurplus_belowBackup()
+function testPowerwallSimulate_solarSurplus_belowBackup():
     data = powerwallSimulate( \
         objectNew( \
             'name', 'Powerwall Scenario', \
@@ -239,7 +239,7 @@ endfunction
 unittestRunTest('testPowerwallSimulate_solarSurplus_belowBackup')
 
 
-function testPowerwallSimulate_solarDeficit()
+function testPowerwallSimulate_solarDeficit():
     data = powerwallSimulate( \
         objectNew( \
             'name', 'Powerwall Scenario', \
@@ -291,7 +291,7 @@ endfunction
 unittestRunTest('testPowerwallSimulate_solarDeficit')
 
 
-function testPowerwallSimulate_solarDeficit_nearBackup()
+function testPowerwallSimulate_solarDeficit_nearBackup():
     data = powerwallSimulate( \
         objectNew( \
             'name', 'Powerwall Scenario', \
@@ -343,7 +343,7 @@ endfunction
 unittestRunTest('testPowerwallSimulate_solarDeficit_nearBackup')
 
 
-function testPowerwallSimulate_solarDeficit_belowBackup()
+function testPowerwallSimulate_solarDeficit_belowBackup():
     data = powerwallSimulate( \
         objectNew( \
             'name', 'Powerwall Scenario', \
@@ -400,7 +400,7 @@ unittestRunTest('testPowerwallSimulate_solarDeficit_belowBackup')
 #
 
 
-function testPowerwallSimulate_vehicleScenario()
+function testPowerwallSimulate_vehicleScenario():
     data = powerwallSimulate( \
         objectNew( \
             'name', 'Powerwall Scenario', \
@@ -557,7 +557,7 @@ endfunction
 unittestRunTest('testPowerwallSimulate_vehicleScenario')
 
 
-function testPowerwallSimulate_vehicleScenario_tespo()
+function testPowerwallSimulate_vehicleScenario_tespo():
     data = powerwallSimulate( \
         objectNew( \
             'name', 'Powerwall Scenario', \
@@ -721,7 +721,7 @@ unittestRunTest('testPowerwallSimulate_vehicleScenario_tespo')
 
 
 # Mock fetch for powerwallLoadScenario tests
-function testPowerwallLoadScenario_fetch(url, options, text)
+function testPowerwallLoadScenario_fetch(url, options, text):
     unittestEquals(options, null)
     if url == 'scenario.json':
         unittestEquals(text, null)
@@ -801,7 +801,7 @@ testPowerwallFetchOrig = systemGlobalGet('systemFetch')
 systemFetch = testPowerwallLoadScenario_fetch
 
 
-async function testPowerwallLoadScenario()
+async function testPowerwallLoadScenario():
     unittestDeepEquals( \
         powerwallLoadScenario('scenario.json'), \
         objectNew( \
@@ -851,7 +851,7 @@ endfunction
 unittestRunTestAsync('testPowerwallLoadScenario')
 
 
-async function testPowerwallLoadScenario_relative()
+async function testPowerwallLoadScenario_relative():
     unittestDeepEquals( \
         powerwallLoadScenario('data/scenario3.json'), \
         objectNew( \
@@ -885,7 +885,7 @@ endfunction
 unittestRunTestAsync('testPowerwallLoadScenario_relative')
 
 
-async function testPowerwallLoadScenario_absolute()
+async function testPowerwallLoadScenario_absolute():
     unittestDeepEquals( \
         powerwallLoadScenario('data/scenario4.json'), \
         objectNew( \
@@ -919,7 +919,7 @@ endfunction
 unittestRunTestAsync('testPowerwallLoadScenario_absolute')
 
 
-async function testPowerwallLoadScenario_trailing_holes()
+async function testPowerwallLoadScenario_trailing_holes():
     unittestDeepEquals( \
         powerwallLoadScenario('scenario5.json'), \
         objectNew( \
@@ -969,7 +969,7 @@ endfunction
 unittestRunTestAsync('testPowerwallLoadScenario_trailing_holes')
 
 
-async function testPowerwallLoadScenario_notFound()
+async function testPowerwallLoadScenario_notFound():
     unittestDeepEquals( \
         powerwallLoadScenario('scenarioUnknown.json'), \
         null \
@@ -978,7 +978,7 @@ endfunction
 unittestRunTestAsync('testPowerwallLoadScenario_notFound')
 
 
-async function testPowerwallLoadScenario_notFoundData()
+async function testPowerwallLoadScenario_notFoundData():
     unittestDeepEquals( \
         powerwallLoadScenario('scenario2.json'), \
         null \
@@ -996,7 +996,7 @@ systemFetch = testPowerwallFetchOrig
 #
 
 
-function testPowerwallVehicleDeparted()
+function testPowerwallVehicleDeparted():
     unittestDeepEquals( \
         powerwallVehicleDeparted( \
             objectNew( \
@@ -1029,7 +1029,7 @@ endfunction
 unittestRunTest('testPowerwallVehicleDeparted')
 
 
-function testPowerwallVehicleDeparted_connected()
+function testPowerwallVehicleDeparted_connected():
     unittestDeepEquals( \
         powerwallVehicleDeparted( \
             objectNew( \
@@ -1057,7 +1057,7 @@ endfunction
 unittestRunTest('testPowerwallVehicleDeparted_connected')
 
 
-function testPowerwallVehicleDeparted_connected_id()
+function testPowerwallVehicleDeparted_connected_id():
     unittestDeepEquals( \
         powerwallVehicleDeparted( \
             objectNew( \
@@ -1090,7 +1090,7 @@ unittestRunTest('testPowerwallVehicleDeparted_connected_id')
 #
 
 
-function testPowerwallValidateVehicleScenario()
+function testPowerwallValidateVehicleScenario():
     vehicleScenario = objectNew( \
         'name', 'Vehicle Scenario', \
         'vehicles', arrayNew( \
@@ -1129,7 +1129,7 @@ endfunction
 unittestRunTest('testPowerwallValidateVehicleScenario')
 
 
-function testPowerwallValidateVehicleScenario_fail()
+function testPowerwallValidateVehicleScenario_fail():
     unittestDeepEquals(powerwallValidateVehicleScenario(objectNew()), vehicleScenario)
 endfunction
 unittestRunTest('testPowerwallValidateVehicleScenario_fail')
