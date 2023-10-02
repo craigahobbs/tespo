@@ -3,12 +3,6 @@
 
 include <unittest.mds>
 
-
-# Set the title
-title = 'TESPO Tests'
-documentSetTitle(title)
-markdownPrint('# ' + markdownEscape(title))
-
 # Test includes
 include 'testPowerwall.mds'
 include 'testTespo.mds'
