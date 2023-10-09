@@ -498,7 +498,7 @@ unittestRunTest('testTespoValidateInput')
 
 
 function testTespoValidateInput_fail():
-    unittestDeepEqual(tespoValidateInput(objectNew()), null)
+    unittestEqual(tespoValidateInput(objectNew()), null)
 endfunction
 unittestRunTest('testTespoValidateInput_fail')
 

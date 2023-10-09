@@ -970,7 +970,7 @@ unittestRunTestAsync('testPowerwallLoadScenario_trailing_holes')
 
 
 async function testPowerwallLoadScenario_notFound():
-    unittestDeepEqual( \
+    unittestEqual( \
         powerwallLoadScenario('scenarioUnknown.json'), \
         null \
     )
@@ -979,7 +979,7 @@ unittestRunTestAsync('testPowerwallLoadScenario_notFound')
 
 
 async function testPowerwallLoadScenario_notFoundData():
-    unittestDeepEqual( \
+    unittestEqual( \
         powerwallLoadScenario('scenario2.json'), \
         null \
     )
@@ -1030,7 +1030,7 @@ unittestRunTest('testPowerwallVehicleDeparted')
 
 
 function testPowerwallVehicleDeparted_connected():
-    unittestDeepEqual( \
+    unittestEqual( \
         powerwallVehicleDeparted( \
             objectNew( \
                 'departures', arrayNew( \
@@ -1058,7 +1058,7 @@ unittestRunTest('testPowerwallVehicleDeparted_connected')
 
 
 function testPowerwallVehicleDeparted_connected_id():
-    unittestDeepEqual( \
+    unittestEqual( \
         powerwallVehicleDeparted( \
             objectNew( \
                 'departures', arrayNew( \
