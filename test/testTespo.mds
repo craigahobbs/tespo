@@ -10,7 +10,7 @@ include '../tespo.mds'
 
 
 function testTespo_allCharged():
-    unittestDeepEquals( \
+    unittestDeepEqual( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 8.2, \
             'homePower', 1.4, \
@@ -45,7 +45,7 @@ unittestRunTest('testTespo_allCharged')
 
 
 function testTespo_homeCharged():
-    unittestDeepEquals( \
+    unittestDeepEqual( \
         tespo(tespoValidateInput(objectNew( \
             "solarPower", 9.9, \
             "homePower", 8.4, \
@@ -80,7 +80,7 @@ unittestRunTest('testTespo_homeCharged')
 
 
 function testTespo_homeCharged_lowSolar():
-    unittestDeepEquals( \
+    unittestDeepEqual( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 3.8, \
             'homePower', 9.4, \
@@ -115,7 +115,7 @@ unittestRunTest('testTespo_homeCharged_lowSolar')
 
 
 function testTespo_homeCharged_medSolar():
-    unittestDeepEquals( \
+    unittestDeepEqual( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 5.8, \
             'homePower', 9.6, \
@@ -150,7 +150,7 @@ unittestRunTest('testTespo_homeCharged_medSolar')
 
 
 function testTespo_homeCharged_zeroSolar():
-    unittestDeepEquals( \
+    unittestDeepEqual( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 0, \
             'homePower', 8.7, \
@@ -185,7 +185,7 @@ unittestRunTest('testTespo_homeCharged_zeroSolar')
 
 
 function testTespo_noneCharged():
-    unittestDeepEquals( \
+    unittestDeepEqual( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 9.9, \
             'homePower', 0.4, \
@@ -220,7 +220,7 @@ unittestRunTest('testTespo_noneCharged')
 
 
 function testTespo_multipleVehicles():
-    unittestDeepEquals( \
+    unittestDeepEqual( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 5, \
             'homePower', 2.9, \
@@ -270,7 +270,7 @@ unittestRunTest('testTespo_multipleVehicles')
 
 
 function testTespo_multipleVehicles_allCharged():
-    unittestDeepEquals( \
+    unittestDeepEqual( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 5, \
             'homePower', 1.1, \
@@ -320,7 +320,7 @@ unittestRunTest('testTespo_multipleVehicles_allCharged')
 
 
 function testTespo_multipleVehicles_oneCharged():
-    unittestDeepEquals( \
+    unittestDeepEqual( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 5, \
             'homePower', 2.3, \
@@ -370,7 +370,7 @@ unittestRunTest('testTespo_multipleVehicles_oneCharged')
 
 
 function testTespo_multipleVehicles_minChargeRate():
-    unittestDeepEquals( \
+    unittestDeepEqual( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 3, \
             'homePower', 2.9, \
@@ -420,7 +420,7 @@ unittestRunTest('testTespo_multipleVehicles_minChargeRate')
 
 
 function testTespo_multipleVehicles_minChargeRateSingle():
-    unittestDeepEquals( \
+    unittestDeepEqual( \
         tespo(tespoValidateInput(objectNew( \
             'solarPower', 2.8, \
             'homePower', 2.9, \
@@ -492,13 +492,13 @@ function testTespoValidateInput():
             ) \
         ) \
     )
-    unittestDeepEquals(tespoValidateInput(input), input)
+    unittestDeepEqual(tespoValidateInput(input), input)
 endfunction
 unittestRunTest('testTespoValidateInput')
 
 
 function testTespoValidateInput_fail():
-    unittestDeepEquals(tespoValidateInput(objectNew()), null)
+    unittestDeepEqual(tespoValidateInput(objectNew()), null)
 endfunction
 unittestRunTest('testTespoValidateInput_fail')
 
@@ -520,12 +520,12 @@ function testTespoValidateOutput():
             ) \
         ) \
     )
-    unittestDeepEquals(tespoValidateOutput(output), output)
+    unittestDeepEqual(tespoValidateOutput(output), output)
 endfunction
 unittestRunTest('testTespoValidateOutput')
 
 
 function testTespoValidateOutput_fail():
-    unittestDeepEquals(tespoValidateOutput(objectNew()), null)
+    unittestEqual(tespoValidateOutput(objectNew()), null)
 endfunction
 unittestRunTest('testTespoValidateOutput_fail')
