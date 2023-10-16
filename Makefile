@@ -41,6 +41,9 @@ gh-pages:
 
 
 build/npm.build:
+ifeq '$(NO_DOCKER)' ''
+	if [ "$$(docker images -q $(NODE_IMAGE))" = "" ]; then docker pull -q $(NODE_IMAGE); fi
+endif
 	echo '{"type":"module","devDependencies":{"bare-script":"*"}}' > package.json
 	$(NODE_DOCKER) npm install
 	mkdir -p $(dir $@)
