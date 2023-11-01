@@ -29,7 +29,7 @@ endif
 .PHONY: test
 test: build/npm.build
 	$(NODE_DOCKER) npx bare -s *.mds test/*.mds
-	$(NODE_DOCKER) npx bare -c 'include <markdownUp.bare>' test/runTests.mds
+	$(NODE_DOCKER) npx bare -c 'include <markdownUp.bare>' test/runTests.mds$(if $(TEST), -v vTest "'$(TEST)'")
 
 
 .PHONY: commit
