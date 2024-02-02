@@ -787,7 +787,7 @@ function testPowerwallLoadScenario_fetch(url, options, text):
             '2023-03-25T12:05:00-07:00,1.0,3.7,-2.7,0,57' + stringFromCharCode(10) + \
             '2023-03-25T12:10:00-07:00,1.0,3.9,-2.9,0,' + stringFromCharCode(10) + \
             '2023-03-25T12:15:00-07:00,1.0,5.6,-4.6,0,0'
-    elif arrayLength(url) != null:
+    elif systemType(url) == 'array':
         responses = arrayNew()
         for url_ in url:
             response = testPowerwallLoadScenario_fetch(url_, options, text)
