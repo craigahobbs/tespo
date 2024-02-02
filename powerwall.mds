@@ -350,7 +350,7 @@ endfunction
 
 # Is a URL relative?
 function powerwallIsRelativeURL(url):
-    return !regexTest(powerwallRegexNotRelativeURL, url)
+    return !regexMatch(powerwallRegexNotRelativeURL, url)
 endfunction
 
 powerwallRegexNotRelativeURL = regexNew('^(?:[a-z]+:|\\/|\\?|#)')
