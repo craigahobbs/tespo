@@ -722,70 +722,64 @@ unittestRunTest('testPowerwallSimulate_vehicleScenario_tespo')
 
 # Mock fetch for powerwallLoadScenario tests
 function testPowerwallLoadScenario_fetch(url, options, text):
-    unittestEqual(options, null)
     if url == 'scenario.json':
-        unittestEqual(text, null)
-        return objectNew( \
+        return jsonStringify(objectNew( \
             'name', 'Powerwall Scenario', \
             'batteryCapacity', 40, \
             'backupPercent', 20, \
             'chargeRatio', 0.95, \
             'dischargeRatio', 0.95, \
-            'dataURLs', arrayNew('data1.json', 'data2.json') \
-        )
+            'dataURLs', arrayNew('data1.csv', 'data2.csv') \
+        ))
     elif url == 'scenario2.json':
-        unittestEqual(text, null)
-        return objectNew( \
+        return jsonStringify(objectNew( \
             'name', 'Powerwall Scenario 2', \
             'batteryCapacity', 40, \
             'backupPercent', 20, \
             'chargeRatio', 0.95, \
             'dischargeRatio', 0.95, \
-            'dataURLs', arrayNew('data1.json', 'dataUnknown.json', 'data2.json') \
-        )
+            'dataURLs', arrayNew('data1.csv', 'dataUnknown.json', 'data2.csv') \
+        ))
     elif url == 'data/scenario3.json':
-        unittestEqual(text, null)
-        return objectNew( \
+        return jsonStringify(objectNew( \
             'name', 'Powerwall Scenario 3', \
             'batteryCapacity', 40, \
             'backupPercent', 20, \
             'chargeRatio', 0.95, \
             'dischargeRatio', 0.95, \
-            'dataURLs', arrayNew('data2.json') \
-        )
+            'dataURLs', arrayNew('data2.csv') \
+        ))
     elif url == 'data/scenario4.json':
-        unittestEqual(text, null)
-        return objectNew( \
+        return jsonStringify(objectNew( \
             'name', 'Powerwall Scenario 4', \
             'batteryCapacity', 40, \
             'backupPercent', 20, \
             'chargeRatio', 0.95, \
             'dischargeRatio', 0.95, \
-            'dataURLs', arrayNew('/data2.json') \
-        )
+            'dataURLs', arrayNew('/data2.csv') \
+        ))
     elif url == 'scenario5.json':
-        unittestEqual(text, null)
-        return objectNew( \
+        return jsonStringify(objectNew( \
             'name', 'Powerwall Scenario 5', \
             'batteryCapacity', 40, \
             'backupPercent', 20, \
             'chargeRatio', 0.95, \
             'dischargeRatio', 0.95, \
-            'dataURLs', arrayNew('data3.json') \
-        )
-    elif stringEndsWith(url, 'data1.json'):
+            'dataURLs', arrayNew('data3.csv') \
+        ))
+    elif stringEndsWith(url, 'data1.csv'):
         return 'Date time,Home (kW),Solar (kW),Powerwall (kW),Grid (kW),Energy Remaining (%)' + stringFromCharCode(10) + \
-            '2023-03-25T12:10:00-07:00,1.0,4.2,-3.2,0,' + stringFromCharCode(10) + \
+            '2023-03-25T12:10:00-07:00,1.0,4.2,-3.2,0' + stringFromCharCode(10) + \
             '2023-03-25T12:15:00-07:00,1.0,5.6,-4.6,0,58'
-    elif stringEndsWith(url, 'data2.json'):
+    elif stringEndsWith(url, 'data2.csv'):
         return 'Date time,Home (kW),Solar (kW),Powerwall (kW),Grid (kW),Energy Remaining (%)' + stringFromCharCode(10) + \
             '2023-03-25T12:00:00-07:00,1.0,4.1,-3.1,0,55' + stringFromCharCode(10) + \
-            '2023-03-25T12:05:00-07:00,1.0,3.7,-2.7,0,'
-    elif stringEndsWith(url, 'data3.json'):
+            '2023-03-25T12:05:00-07:00,1.0,3.7,-2.7,0'
+    elif stringEndsWith(url, 'data3.csv'):
         return 'Date time,Home (kW),Solar (kW),Powerwall (kW),Grid (kW),Energy Remaining (%)' + stringFromCharCode(10) + \
             '2023-03-25T12:00:00-07:00,1.0,4.1,-3.1,0,55' + stringFromCharCode(10) + \
             '2023-03-25T12:05:00-07:00,1.0,3.7,-2.7,0,57' + stringFromCharCode(10) + \
-            '2023-03-25T12:10:00-07:00,1.0,3.9,-2.9,0,' + stringFromCharCode(10) + \
+            '2023-03-25T12:10:00-07:00,1.0,3.9,-2.9,0' + stringFromCharCode(10) + \
             '2023-03-25T12:15:00-07:00,1.0,5.6,-4.6,0,0'
     elif systemType(url) == 'array':
         responses = arrayNew()
@@ -810,10 +804,10 @@ async function testPowerwallLoadScenario():
             'backupPercent', 20, \
             'chargeRatio', 0.95, \
             'dischargeRatio', 0.95, \
-            'dataURLs', arrayNew('data1.json', 'data2.json'), \
+            'dataURLs', arrayNew('data1.csv', 'data2.csv'), \
             'data', arrayNew( \
                 objectNew( \
-                    powerwallFieldDate, '2023-03-25T19:00:00.000Z', \
+                    powerwallFieldDate, datetimeISOFormat(datetimeISOParse('2023-03-25T19:00:00+00:00')), \
                     powerwallFieldHome, 1, \
                     powerwallFieldSolar, 4.1, \
                     powerwallFieldPowerwall, -3.1, \
@@ -821,7 +815,7 @@ async function testPowerwallLoadScenario():
                     powerwallFieldBatteryPercent, 55 \
                 ), \
                 objectNew( \
-                    powerwallFieldDate, '2023-03-25T19:05:00.000Z', \
+                    powerwallFieldDate, datetimeISOFormat(datetimeISOParse('2023-03-25T19:05:00+00:00')), \
                     powerwallFieldHome, 1, \
                     powerwallFieldSolar, 3.7, \
                     powerwallFieldPowerwall, -2.7, \
@@ -829,7 +823,7 @@ async function testPowerwallLoadScenario():
                     powerwallFieldBatteryPercent, 56 \
                 ), \
                 objectNew( \
-                    powerwallFieldDate, '2023-03-25T19:10:00.000Z', \
+                    powerwallFieldDate, datetimeISOFormat(datetimeISOParse('2023-03-25T19:10:00+00:00')), \
                     powerwallFieldHome, 1, \
                     powerwallFieldSolar, 4.2, \
                     powerwallFieldPowerwall, -3.2, \
@@ -837,7 +831,7 @@ async function testPowerwallLoadScenario():
                     powerwallFieldBatteryPercent, 57 \
                 ), \
                 objectNew( \
-                    powerwallFieldDate, '2023-03-25T19:15:00.000Z', \
+                    powerwallFieldDate, datetimeISOFormat(datetimeISOParse('2023-03-25T19:15:00+00:00')), \
                     powerwallFieldHome, 1, \
                     powerwallFieldSolar, 5.6, \
                     powerwallFieldPowerwall, -4.6, \
@@ -860,10 +854,10 @@ async function testPowerwallLoadScenario_relative():
             'backupPercent', 20, \
             'chargeRatio', 0.95, \
             'dischargeRatio', 0.95, \
-            'dataURLs', arrayNew('data/data2.json'), \
+            'dataURLs', arrayNew('data/data2.csv'), \
             'data', arrayNew( \
                 objectNew( \
-                    powerwallFieldDate, '2023-03-25T19:00:00.000Z', \
+                    powerwallFieldDate, datetimeISOFormat(datetimeISOParse('2023-03-25T19:00:00+00:00')), \
                     powerwallFieldHome, 1, \
                     powerwallFieldSolar, 4.1, \
                     powerwallFieldPowerwall, -3.1, \
@@ -871,7 +865,7 @@ async function testPowerwallLoadScenario_relative():
                     powerwallFieldBatteryPercent, 55 \
                 ), \
                 objectNew( \
-                    powerwallFieldDate, '2023-03-25T19:05:00.000Z', \
+                    powerwallFieldDate, datetimeISOFormat(datetimeISOParse('2023-03-25T19:05:00+00:00')), \
                     powerwallFieldHome, 1, \
                     powerwallFieldSolar, 3.7, \
                     powerwallFieldPowerwall, -2.7, \
@@ -894,10 +888,10 @@ async function testPowerwallLoadScenario_absolute():
             'backupPercent', 20, \
             'chargeRatio', 0.95, \
             'dischargeRatio', 0.95, \
-            'dataURLs', arrayNew('/data2.json'), \
+            'dataURLs', arrayNew('/data2.csv'), \
             'data', arrayNew( \
                 objectNew( \
-                    powerwallFieldDate, '2023-03-25T19:00:00.000Z', \
+                    powerwallFieldDate, datetimeISOFormat(datetimeISOParse('2023-03-25T19:00:00+00:00')), \
                     powerwallFieldHome, 1, \
                     powerwallFieldSolar, 4.1, \
                     powerwallFieldPowerwall, -3.1, \
@@ -905,7 +899,7 @@ async function testPowerwallLoadScenario_absolute():
                     powerwallFieldBatteryPercent, 55 \
                 ), \
                 objectNew( \
-                    powerwallFieldDate, '2023-03-25T19:05:00.000Z', \
+                    powerwallFieldDate, datetimeISOFormat(datetimeISOParse('2023-03-25T19:05:00+00:00')), \
                     powerwallFieldHome, 1, \
                     powerwallFieldSolar, 3.7, \
                     powerwallFieldPowerwall, -2.7, \
@@ -928,10 +922,10 @@ async function testPowerwallLoadScenario_trailing_holes():
             'backupPercent', 20, \
             'chargeRatio', 0.95, \
             'dischargeRatio', 0.95, \
-            'dataURLs', arrayNew('data3.json'), \
+            'dataURLs', arrayNew('data3.csv'), \
             'data', arrayNew( \
                 objectNew( \
-                    powerwallFieldDate, '2023-03-25T19:00:00.000Z', \
+                    powerwallFieldDate, datetimeISOFormat(datetimeISOParse('2023-03-25T19:00:00+00:00')), \
                     powerwallFieldHome, 1, \
                     powerwallFieldSolar, 4.1, \
                     powerwallFieldPowerwall, -3.1, \
@@ -939,7 +933,7 @@ async function testPowerwallLoadScenario_trailing_holes():
                     powerwallFieldBatteryPercent, 55 \
                 ), \
                 objectNew( \
-                    powerwallFieldDate, '2023-03-25T19:05:00.000Z', \
+                    powerwallFieldDate, datetimeISOFormat(datetimeISOParse('2023-03-25T19:05:00+00:00')), \
                     powerwallFieldHome, 1, \
                     powerwallFieldSolar, 3.7, \
                     powerwallFieldPowerwall, -2.7, \
@@ -947,7 +941,7 @@ async function testPowerwallLoadScenario_trailing_holes():
                     powerwallFieldBatteryPercent, 57 \
                 ), \
                 objectNew( \
-                    powerwallFieldDate, '2023-03-25T19:10:00.000Z', \
+                    powerwallFieldDate, datetimeISOFormat(datetimeISOParse('2023-03-25T19:10:00+00:00')), \
                     powerwallFieldHome, 1, \
                     powerwallFieldSolar, 3.9, \
                     powerwallFieldPowerwall, -2.9, \
@@ -955,7 +949,7 @@ async function testPowerwallLoadScenario_trailing_holes():
                     powerwallFieldBatteryPercent, 59 \
                 ), \
                 objectNew( \
-                    powerwallFieldDate, '2023-03-25T19:15:00.000Z', \
+                    powerwallFieldDate, datetimeISOFormat(datetimeISOParse('2023-03-25T19:15:00+00:00')), \
                     powerwallFieldHome, 1, \
                     powerwallFieldSolar, 5.6, \
                     powerwallFieldPowerwall, -4.6, \
