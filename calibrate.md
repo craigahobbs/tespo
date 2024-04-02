@@ -25,19 +25,20 @@ async function calibrateIndex():
 
     # Fetch the scenario files
     powerwallScenarioURLs = jsonParse(systemFetch('scenarios/powerwallScenarioURLs.json'))
-    powerwallScenarioJSONs = jsonParse(systemFetch(powerwallScenarioURLs))
+    powerwallScenarioJSONs = systemFetch(powerwallScenarioURLs)
 
     # Create the scenario table's data
     scenarioTable = arrayNew()
     for scenarioJSON, ixScenario in powerwallScenarioJSONs:
         scenarioURL = arrayGet(powerwallScenarioURLs, ixScenario)
-        scenarioName = objectGet(scenarioJSON, 'name')
+        scenario = jsonParse(scenarioJSON)
+        scenarioName = objectGet(scenario, 'name')
         arrayPush(scenarioTable, objectNew( \
             'Scenario', '[' + markdownEscape(scenarioName) + '](' + calibrateURL(objectNew('scenarioURL', scenarioURL)) + ')', \
-            'Battery Capacity (kWh)', objectGet(scenarioJSON, 'batteryCapacity'), \
-            'Backup (%)', objectGet(scenarioJSON, 'backupPercent'), \
-            'Charge Ratio', objectGet(scenarioJSON, 'chargeRatio'), \
-            'Discharge Ratio', objectGet(scenarioJSON, 'dischargeRatio') \
+            'Battery Capacity (kWh)', objectGet(scenario, 'batteryCapacity'), \
+            'Backup (%)', objectGet(scenario, 'backupPercent'), \
+            'Charge Ratio', objectGet(scenario, 'chargeRatio'), \
+            'Discharge Ratio', objectGet(scenario, 'dischargeRatio') \
         ))
     endfor
 
