@@ -10,7 +10,7 @@ _WGET := $$(shell $(call WGET_CMD, $(1)))
 endif
 endef
 WGET_CMD = if which wget; then wget -q -c $(1); else curl -f -Os $(1); fi
-$(eval $(call WGET, https://raw.githubusercontent.com/craigahobbs/python-build/main/Makefile.tool))
+$(eval $(call WGET, https://craigahobbs.github.io/python-build/Makefile.tool))
 
 
 # Include python-build
