@@ -26,7 +26,7 @@ clean:
 
 
 test: $(DEFAULT_VENV_BUILD)
-	$(DEFAULT_VENV_BIN)/bare -c 'include <markdownUp.bare>' test/runTests.mds $(BARE_ARGS) $(if $(TEST),-v vTest "'$(TEST)'")
+	$(DEFAULT_VENV_BIN)/bare -m test/runTests.mds $(BARE_ARGS) $(if $(TEST),-v vTest "'$(TEST)'")
 
 
 lint: $(DEFAULT_VENV_BUILD)
